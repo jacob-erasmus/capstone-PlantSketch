@@ -1,26 +1,36 @@
 public class SpeciesMap {
-    private Species[][] speciesData;
-    private int width;
-    private int height;
+    private Species species;
+    private ArrayList<Plant> map;
     
     public SpeciesMap() {
-        this.width = 0;
-        this.height = 0;
-        this.speciesData = null;
+        this.species = null;
+        this.map = new ArrayList<>();
     }
     
-    public SpeciesMap(int width, int height) {
-        this.width = width;
-        this.height = height;
-        this.speciesData = new Species[height][width];
+    public SpeciesMap(Species species) {
+        this.species = species;
+        this.map = new ArrayList<>();
     }
     
-    public Species getSpeciesAt(int x, int y) {
+    public void setPlantAt(Plant plant) {
+        // Method stub
+    }
+    
+    public boolean isPlantAt(float x, float y) {
+        // Method stub
+        return false;
+    }
+    
+    public void removePlantAt(float x, float y) {
+        // Method stub
+    }
+    
+    public Plant getPlantAt(float x, float y) {
         // Method stub
         return null;
     }
     
-    public void setSpeciesAt(int x, int y, Species species) {
+    public void clearMap() {
         // Method stub
     }
 }

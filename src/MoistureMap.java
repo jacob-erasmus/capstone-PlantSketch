@@ -1,22 +1,31 @@
 public class MoistureMap {
-    private double[][] data;
-    private int width;
-    private int height;
+    private float[][] baseMMap;
+    private float[][] adjustedMMap;
     
     public MoistureMap() {
-        this.width = 0;
-        this.height = 0;
-        this.data = null;
+        this.baseMMap = null;
+        this.adjustedMMap = null;
     }
     
     public MoistureMap(int width, int height) {
-        this.width = width;
-        this.height = height;
-        this.data = new double[height][width];
+        this.baseMMap = new float[height][width];
+        this.adjustedMMap = new float[height][width];
     }
     
-    public double getMoistureAt(int x, int y) {
+    public float getMoisture(int x, int y) {
         // Method stub
-        return 0.0;
+        return 0.0f;
+    }
+    
+    public void setBase(int x, int y, float newValue) {
+        // Method stub
+    }
+    
+    public void setAdjustment(int x, int y, float newValue) {
+        // Method stub
+    }
+    
+    public void resetAdjustment(int x, int y, float newValue) {
+        // Method stub
     }
 }

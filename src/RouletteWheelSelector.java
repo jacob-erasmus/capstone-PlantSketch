@@ -1,21 +1,16 @@
 public class RouletteWheelSelector {
-    private double[] selectionWeights;
+    private float random;
     
     public RouletteWheelSelector() {
-        this.selectionWeights = new double[0];
+        this.random = 0.0f;
     }
     
-    public RouletteWheelSelector(double[] weights) {
-        this.selectionWeights = weights.clone();
+    public RouletteWheelSelector(float density) {
+        this.random = density;
     }
     
-    public Object select(Object[] candidates, double[] weights) {
+    public Species selectSpecies(float density) {
         // Method stub
         return null;
-    }
-    
-    public double[] normalizeWeights(double[] weights) {
-        // Method stub
-        return new double[0];
     }
 }

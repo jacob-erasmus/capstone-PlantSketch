@@ -1,18 +1,18 @@
 public class Forest {
-    private List<Plant> plants;
-    private Terrain terrain;
-    private SpeciesMap speciesMap;
+    private ArrayList<Plant> plants;
+    private ArrayList<Species> species;
+    private ArrayList<SpeciesMap> speciesMap;
     
     public Forest() {
         this.plants = new ArrayList<>();
-        this.terrain = null;
-        this.speciesMap = null;
+        this.species = new ArrayList<>();
+        this.speciesMap = new ArrayList<>();
     }
     
-    public Forest(Terrain terrain, SpeciesMap speciesMap) {
+    public Forest(int width, int height) {
         this.plants = new ArrayList<>();
-        this.terrain = terrain;
-        this.speciesMap = speciesMap;
+        this.species = new ArrayList<>();
+        this.speciesMap = new ArrayList<>();
     }
     
     public void addPlant(Plant plant) {
@@ -23,12 +23,30 @@ public class Forest {
         // Method stub
     }
     
-    public List<Plant> getPlantsInArea(int x, int y, double radius) {
+    public ArrayList<Plant> getPlants() {
         // Method stub
         return new ArrayList<>();
     }
     
-    public void simulateStep() {
+    public ArrayList<Species> getSpecies() {
+        // Method stub
+        return new ArrayList<>();
+    }
+    
+    public void addSpecies(Species species) {
+        // Method stub
+    }
+    
+    public SpeciesMap getSpeciesMap(Species species) {
+        // Method stub
+        return null;
+    }
+    
+    public void applyBrushChange(Brush brush) {
+        // Method stub
+    }
+    
+    public void regenerateForest() {
         // Method stub
     }
 }

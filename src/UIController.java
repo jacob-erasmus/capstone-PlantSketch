@@ -1,36 +1,39 @@
 public class UIController {
-    private Renderer2D renderer;
-    private FileManager fileManager;
-    private String currentTool;
-    private Object uiState;
+    private PlantSim simulator;
+    private Brush brush;
+    private boolean isMousePressed;
+    private int lastMouseX;
+    private int lastMouseY;
     
     public UIController() {
-        this.renderer = null;
-        this.fileManager = null;
-        this.currentTool = "select";
-        this.uiState = null;
+        this.simulator = null;
+        this.brush = null;
+        this.isMousePressed = false;
+        this.lastMouseX = 0;
+        this.lastMouseY = 0;
     }
     
-    public UIController(Renderer2D renderer, FileManager fileManager) {
-        this.renderer = renderer;
-        this.fileManager = fileManager;
-        this.currentTool = "select";
-        this.uiState = null;
+    public UIController(PlantSim simulator) {
+        this.simulator = simulator;
+        this.brush = new Brush();
+        this.isMousePressed = false;
+        this.lastMouseX = 0;
+        this.lastMouseY = 0;
     }
     
-    public void handleMouseInput(int x, int y, String button) {
+    public void handleMouseClick(int x, int y) {
         // Method stub
     }
     
-    public void handleKeyboardInput(String key) {
+    public void handleMouseDrag(int x, int y) {
         // Method stub
     }
     
-    public void updateDisplay() {
+    public void handleKeyPress(int keyCode) {
         // Method stub
     }
     
-    public void switchTool(String tool) {
+    public void updateBrushSettings(float radius) {
         // Method stub
     }
 }
