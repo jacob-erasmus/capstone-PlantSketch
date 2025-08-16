@@ -2,14 +2,14 @@ public class Species {
 
     String name;
     float lifeSpan;
-    float minSunlight;
-    float maxSunlight;
-    float minMoisture;
-    float maxMoisture;
-    float minTemperature;
-    float maxTemperature;
-    float minSlope;
-    float maxSlope;
+    float sunlightC;
+    float sunlightR;
+    float moistureC;
+    float moistureR;
+    float temperatureC;
+    float temperatureR;
+    float slopeC;
+    float slopeR;
     String colour;
 
     float maxHeightOpen;
@@ -19,28 +19,28 @@ public class Species {
     float radiusMultiplierClosed;
     float leafTransparency;
     float moistureAbsorbtion;
+    String growthPeriod;
 
     // Constructor
-    public Species(String name, float lifeSpan, float minSunlight, float maxSunlight,
-                   float minMoisture, float maxMoisture,
-                   float minTemperature, float maxTemperature,
-                   float minSlope, float maxSlope,
+    public Species(String name, float lifeSpan, float sunlightC, float sunlightR,
+                   float moistureC, float moistureR,
+                   float temperatureC, float temperatureR,
+                   float slopeC, float slopeR,
                    String colour,
                    float maxHeightOpen, float maxHeightClosed, float q,
                    float radiusMultiplierOpen, float radiusMultiplierClosed,
-                   float leafTransparency, float moistureAbsorbtion) {
+                   float leafTransparency, float moistureAbsorbtion, String growthPeriod ) {
         this.name = name;
         this.lifeSpan = lifeSpan;
-        this.minSunlight = minSunlight;
-        this.maxSunlight = maxSunlight;
-        this.minMoisture = minMoisture;
-        this.maxMoisture = maxMoisture;
-        this.minTemperature = minTemperature;
-        this.maxTemperature = maxTemperature;
-        this.minSlope = minSlope;
-        this.maxSlope = maxSlope;
+        this.sunlightC = sunlightC;
+        this.sunlightR = sunlightR;
+        this.moistureC = moistureC;
+        this.moistureR = moistureR;
+        this.temperatureC = temperatureC;
+        this.temperatureR = temperatureR;
+        this.slopeC = slopeC;
+        this.slopeR = slopeR;
         this.colour = colour;
-
         this.maxHeightOpen = maxHeightOpen;
         this.maxHeightClosed = maxHeightClosed;
         this.q = q;
@@ -48,5 +48,6 @@ public class Species {
         this.radiusMultiplierClosed = radiusMultiplierClosed;
         this.leafTransparency = leafTransparency;
         this.moistureAbsorbtion = moistureAbsorbtion;
+        this.growthPeriod = growthPeriod;
     }
 }
