@@ -1,33 +1,32 @@
 public class AbioticFactors {
-    
-    private SunlightMap sunlightMap;
-    private MoistureMap moistureMap;
-    private TemperatureMap temperatureMap;
+    public MoistureMap moistureMap;
+    public TemperatureMap temperatureMap;
+    public SunlightMap sunlightMap;
     
     public AbioticFactors() {
-        this.sunlightMap = null;
         this.moistureMap = null;
         this.temperatureMap = null;
+        this.sunlightMap = null;
     }
     
-    public AbioticFactors(SunlightMap sunlightMap, MoistureMap moistureMap, TemperatureMap temperatureMap) {
-        this.sunlightMap = sunlightMap;
-        this.moistureMap = moistureMap;
-        this.temperatureMap = temperatureMap;
+    public AbioticFactors(int width, int height) {
+        this.moistureMap = new MoistureMap(width, height);
+        this.temperatureMap = new TemperatureMap(width, height);
+        this.sunlightMap = new SunlightMap(width, height);
     }
     
-    public double getSunlightAt(int x, int y) {
+    public float getAdjustedMoisture(int x, int y) {
         // Method stub
-        return 0.0;
+        return 0.0f;
     }
     
-    public double getMoistureAt(int x, int y) {
+    public float getAdjustedTemperature(int x, int y) {
         // Method stub
-        return 0.0;
+        return 0.0f;
     }
     
-    public double getTemperatureAt(int x, int y) {
+    public float getAdjustedSunlight(int x, int y) {
         // Method stub
-        return 0.0;
+        return 0.0f;
     }
 }

@@ -1,21 +1,19 @@
 public class ViabilityCalculator {
-    private double[] calculationParameters;
+    private Terrain terrain;
+    private AbioticFactors abioticFactors;
     
     public ViabilityCalculator() {
-        this.calculationParameters = new double[0];
+        this.terrain = null;
+        this.abioticFactors = null;
     }
     
-    public ViabilityCalculator(double[] parameters) {
-        this.calculationParameters = parameters.clone();
+    public ViabilityCalculator(Terrain terrain, AbioticFactors abioticFactors) {
+        this.terrain = terrain;
+        this.abioticFactors = abioticFactors;
     }
     
-    public double calculateViability(Species species, Terrain terrain, int x, int y) {
+    public float calculateViability(Species species, float x, float y) {
         // Method stub
-        return 0.0;
-    }
-    
-    public double getEnvironmentalSuitability(Species species, AbioticFactors abioticFactors, int x, int y) {
-        // Method stub
-        return 0.0;
+        return 0.0f;
     }
 }

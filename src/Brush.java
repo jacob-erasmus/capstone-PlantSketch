@@ -1,25 +1,29 @@
 public class Brush {
-    private String brushType;
-    private int size;
-    private double intensity;
+    private float radius;
+    private Species selectedSpecies;
+    private BrushType brushType;
     
     public Brush() {
-        this.brushType = "default";
-        this.size = 1;
-        this.intensity = 1.0;
+        this.radius = 5.0f;
+        this.selectedSpecies = null;
+        this.brushType = BrushType.ADD;
     }
     
-    public Brush(String brushType, int size, double intensity) {
-        this.brushType = brushType;
-        this.size = size;
-        this.intensity = intensity;
+    public Brush(float radius) {
+        this.radius = radius;
+        this.selectedSpecies = null;
+        this.brushType = BrushType.ADD;
     }
     
-    public void apply(int x, int y, Object canvas) {
+    public void applyBrush(int x, int y, Forest forest) {
         // Method stub
     }
     
-    public void setProperties(String brushType, int size, double intensity) {
+    public void setRadius(float radius) {
+        // Method stub
+    }
+    
+    public void setSelectedSpecies(Species species) {
         // Method stub
     }
 }

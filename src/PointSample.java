@@ -1,20 +1,24 @@
-import java.util.List;
-import java.util.ArrayList;
-
 public class PointSample {
-    private int x;
-    private int y;
-    private double value;
+    private float x;
+    private float y;
     
     public PointSample() {
-        this.x = 0;
-        this.y = 0;
-        this.value = 0.0;
+        this.x = 0.0f;
+        this.y = 0.0f;
     }
     
-    public PointSample(int x, int y, double value) {
+    public PointSample(float x, float y) {
         this.x = x;
         this.y = y;
-        this.value = value;
+    }
+    
+    public float getX() {
+        // Method stub
+        return this.x;
+    }
+    
+    public float getY() {
+        // Method stub
+        return this.y;
     }
 }

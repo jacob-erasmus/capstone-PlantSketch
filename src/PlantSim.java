@@ -1,30 +1,50 @@
-public class PlantSim{
-
-    public static void main(String[] args){
-        System.out.println("Hello and welcome");
-        Species boxwood = new Species(
-            "Boxwood",       // name
-            300,             // lifeSpan
-            3.75f,           // sunlightC
-            4.25f,           // sunlightR
-            27.5f,           // moistureC
-            12.5f,           // moistureR
-            11.75f,          // temperatureC
-            23.35f,          // temperatureR
-            0f,              // slopeC
-            80f,             // slopeR
-            "Red",           // colour
-            9f,              // maxHeightOpen
-            9f,              // maxHeightClosed
-            -5f,             // q
-            0.42f,           // radiusMultiplierOpen
-            0.42f,           // radiusMultiplierClosed
-            0.70f,           // leafTransparency
-            15f,             // moistureAbsorbtion
-            "L"              // growthPeriod
-        );
-
-        boxwood.toString();
-
+public class PlantSim {
+    private Terrain terrain;
+    private Forest forest;
+    private Renderer2D renderer;
+    private UIController uiController;
+    private FileManager fileManager;
+    private boolean isRunning;
+    
+    public PlantSim() {
+        this.terrain = null;
+        this.forest = null;
+        this.renderer = null;
+        this.uiController = null;
+        this.fileManager = null;
+        this.isRunning = false;
+    }
+    
+    public PlantSim(Terrain terrain, Forest forest, Renderer2D renderer, UIController uiController, FileManager fileManager) {
+        this.terrain = terrain;
+        this.forest = forest;
+        this.renderer = renderer;
+        this.uiController = uiController;
+        this.fileManager = fileManager;
+        this.isRunning = false;
+    }
+    
+    public void startSimulation() {
+        // Method stub
+    }
+    
+    public void pauseSimulation() {
+        // Method stub
+    }
+    
+    public void resetSimulation() {
+        // Method stub
+    }
+    
+    public void applyGlobalChanges() {
+        // Method stub
+    }
+    
+    public void save(String folderPath) {
+        // Method stub
+    }
+    
+    public void load(String folderPath) {
+        // Method stub
     }
 }

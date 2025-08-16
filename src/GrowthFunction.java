@@ -1,20 +1,24 @@
 public class GrowthFunction {
-    private double[] growthParameters;
+    private float maxSize;
+    private float growthRate;
     
     public GrowthFunction() {
-        this.growthParameters = new double[0];
+        this.maxSize = 1.0f;
+        this.growthRate = 0.1f;
     }
     
-    public GrowthFunction(double[] parameters) {
-        this.growthParameters = parameters.clone();
+    public GrowthFunction(float maxSize, float growthRate) {
+        this.maxSize = maxSize;
+        this.growthRate = growthRate;
     }
     
-    public double calculateGrowth(Plant plant, AbioticFactors environmentFactors) {
+    public float calculateSize(int age) {
         // Method stub
-        return 0.0;
+        return 0.0f;
     }
     
-    public void applyGrowth(Plant plant, double growthAmount) {
+    public int getMaxAge() {
         // Method stub
+        return 0;
     }
 }

@@ -1,25 +1,32 @@
 public class Renderer2D {
-    private Object canvas;
-    private Brush brush;
-    private Object viewport;
+    private Graphics2D graphics;
+    private int width;
+    private int height;
+    private float scale;
     
     public Renderer2D() {
-        this.canvas = null;
-        this.brush = null;
-        this.viewport = null;
+        this.graphics = null;
+        this.width = 0;
+        this.height = 0;
+        this.scale = 1.0f;
     }
     
-    public Renderer2D(Object canvas) {
-        this.canvas = canvas;
-        this.brush = new Brush();
-        this.viewport = null;
+    public Renderer2D(int width, int height) {
+        this.width = width;
+        this.height = height;
+        this.graphics = null;
+        this.scale = 1.0f;
+    }
+    
+    public void setGraphics(Graphics2D graphics) {
+        // Method stub
     }
     
     public void renderTerrain(Terrain terrain) {
         // Method stub
     }
     
-    public void renderPlants(List<Plant> plants) {
+    public void renderForest(Forest forest) {
         // Method stub
     }
     
@@ -27,7 +34,15 @@ public class Renderer2D {
         // Method stub
     }
     
-    public void clearCanvas() {
+    public void renderPlant(Plant plant) {
+        // Method stub
+    }
+    
+    public void setScale(float scale) {
+        // Method stub
+    }
+    
+    public void clear() {
         // Method stub
     }
 }

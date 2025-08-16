@@ -1,25 +1,40 @@
 public class PinkNoiseSampler {
-    
     private long seed;
-    private double[][] noiseArray;
+    private float[][][] noiseArray;
+    private int width;
+    private int height;
+    private float exclusionRadius;
+    private int numPoints;
     
     public PinkNoiseSampler() {
         this.seed = System.currentTimeMillis();
         this.noiseArray = null;
+        this.width = 0;
+        this.height = 0;
+        this.exclusionRadius = 1.0f;
+        this.numPoints = 100;
     }
     
-    public PinkNoiseSampler(long seed) {
+    public PinkNoiseSampler(long seed, int width, int height, int numPoints) {
         this.seed = seed;
-        this.noiseArray = null;
+        this.width = width;
+        this.height = height;
+        this.numPoints = numPoints;
+        this.exclusionRadius = 1.0f;
+        this.noiseArray = new float[1][height][width];
     }
     
-    public double[][] generateNoise(int width, int height) {
+    public ArrayList<PointSample> generatePoints(float density) {
         // Method stub
-        return new double[height][width];
+        return new ArrayList<>();
     }
     
-    public double sampleAt(int x, int y) {
+    public float getSampleValue(int x, int y) {
         // Method stub
-        return 0.0;
+        return 0.0f;
+    }
+    
+    public void regenerate() {
+        // Method stub
     }
 }

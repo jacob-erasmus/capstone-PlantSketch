@@ -1,22 +1,31 @@
 public class SunlightMap {
-    private double[][] data;
-    private int width;
-    private int height;
+    private float[][] baseSMap;
+    private float[][] adjustedSMap;
     
     public SunlightMap() {
-        this.width = 0;
-        this.height = 0;
-        this.data = null;
+        this.baseSMap = null;
+        this.adjustedSMap = null;
     }
     
     public SunlightMap(int width, int height) {
-        this.width = width;
-        this.height = height;
-        this.data = new double[height][width];
+        this.baseSMap = new float[height][width];
+        this.adjustedSMap = new float[height][width];
     }
     
-    public double getSunlightAt(int x, int y) {
+    public float getSunlight(int x, int y) {
         // Method stub
-        return 0.0;
+        return 0.0f;
+    }
+    
+    public void setBase(int x, int y, float newValue) {
+        // Method stub
+    }
+    
+    public void setAdjustment(int x, int y, float newValue) {
+        // Method stub
+    }
+    
+    public void resetAdjustment(int x, int y, float newValue) {
+        // Method stub
     }
 }
