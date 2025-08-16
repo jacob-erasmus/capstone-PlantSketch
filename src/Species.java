@@ -127,4 +127,29 @@ public class Species {
     public String getGrowthPeriod() {
         return growthPeriod;
     }
+
+        @Override
+    public String toString() {
+        return "Species {" +
+                "\n  name='" + name + '\'' +
+                ",\n  lifeSpan=" + lifeSpan +
+                ",\n  sunlightC=" + sunlightC +
+                ",\n  sunlightR=" + sunlightR +
+                ",\n  moistureC=" + moistureC +
+                ",\n  moistureR=" + moistureR +
+                ",\n  temperatureC=" + temperatureC +
+                ",\n  temperatureR=" + temperatureR +
+                ",\n  slopeC=" + slopeC +
+                ",\n  slopeR=" + slopeR +
+                ",\n  colour='" + colour + '\'' +
+                ",\n  maxHeightOpen=" + maxHeightOpen +
+                ",\n  maxHeightClosed=" + maxHeightClosed +
+                ",\n  q=" + q +
+                ",\n  radiusMultiplierOpen=" + radiusMultiplierOpen +
+                ",\n  radiusMultiplierClosed=" + radiusMultiplierClosed +
+                ",\n  leafTransparency=" + leafTransparency +
+                ",\n  moistureAbsorbtion=" + moistureAbsorbtion +
+                ",\n  growthPeriod='" + growthPeriod + '\'' +
+                "\n}";
+    }
 }
