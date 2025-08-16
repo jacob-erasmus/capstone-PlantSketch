@@ -10,15 +10,16 @@ public class Species {
     float maxTemperature;
     float minSlope;
     float maxSlope;
-    Colour colour;  // Assuming Colour is a class you've defined or imported
+    String colour
 
     // Constructor
     public Species(String name, float lifeSpan, float minSunlight, float maxSunlight,
                  float minMoisture, float maxMoisture,
                  float minTemperature, float maxTemperature,
                  float minSlope, float maxSlope,
-                 Colour colour) {
+                 String colour) {
         this.name = name;
+        this.lifeSpan = lifeSpan;
         this.minSunlight = minSunlight;
         this.maxSunlight = maxSunlight;
         this.minMoisture = minMoisture;
