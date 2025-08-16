@@ -15,6 +15,25 @@ public class AbioticFactors {
         this.sunlightMap = new SunlightMap(width, height);
     }
     
+
+    // i had to add in these three getters becaue we did not have them
+    public MoistureMap getMoistureMap()
+    {
+        return moistureMap;
+    }
+
+    public TemperatureMap getTemperatureMap()
+    {
+        return temperatureMap;
+    }
+
+    public SunlightMap getSunlightMap()
+    {
+        return sunlightMap;
+    }
+
+
+    
     public float getAdjustedMoisture(int x, int y) {
         // Method stub
         return 0.0f;
