@@ -10,14 +10,25 @@ public class Species {
     float maxTemperature;
     float minSlope;
     float maxSlope;
-    String colour
+    String colour;
+
+    float maxHeightOpen;
+    float maxHeightClosed;
+    float q;
+    float radiusMultiplierOpen;
+    float radiusMultiplierClosed;
+    float leafTransparency;
+    float moistureAbsorbtion;
 
     // Constructor
     public Species(String name, float lifeSpan, float minSunlight, float maxSunlight,
-                 float minMoisture, float maxMoisture,
-                 float minTemperature, float maxTemperature,
-                 float minSlope, float maxSlope,
-                 String colour) {
+                   float minMoisture, float maxMoisture,
+                   float minTemperature, float maxTemperature,
+                   float minSlope, float maxSlope,
+                   String colour,
+                   float maxHeightOpen, float maxHeightClosed, float q,
+                   float radiusMultiplierOpen, float radiusMultiplierClosed,
+                   float leafTransparency, float moistureAbsorbtion) {
         this.name = name;
         this.lifeSpan = lifeSpan;
         this.minSunlight = minSunlight;
@@ -29,5 +40,13 @@ public class Species {
         this.minSlope = minSlope;
         this.maxSlope = maxSlope;
         this.colour = colour;
+
+        this.maxHeightOpen = maxHeightOpen;
+        this.maxHeightClosed = maxHeightClosed;
+        this.q = q;
+        this.radiusMultiplierOpen = radiusMultiplierOpen;
+        this.radiusMultiplierClosed = radiusMultiplierClosed;
+        this.leafTransparency = leafTransparency;
+        this.moistureAbsorbtion = moistureAbsorbtion;
     }
 }
