@@ -1,0 +1,3 @@
+# Always use LF in repo. This ensures that the repository always saves line endings in files in a certain way
+# This is important as I am working on Windows and youo guys are on mac. Dont worry about this. jsut explaing for interest's sake
+* text=auto eol=lf
