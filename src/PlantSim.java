@@ -47,4 +47,14 @@ public class PlantSim {
     public void load(String folderPath) {
         // Method stub
     }
+
+
+    public static void main(String[] args)
+    {
+        // option 1: upload all files
+        // 2: upload .pdb file
+        // read in files
+        FileManager fileManager = new FileManager();
+        fileManager.fileFinder();
+    }
 }
