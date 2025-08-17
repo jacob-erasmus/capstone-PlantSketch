@@ -1,3 +1,6 @@
+
+import java.util.ArrayList;
+
 public class SpeciesMap {
     private Species species;
     private ArrayList<Plant> map;

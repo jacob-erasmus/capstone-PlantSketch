@@ -1,3 +1,6 @@
+
+import java.util.ArrayList;
+
 public class PinkNoiseSampler {
     private long seed;
     private float[][][] noiseArray;

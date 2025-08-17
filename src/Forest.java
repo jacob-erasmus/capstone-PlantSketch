@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 public class Forest {
     private ArrayList<Plant> plants;
     private ArrayList<Species> species;
