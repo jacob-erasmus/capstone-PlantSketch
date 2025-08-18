@@ -5,13 +5,19 @@ public class Terrain {
     int cellSize;
     float[][] elevationMap;
     float[][] slopeMap;
-    //AbioticFactors abioticFactors;
+    AbioticFactors abioticFactors;
+    TemperatureMap temperatureMap;
+    MoistureMap moistureMap;
+    SunlightMap sunlightMap;
 
     //Constructor
-    public Terrain(int width, int height, int cellSize){
+    public Terrain(int width, int height, int cellSize, AbioticFactors abioticFactors){
         this.width = width;
         this.height = height;
         this.cellSize = cellSize; 
+        this.elevationMap = new float[width][height];
+        this.slopeMap = new float[width][height];
+        this.abioticFactors = abioticFactors;
     }
 
     //Get Elevation Method
@@ -32,5 +38,12 @@ public class Terrain {
         //Calculate slope
         float slope = (float)Math.toDegrees(Math.acos(n.dot(vertical)));
         return slope;
+    }
+
+    //Set Abiotic Factors
+    public void setAbioticFactors(){
+        temperatureMap = abioticFactors.getTemperatureMap();
+        sunlightMap = abioticFactors.getSunlightMap();
+        moistureMap = abioticFactors.getMoistureMap();
     }
 }
