@@ -8,10 +8,12 @@ public class Plant {
     private Species species;
     private float size;        // e.g. canopy radius or height
     private boolean isAlive;
-    private float vigour;      // growth health index
+    private float vigour;
+    private boolean allometryIsOpen; // open vs closed growth mode
 
     // Constructor
-    public Plant(int id, float x, float y, int age, Species species, float size, boolean isAlive, float vigour) {
+    public Plant(int id, float x, float y, int age, Species species,
+                 float size, boolean isAlive, float vigour, boolean allometryIsOpen) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -20,57 +22,62 @@ public class Plant {
         this.size = size;
         this.isAlive = isAlive;
         this.vigour = vigour;
+        this.allometryIsOpen = allometryIsOpen;
     }
 
-    // Getters
-    public int getId() {
-        return id;
-    }
+    // ============================
+    // Plant getters/setters
+    // ============================
 
-    public float getX() {
-        return x;
-    }
+    public int getId() { return id; }
+    public float getX() { return x; }
+    public float getY() { return y; }
+    public int getAge() { return age; }
+    public Species getSpecies() { return species; }
+    public float getSize() { return size; }
+    public boolean isAlive() { return isAlive; }
+    public float getVigour() { return vigour; }
+    public boolean isAllometryOpen() { return allometryIsOpen; }
 
-    public float getY() {
-        return y;
-    }
+    public void setAge(int age) { this.age = age; }
+    public void setSize(float size) { this.size = size; }
+    public void setAlive(boolean alive) { isAlive = alive; }
+    public void setVigour(float vigour) { this.vigour = vigour; }
+    public void setAllometryIsOpen(boolean open) { this.allometryIsOpen = open; }
 
-    public int getAge() {
-        return age;
-    }
+    // ============================
+    // Delegated Species accessors
+    // ============================
 
-    public Species getSpecies() {
-        return species;
-    }
+    public String getSpeciesName() { return species.getName(); }
+    public float getLifeSpan() { return species.getLifeSpan(); }
 
-    public float getSize() {
-        return size;
-    }
+    public float getSunlightC() { return species.getSunlightC(); }
+    public float getSunlightR() { return species.getSunlightR(); }
 
-    public boolean isAlive() {
-        return isAlive;
-    }
+    public float getMoistureC() { return species.getMoistureC(); }
+    public float getMoistureR() { return species.getMoistureR(); }
 
-    public float getVigour() {
-        return vigour;
-    }
+    public float getTemperatureC() { return species.getTemperatureC(); }
+    public float getTemperatureR() { return species.getTemperatureR(); }
 
-    // Setters
-    public void setAge(int age) {
-        this.age = age;
-    }
+    public float getSlopeC() { return species.getSlopeC(); }
+    public float getSlopeR() { return species.getSlopeR(); }
 
-    public void setSize(float size) {
-        this.size = size;
-    }
+    public String getColour() { return species.getColour(); }
 
-    public void setAlive(boolean alive) {
-        isAlive = alive;
-    }
+    public float getMaxHeightOpen() { return species.getMaxHeightOpen(); }
+    public float getMaxHeightClosed() { return species.getMaxHeightClosed(); }
 
-    public void setVigour(float vigour) {
-        this.vigour = vigour;
-    }
+    public float getQ() { return species.getQ(); }
+
+    public float getRadiusMultiplierOpen() { return species.getRadiusMultiplierOpen(); }
+    public float getRadiusMultiplierClosed() { return species.getRadiusMultiplierClosed(); }
+
+    public float getLeafTransparency() { return species.getLeafTransparency(); }
+    public float getMoistureAbsorbtion() { return species.getMoistureAbsorbtion(); }
+
+    public String getGrowthPeriod() { return species.getGrowthPeriod(); }
 
     @Override
     public String toString() {
@@ -79,10 +86,11 @@ public class Plant {
                 ",\n  x=" + x +
                 ",\n  y=" + y +
                 ",\n  age=" + age +
-                ",\n  species=" + species.getName() +   // use Species association
+                ",\n  species=" + getSpeciesName() +
                 ",\n  size=" + size +
                 ",\n  isAlive=" + isAlive +
                 ",\n  vigour=" + vigour +
+                ",\n  allometryIsOpen=" + allometryIsOpen +
                 "\n}";
     }
 }

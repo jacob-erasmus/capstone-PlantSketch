@@ -1,49 +1,35 @@
 public class Species {
 
-    String name;
-    float lifeSpan;
-    float sunlightC;
-    float sunlightR;
-    float moistureC;
-    float moistureR;
-    float temperatureC;
-    float temperatureR;
-    float slopeC;
-    float slopeR;
-    String colour;
+    // Basic info
+    private String name;
 
-    float maxHeightOpen;
-    float maxHeightClosed;
-    float q;
-    float radiusMultiplierOpen;
-    float radiusMultiplierClosed;
-    float leafTransparency;
-    float moistureAbsorbtion;
-    String growthPeriod;
+    // Encapsulated parameter objects
+    private ViabilityParameters viabilityParameters;
+    private GrowthParameters growthParameters;
+
+    // Other traits
+    private float radiusMultiplierOpen;
+    private float radiusMultiplierClosed;
+    private float leafTransparency;
+    private float moistureAbsorbtion;
+    private String growthPeriod;
+    private String colour;
 
     // Constructor
-    public Species(String name, float lifeSpan, float sunlightC, float sunlightR,
-                   float moistureC, float moistureR,
-                   float temperatureC, float temperatureR,
-                   float slopeC, float slopeR,
+    public Species(String name,
+                   ViabilityParameters viabilityParameters,
+                   GrowthParameters growthParameters,
                    String colour,
-                   float maxHeightOpen, float maxHeightClosed, float q,
-                   float radiusMultiplierOpen, float radiusMultiplierClosed,
-                   float leafTransparency, float moistureAbsorbtion, String growthPeriod) {
+                   float radiusMultiplierOpen,
+                   float radiusMultiplierClosed,
+                   float leafTransparency,
+                   float moistureAbsorbtion,
+                   String growthPeriod) {
+
         this.name = name;
-        this.lifeSpan = lifeSpan;
-        this.sunlightC = sunlightC;
-        this.sunlightR = sunlightR;
-        this.moistureC = moistureC;
-        this.moistureR = moistureR;
-        this.temperatureC = temperatureC;
-        this.temperatureR = temperatureR;
-        this.slopeC = slopeC;
-        this.slopeR = slopeR;
+        this.viabilityParameters = viabilityParameters;
+        this.growthParameters = growthParameters;
         this.colour = colour;
-        this.maxHeightOpen = maxHeightOpen;
-        this.maxHeightClosed = maxHeightClosed;
-        this.q = q;
         this.radiusMultiplierOpen = radiusMultiplierOpen;
         this.radiusMultiplierClosed = radiusMultiplierClosed;
         this.leafTransparency = leafTransparency;
@@ -51,61 +37,13 @@ public class Species {
         this.growthPeriod = growthPeriod;
     }
 
-    // Getters
+    // ===== Core getters =====
     public String getName() {
         return name;
     }
 
-    public float getLifeSpan() {
-        return lifeSpan;
-    }
-
-    public float getSunlightC() {
-        return sunlightC;
-    }
-
-    public float getSunlightR() {
-        return sunlightR;
-    }
-
-    public float getMoistureC() {
-        return moistureC;
-    }
-
-    public float getMoistureR() {
-        return moistureR;
-    }
-
-    public float getTemperatureC() {
-        return temperatureC;
-    }
-
-    public float getTemperatureR() {
-        return temperatureR;
-    }
-
-    public float getSlopeC() {
-        return slopeC;
-    }
-
-    public float getSlopeR() {
-        return slopeR;
-    }
-
     public String getColour() {
         return colour;
-    }
-
-    public float getMaxHeightOpen() {
-        return maxHeightOpen;
-    }
-
-    public float getMaxHeightClosed() {
-        return maxHeightClosed;
-    }
-
-    public float getQ() {
-        return q;
     }
 
     public float getRadiusMultiplierOpen() {
@@ -128,23 +66,63 @@ public class Species {
         return growthPeriod;
     }
 
+    //Viability getters
+    public float getSunlightC() {
+        return viabilityParameters.getSunlightC();
+    }
+
+    public float getSunlightR() {
+        return viabilityParameters.getSunlightR();
+    }
+
+    public float getMoistureC() {
+        return viabilityParameters.getMoistureC();
+    }
+
+    public float getMoistureR() {
+        return viabilityParameters.getMoistureR();
+    }
+
+    public float getTemperatureC() {
+        return viabilityParameters.getTemperatureC();
+    }
+
+    public float getTemperatureR() {
+        return viabilityParameters.getTemperatureR();
+    }
+
+    public float getSlopeC() {
+        return viabilityParameters.getSlopeC();
+    }
+
+    public float getSlopeR() {
+        return viabilityParameters.getSlopeR();
+    }
+
+    //Growth getters
+    public float getMaxHeightOpen() {
+        return growthParameters.getMaxHeightOpen();
+    }
+
+    public float getMaxHeightClosed() {
+        return growthParameters.getMaxHeightClosed();
+    }
+
+    public float getQ() {
+        return growthParameters.getQ();
+    }
+
+    public float getLifeSpan() {
+        return growthParameters.getLifeSpan();
+    }
+
     @Override
     public String toString() {
         return "Species {" +
                 "\n  name='" + name + '\'' +
-                ",\n  lifeSpan=" + lifeSpan +
-                ",\n  sunlightC=" + sunlightC +
-                ",\n  sunlightR=" + sunlightR +
-                ",\n  moistureC=" + moistureC +
-                ",\n  moistureR=" + moistureR +
-                ",\n  temperatureC=" + temperatureC +
-                ",\n  temperatureR=" + temperatureR +
-                ",\n  slopeC=" + slopeC +
-                ",\n  slopeR=" + slopeR +
+                ",\n  viability=" + viabilityParameters +
+                ",\n  growth=" + growthParameters +
                 ",\n  colour='" + colour + '\'' +
-                ",\n  maxHeightOpen=" + maxHeightOpen +
-                ",\n  maxHeightClosed=" + maxHeightClosed +
-                ",\n  q=" + q +
                 ",\n  radiusMultiplierOpen=" + radiusMultiplierOpen +
                 ",\n  radiusMultiplierClosed=" + radiusMultiplierClosed +
                 ",\n  leafTransparency=" + leafTransparency +
