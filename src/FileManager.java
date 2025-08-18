@@ -14,6 +14,7 @@ public class FileManager {
 
     private String currentFilePath;
     private Scanner scan;
+    private String pwd;
     
     public FileManager() {
         this.currentFilePath = "";
@@ -25,7 +26,7 @@ public class FileManager {
     public void fileFinder()
     {
         System.out.println("Please enter the path for the directory containing your files");
-        String pwd = scan.nextLine();
+        pwd = scan.nextLine();
         File directory = new File(pwd);
 
         if (directory.isDirectory()) {
@@ -39,28 +40,21 @@ public class FileManager {
                         if (name.endsWith(".txt")) 
                         {
                             System.out.println("Loading Abiotics file: " + name);
-                            loadTxt(pwd + "/" + name);
-                            System.out.println(name + " Loaded :)");
-                        } 
-
-                        else if (name.endsWith(".clim")) 
-                        {
-                            System.out.println("Loading Climate file: " + name);
-                            loadClim(pwd + "/" + name);
+                            loadTxt(file);
                             System.out.println(name + " Loaded :)");
                         } 
 
                         else if (name.endsWith(".elv")) 
                         {
                             System.out.println("Loading Elevation file: " + name);
-                            loadElv(pwd + "/" + name);
+                            loadElv(file);
                             System.out.println(name + " Loaded :)");
                         } 
 
                         else if (name.endsWith(".xlsx")) 
                         {
                             System.out.println("Loading Plant Parameters file: " + name);
-                            loadXlsx(pwd + "/" + name);
+                            loadXlsx(file);
                             System.out.println(name + " Loaded :)");
                         } 
 
@@ -78,23 +72,32 @@ public class FileManager {
     }
 
     
-    public void loadTxt(String filePath) {
+    public void loadTxt(File file) 
+    {
+        String name = file.getName();
+        String[] parts = name.split("[-_]");
+        // parts = ["D4", "1024", "temp.txt"]
+
+        int gridSize = Integer.parseInt(parts[1]); // "1024" → int
+
+        if (name.contains("sun"))
+        {
+            System.out.println("Sunlight file");
+            
+
+        }    
+    }
+
+    
+    public void loadElv(File file) {
         // Method stub
     }
     
-    public void loadClim(String filePath) {
+    public void loadXlsx(File file) {
         // Method stub
     }
     
-    public void loadElv(String filePath) {
-        // Method stub
-    }
-    
-    public void loadXlsx(String filePath) {
-        // Method stub
-    }
-    
-    public void loadPdb(String filePath) {
+    public void loadPdb(File file) {
         // Method stub
     }
     

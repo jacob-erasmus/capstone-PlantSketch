@@ -24,6 +24,17 @@ public class PlantSim {
         this.isRunning = false;
     }
     
+
+    public static void main(String[] args)
+    {
+        // option 1: upload all files
+        // 2: upload .pdb file
+        // read in files
+        FileManager fileManager = new FileManager();
+        fileManager.fileFinder();
+    }
+
+
     public void startSimulation() {
         // Method stub
     }
@@ -49,12 +60,4 @@ public class PlantSim {
     }
 
 
-    public static void main(String[] args)
-    {
-        // option 1: upload all files
-        // 2: upload .pdb file
-        // read in files
-        FileManager fileManager = new FileManager();
-        fileManager.fileFinder();
-    }
 }
