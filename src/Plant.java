@@ -7,7 +7,7 @@ public class Plant {
     private int id;
     private float x;
     private float y;
-    private int age;
+    private int currentAge;
     private Species species;
     private float size;             // e.g. canopy radius or height
     private boolean isAlive;
@@ -18,12 +18,12 @@ public class Plant {
     // Constructor
     // ============================
 
-    public Plant(int id, float x, float y, int age, Species species,
+    public Plant(int id, float x, float y, int currentAge, Species species,
                  float size, boolean isAlive, float vigour, boolean allometryIsOpen) {
         this.id = id;
         this.x = x;
         this.y = y;
-        this.age = age;
+        this.currentAge = currentAge;
         this.species = species; // link to shared species data
         this.size = size;
         this.isAlive = isAlive;
@@ -48,7 +48,7 @@ public class Plant {
     }
 
     public int getAge() {
-        return age;
+        return currentAge;
     }
 
     public Species getSpecies() {
@@ -75,8 +75,8 @@ public class Plant {
     // Plant setters
     // ============================
 
-    public void setAge(int age) {
-        this.age = age;
+    public void setAge(int currentAge) {
+        this.currentAge = currentAge;
     }
 
     public void setSize(float size) {
@@ -185,7 +185,7 @@ public class Plant {
                 "\n  id=" + id +
                 ",\n  x=" + x +
                 ",\n  y=" + y +
-                ",\n  age=" + age +
+                ",\n  currentAge=" + currentAge +
                 ",\n  species=" + getSpeciesName() +
                 ",\n  size=" + size +
                 ",\n  isAlive=" + isAlive +
