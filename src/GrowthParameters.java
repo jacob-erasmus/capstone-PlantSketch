@@ -1,11 +1,11 @@
 // Handles growth function parameters
-public class GrowthProfile {
+public class GrowthParameters {
     private float maxHeightOpen;
     private float maxHeightClosed;
     private float q;
     private float lifeSpan;
 
-    public GrowthProfile(float maxHeightOpen, float maxHeightClosed,
+    public GrowthParameters(float maxHeightOpen, float maxHeightClosed,
                          float q, float lifeSpan) {
         this.maxHeightOpen = maxHeightOpen;
         this.maxHeightClosed = maxHeightClosed;
@@ -21,7 +21,7 @@ public class GrowthProfile {
 
     @Override
     public String toString() {
-        return "GrowthProfile{" +
+        return "GrowthParameters{" +
                 "maxHeightOpen=" + maxHeightOpen +
                 ", maxHeightClosed=" + maxHeightClosed +
                 ", q=" + q +
