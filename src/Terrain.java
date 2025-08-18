@@ -11,11 +11,11 @@ public class Terrain {
     SunlightMap sunlightMap;
 
     //Constructor
-    public Terrain(int width, int height, int cellSize, AbioticFactors abioticFactors){
+    public Terrain(int width, int height, int cellSize, AbioticFactors abioticFactors, float[][] grid){
         this.width = width;
         this.height = height;
         this.cellSize = cellSize; 
-        this.elevationMap = new float[width][height];
+        this.elevationMap = grid;
         this.slopeMap = new float[width][height];
         this.abioticFactors = abioticFactors;
     }

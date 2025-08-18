@@ -9,7 +9,7 @@ public class ViabilityParameters {
     private float slopeC;
     private float slopeR;
 
-    public ViabilityProfile(float sunlightC, float sunlightR,
+    public ViabilityParameters(float sunlightC, float sunlightR,
                             float moistureC, float moistureR,
                             float temperatureC, float temperatureR,
                             float slopeC, float slopeR) {
@@ -30,4 +30,20 @@ public class ViabilityParameters {
     public float getMoistureR() { return moistureR; }
     public float getTemperatureC() { return temperatureC; }
     public float getTemperatureR() { return temperatureR; }
-    public float getSlo
+    public float getSlopeC() { return slopeC; }
+    public float getSlopeR() { return slopeR; }
+
+    @Override
+    public String toString() {
+        return "ViabilityParameters{" +
+                "sunlightC=" + sunlightC +
+                ", sunlightR=" + sunlightR +
+                ", moistureC=" + moistureC +
+                ", moistureR=" + moistureR +
+                ", temperatureC=" + temperatureC +
+                ", temperatureR=" + temperatureR +
+                ", slopeC=" + slopeC +
+                ", slopeR=" + slopeR +
+                '}';
+    }
+}
