@@ -1,20 +1,29 @@
 public class SunlightMap {
-    private float[][] baseSMap;
-    private float[][] adjustedSMap;
+
+    private int dimX;
+    private int dimY;
+    private int gridSpacing;
+    private float[][] grid;
     
-    public SunlightMap() {
-        this.baseSMap = null;
-        this.adjustedSMap = null;
+    public SunlightMap() 
+    {
+        this.dimX = 0;
+        this.dimY = 0;
+        this.gridSpacing = 0;
+        this.grid = null;
     }
     
-    public SunlightMap(int width, int height) {
-        this.baseSMap = new float[height][width];
-        this.adjustedSMap = new float[height][width];
+    public SunlightMap(int width, int height, int gridSpacing, float[][] grid) 
+    {
+        this.dimX = width;
+        this.dimY = height;
+        this.gridSpacing = gridSpacing;
+        this.grid = grid;
     }
     
     public float getSunlight(int x, int y) {
-        // Method stub
-        return 0.0f;
+        
+        return grid[x][y];
     }
     
     public void setBase(int x, int y, float newValue) {

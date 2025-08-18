@@ -21,10 +21,14 @@ public class FileManager {
     private int gridSize;
     private int dimX;
     private int dimY;
+
+    private float[][] temperatureMap; // We are going to store the maps here and have getters to get them after running the program
+    private float[][] moistureMap;
+    private float[][] sunlightMap;
+    private float[][] elevationMap;
     
     public FileManager() {
         this.currentFilePath = "";
-        this.scan = new Scanner(System.in);
     }
 
 
@@ -32,6 +36,7 @@ public class FileManager {
     public void fileFinder()
     {
         System.out.println("Please enter the path for the directory containing your files");
+        scan = new Scanner(System.in);
         pwd = scan.nextLine();
         File directory = new File(pwd);
 
@@ -53,7 +58,7 @@ public class FileManager {
                             System.out.print("Loading Elevation file: " + name);
                             // going to have to change terrain constructoe to take in grid[][]
                             // and to take in grid spacing, dimensions and yeah
-                            loadElv(file);
+                            elevationMap = loadElv(file);
                             System.out.println(name + " Loaded :)");
                         } 
                     }
@@ -70,7 +75,7 @@ public class FileManager {
                             if (name.contains("sun"))
                             {
                                 System.out.println("Loading Sunlight File: " + name);
-                                loadTxt(file);
+                                sunlightMap = loadTxt(file);
                                 // now edit constructors to allow accepting grid[][]
                                 System.out.println(name + " Loaded :)");
                             }
@@ -78,7 +83,7 @@ public class FileManager {
                             if (name.contains("temp"))
                             {
                                 System.out.println("Loading Temperature File: " + name);
-                                loadTxt(file);
+                                temperatureMap = loadTxt(file);
                                 // now edit constructors to allow accepting grid[][]
                                 System.out.println(name + " Loaded :)");
                             }
@@ -86,7 +91,7 @@ public class FileManager {
                             if (name.contains("wet"))
                             {
                                 System.out.println("Loading Moisture File: " + name);
-                                loadTxt(file);
+                                moistureMap = loadTxt(file);
                                 // now edit constructors to allow accepting grid[][]
                                 System.out.println(name + " Loaded :)");
                             }
@@ -106,7 +111,7 @@ public class FileManager {
 
     }
 
-    public double[][] loadTxt(File file)
+    public float[][] loadTxt(File file)
     {
         // the abiotics seem to have inconsistent top lines, with grid spacing often missing
         // so i am going to always read the .elv file first as that one is consistent
@@ -125,7 +130,7 @@ public class FileManager {
             String secondLine = fileScanner.nextLine();
             String[] data = secondLine.split(" ");
 
-            double[][] grid = new double[dimXtxt][dimYtxt];
+            float[][] grid = new float[dimXtxt][dimYtxt];
             int temporary = 0;
 
             for(int x = 0; x < dimXtxt; x++)
@@ -141,7 +146,7 @@ public class FileManager {
                     temporary = 0; // reset now because new point
                 }
             }
-
+            fileScanner.close();
             return grid;
 
         }
@@ -154,7 +159,7 @@ public class FileManager {
 
     }
     
-    public double[][] loadElv(File file) 
+    public float[][] loadElv(File file) 
     {
         try{
 
@@ -177,7 +182,7 @@ public class FileManager {
             String secondLine = fileScanner.nextLine();
             String[] altitudes = secondLine.split(" ");
 
-            double[][] grid = new double[dimX][dimY];
+            float[][] grid = new float[dimX][dimY];
 
             for(int x = 0; x < dimX; x++)
             {
@@ -186,7 +191,7 @@ public class FileManager {
                     grid[x][y] = Integer.parseInt(altitudes[x*y]); // x*y because that is the 1D representatino of the 2D coordinate
                 }
             }
-
+            fileScanner.close();
             return grid;
 
 
@@ -197,10 +202,32 @@ public class FileManager {
             System.out.println("Error reading in the file: " + e);
         }
         return null;
-
-
     }
     
+    public float[][] getTemperatureMap()
+    {
+        return temperatureMap;
+    }
+
+    public float[][] getMoistureMap()
+    {
+        return moistureMap;
+    }
+
+    public float[][] getElevationMap()
+    {
+        return elevationMap;
+    }
+
+    public float[][] getSunlightMap()
+    {
+        return sunlightMap;
+    }
+
+
+
+    // gotta do these sometime ig.
+
     public void loadXlsx(File file) {
         // Method stub
     }

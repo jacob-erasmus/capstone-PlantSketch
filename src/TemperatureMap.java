@@ -1,20 +1,29 @@
 public class TemperatureMap {
-    private float[][] baseTMap;
-    private float[][] adjustedTMap;
     
-    public TemperatureMap() {
-        this.baseTMap = null;
-        this.adjustedTMap = null;
+    private int dimX;
+    private int dimY;
+    private int gridSpacing;
+    private float[][] grid;
+    
+    public TemperatureMap() 
+    {
+        this.dimX = 0;
+        this.dimY = 0;
+        this.gridSpacing = 0;
+        this.grid = null;
     }
     
-    public TemperatureMap(int width, int height) {
-        this.baseTMap = new float[height][width];
-        this.adjustedTMap = new float[height][width];
+    public TemperatureMap(int width, int height, int gridSpacing, float[][] grid) 
+    {
+        this.dimX = width;
+        this.dimY = height;
+        this.gridSpacing = gridSpacing;
+        this.grid = grid;
     }
     
     public float getTemperature(int x, int y) {
-        // Method stub
-        return 0.0f;
+        
+        return grid[x][y];
     }
     
     public void setBase(int x, int y, float newValue) {
