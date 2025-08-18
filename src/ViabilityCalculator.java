@@ -1,7 +1,3 @@
-
-
-
-
 public class ViabilityCalculator {
     
     private Terrain terrain;
@@ -9,7 +5,7 @@ public class ViabilityCalculator {
     private SunlightMap sunlightMap;
     private TemperatureMap temperatureMap;
     private MoistureMap moistureMap;
-    double a = 0.2;
+    double a = 0.2; //maximal stress value, constant
     
     public ViabilityCalculator()
     {
@@ -28,11 +24,11 @@ public class ViabilityCalculator {
         this.moistureMap = abioticFactors.getMoistureMap();
     }
     
-    public double calculation(double r, double c, double value)
+    public double calculateViability(double r, double c, double value)
     {
         double dx = Math.abs(value - c);
         double f = (1+a)*(Math.pow(Math.E,Math.pow(dx/r,4.5)*(Math.log(0.2))))-a; 
-        // here is the calculation in all its glory. it is the same calc for all abiotic factors. 
+        // here is the calculateViability in all its glory. it is the same calc for all abiotic factors. 
         // r and c come from the plants files, and value is the abiotic value from the terrain
 
         return f;
@@ -46,25 +42,25 @@ public class ViabilityCalculator {
         double cs = species.getSlopeC();
         double rs = species.getSlopeR();
         float slope = terrain.getSlope(x,y);
-        double fs = calculation(rs, cs, slope);
+        double fs = calculateViability(rs, cs, slope);
         
         // calculating the viablility wrt temperature
         double ct = species.getTemperatureC();
         double rt = species.getTemperatureR();
         float temp = temperatureMap.getTemperature(x,y);
-        double ft = calculation(rt, ct, temp);
+        double ft = calculateViability(rt, ct, temp);
 
         // calculating the viablility wrt sunlight
         double ce = species.getSunlightC();
         double re = species.getSunlightR();
         float sunl = sunlightMap.getSunlight(x,y);
-        double fe = calculation(re, ce, sunl);
+        double fe = calculateViability(re, ce, sunl);
 
         // calculating the viablility wrt moisture
         double cm = species.getMoistureC();
         double rm = species.getMoistureR();
         float moist = moistureMap.getMoisture(x,y);
-        double fm = calculation(rm, cm, moist);
+        double fm = calculateViability(rm, cm, moist);
 
         // now we take the minimum as that is the deciding factor on the viability of the species
         return Math.min(Math.min(fs,ft),Math.min(fe,fm));
