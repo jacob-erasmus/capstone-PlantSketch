@@ -4,8 +4,10 @@
  * William Marketos 17 Aug 2025
  */
 
- import java.io.File;
- import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOError;
+import java.util.Scanner;
 
 
 
@@ -15,6 +17,10 @@ public class FileManager {
     private String currentFilePath;
     private Scanner scan;
     private String pwd;
+    private int gridSpacing;
+    private int gridSize;
+    private int dimX;
+    private int dimY;
     
     public FileManager() {
         this.currentFilePath = "";
@@ -29,35 +35,62 @@ public class FileManager {
         pwd = scan.nextLine();
         File directory = new File(pwd);
 
-        if (directory.isDirectory()) {
+
+        if (directory.isDirectory()) 
+        {
             File[] files = directory.listFiles();
 
-            if (files != null) {
-                for (File file : files) {
-                    if (file.isFile()) {
+            if (files != null) 
+            {
+                for (File file : files) 
+                {
+                    if (file.isFile()) 
+                    {
+                        String name = file.getName();
+
+                        if (name.endsWith(".elv")) 
+                        {
+                            System.out.print("Loading Elevation file: " + name);
+                            // going to have to change terrain constructoe to take in grid[][]
+                            // and to take in grid spacing, dimensions and yeah
+                            loadElv(file);
+                            System.out.println(name + " Loaded :)");
+                        } 
+                    }
+                }
+                // loading .elv file first for the grid spacing
+                for (File file : files) 
+                {
+                    if (file.isFile()) 
+                    {
                         String name = file.getName();
 
                         if (name.endsWith(".txt")) 
                         {
-                            System.out.println("Loading Abiotics file: " + name);
-                            loadTxt(file);
-                            System.out.println(name + " Loaded :)");
+                            if (name.contains("sun"))
+                            {
+                                System.out.println("Loading Sunlight File: " + name);
+                                loadTxt(file);
+                                // now edit constructors to allow accepting grid[][]
+                                System.out.println(name + " Loaded :)");
+                            }
+                            
+                            if (name.contains("temp"))
+                            {
+                                System.out.println("Loading Temperature File: " + name);
+                                loadTxt(file);
+                                // now edit constructors to allow accepting grid[][]
+                                System.out.println(name + " Loaded :)");
+                            }
+
+                            if (name.contains("wet"))
+                            {
+                                System.out.println("Loading Moisture File: " + name);
+                                loadTxt(file);
+                                // now edit constructors to allow accepting grid[][]
+                                System.out.println(name + " Loaded :)");
+                            }
                         } 
-
-                        else if (name.endsWith(".elv")) 
-                        {
-                            System.out.println("Loading Elevation file: " + name);
-                            loadElv(file);
-                            System.out.println(name + " Loaded :)");
-                        } 
-
-                        /*else if (name.endsWith(".xlsx")) 
-                        {
-                            System.out.println("Loading Plant Parameters file: " + name);
-                            loadXlsx(file);
-                            System.out.println(name + " Loaded :)");
-                        } */ //I am pretty sure this is fixed
-
                         else 
                         {
                             System.out.println("Unknown file in directory. Ignoring it." + name);
@@ -65,32 +98,107 @@ public class FileManager {
                     }
                 }
             }
-        } else {
+        else 
+        {
             System.out.println("Not a valid directory :(");
         }
+    } 
 
     }
 
-    
-    public void loadTxt(File file) 
+    public double[][] loadTxt(File file)
     {
-        String name = file.getName();
-        String[] parts = name.split("[-_]");
-        // parts = ["D4", "1024", "temp.txt"]
+        // the abiotics seem to have inconsistent top lines, with grid spacing often missing
+        // so i am going to always read the .elv file first as that one is consistent
+        // and then take the data from that. the grid spacing and dimensions will be the same for all the abiotics as well as the elevation
 
-        int gridSize = Integer.parseInt(parts[1]); // "1024" → int
+        try{
+            Scanner fileScanner = new Scanner(file);
+            String firstLine = fileScanner.nextLine();
+            String[] parts = firstLine.split(" ");  // split by spaces
 
-        if (name.contains("sun"))
+            // this is reading in the first line with all of the info
+            int dimXtxt = Integer.parseInt(parts[0]);
+            int dimYtxt = Integer.parseInt(parts[1]);
+
+            // gonna ignore first line as inconsistent. taking data from .elv file as consistent
+            String secondLine = fileScanner.nextLine();
+            String[] data = secondLine.split(" ");
+
+            double[][] grid = new double[dimXtxt][dimYtxt];
+            int temporary = 0;
+
+            for(int x = 0; x < dimXtxt; x++)
+            {
+                for(int y = 0; y < dimYtxt; y++)
+                {
+                    for(int month = 0; month < 12; month++)
+                    {
+                        temporary += Integer.parseInt(data[month*y]); // Converting the string number for each month into an int
+                        // month*y because there are 12 numbers for each point because of the months
+                    }
+                    grid[x][y] = temporary/12; // the average for the year
+                    temporary = 0; // reset now because new point
+                }
+            }
+
+            return grid;
+
+        }
+        catch(FileNotFoundException e)
         {
-            System.out.println("Sunlight file");
-            
+            System.out.println("Error reading in the file: " + e);
+        }
 
-        }    
+        return null;
+
     }
-
     
-    public void loadElv(File file) {
-        // Method stub
+    public double[][] loadElv(File file) 
+    {
+        try{
+
+            Scanner fileScanner = new Scanner(file);
+            String firstLine = fileScanner.nextLine();
+            String[] parts = firstLine.split(" ");  // split by spaces
+
+            // this is reading in the first line with all of the info
+            int[] nums = new int[parts.length];
+            for (int i = 0; i < parts.length; i++) 
+            {
+                nums[i] = Integer.parseInt(parts[i]); // convert to int
+                // nums[0] = dim x, nums[1] = dim y, nums[2] = GRIDSPACING, nums[3] = latitude(?)
+            }
+            dimX = nums[0];
+            dimY = nums[1];
+            gridSpacing = nums[2];
+            int latitude = nums[3];
+
+            String secondLine = fileScanner.nextLine();
+            String[] altitudes = secondLine.split(" ");
+
+            double[][] grid = new double[dimX][dimY];
+
+            for(int x = 0; x < dimX; x++)
+            {
+                for(int y = 0; y < dimY; y++)
+                {
+                    grid[x][y] = Integer.parseInt(altitudes[x*y]); // x*y because that is the 1D representatino of the 2D coordinate
+                }
+            }
+
+            return grid;
+
+
+
+        } 
+        catch (FileNotFoundException e)
+        {
+            System.out.println("Error reading in the file: " + e);
+        }
+        return null;
+
+
     }
     
     public void loadXlsx(File file) {
