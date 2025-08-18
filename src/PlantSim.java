@@ -36,23 +36,24 @@ public class PlantSim {
         //TESTING SECTION OF MAIN METHOD
 
         //Boxwood Declaration
-        ViabilityParameters boxwoodViabilityParameters = new ViabilitlyParameters(3.75, 4.25,
-                            27.5, 12.5,
-                            11.75, 23.35,
-                            0, 80);
+        ViabilityParameters boxwoodViabilityParameters = new ViabilityParameters(
+        3.75f, 4.25f, 27.5f, 12.5f, 11.75f, 23.35f, 0f, 80f);
+
         
-        GrowthParameters boxwoodGrowthParameters = new GrowthParameters(9, 9,
-                         -5, 300);
+        GrowthParameters boxwoodGrowthParameters = new GrowthParameters(9f, 9f,
+                         -5f, 300f);
 
         Species boxwood = new Species("Boxwood",
-                   boxwoodViabilityParameters,
-                   boxwoodGrowthParameters,
-                   "Red",
-                   0.42,
-                   0.42,
-                   0.70,
-                   15,
-                   "L");
+            boxwoodViabilityParameters,
+            boxwoodGrowthParameters,
+            "Red",
+            0.42f,
+            0.42f,
+            0.70f,
+            15f,
+            "L"
+        );
+
         System.out.println(boxwood.toString());
     }
 
