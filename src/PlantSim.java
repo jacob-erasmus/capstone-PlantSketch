@@ -32,6 +32,28 @@ public class PlantSim {
         // read in files
         FileManager fileManager = new FileManager();
         fileManager.fileFinder();
+
+        //TESTING SECTION OF MAIN METHOD
+
+        //Boxwood Declaration
+        ViabilityParameters boxwoodViabilityParameters = new ViabilitlyParameters(3.75, 4.25,
+                            27.5, 12.5,
+                            11.75, 23.35,
+                            0, 80);
+        
+        GrowthParameters boxwoodGrowthParameters = new GrowthParameters(9, 9,
+                         -5, 300);
+
+        Species boxwood = new Species("Boxwood",
+                   boxwoodViabilityParameters,
+                   boxwoodGrowthParameters,
+                   "Red",
+                   0.42,
+                   0.42,
+                   0.70,
+                   15,
+                   "L");
+        System.out.println(boxwood.toString());
     }
 
 
