@@ -14,10 +14,18 @@ public class GrowthParameters {
     }
 
     // Getters
-    public float getMaxHeightOpen() { return maxHeightOpen; }
-    public float getMaxHeightClosed() { return maxHeightClosed; }
-    public float getQ() { return q; }
-    public float getLifeSpan() { return lifeSpan; }
+    public float getMaxHeightOpen() { 
+        return maxHeightOpen;
+    }
+    public float getMaxHeightClosed() { 
+        return maxHeightClosed; 
+    }
+    public float getQ() { 
+        return q;
+    }
+    public float getLifeSpan() { 
+        return lifeSpan;
+    }
 
     @Override
     public String toString() {

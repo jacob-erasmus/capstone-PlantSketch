@@ -12,12 +12,12 @@ public class GrowthFunction {
         float age = plant.getAge();
 
         if (plant.isAllometryOpen()){
-            maxHeight = plant.getMaxHeightOpen();
+            float maxHeight = plant.getMaxHeightOpen();
         }else{
-            maxHeight = plant.getMaxHeightClosed(); 
+            float maxHeight = plant.getMaxHeightClosed(); 
         }
 
-        float plantHeight = ((2 / 1 + e^((age/lifeSpan)*q)) - 1) * maxHeight;
+        float plantHeight = (2 / (1 + (Math.exp((age/lifeSpan)*q))) - 1) * maxHeight;
         // where t is the current tree age in years, tm is the maximum achievable tree age in years,
         // mh is maximum achieve height in metres.
         return plantHeight;
