@@ -57,12 +57,12 @@ public class FileManager {
                             System.out.println(name + " Loaded :)");
                         } 
 
-                        else if (name.endsWith(".xlsx")) 
+                        /*else if (name.endsWith(".xlsx")) 
                         {
                             System.out.println("Loading Plant Parameters file: " + name);
                             loadXlsx(pwd + "/" + name);
                             System.out.println(name + " Loaded :)");
-                        } 
+                        } */ //I am pretty sure this is fixed
 
                         else 
                         {
