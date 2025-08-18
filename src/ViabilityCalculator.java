@@ -5,7 +5,7 @@ public class ViabilityCalculator {
     private SunlightMap sunlightMap;
     private TemperatureMap temperatureMap;
     private MoistureMap moistureMap;
-    double a = 0.2;
+    double a = 0.2; //maximal stress value, constant
     
     public ViabilityCalculator()
     {
