@@ -25,6 +25,13 @@ public class SunlightMap {
         
         return grid[x][y];
     }
+
+    public void testSunlight()
+    {
+        for(int i = 0; i < 13; i++) {
+            System.out.println("Sunlight at (0," + i + "): " + getSunlight(0,i));
+        }
+    }
     
     public void setBase(int x, int y, float newValue) {
         // Method stub

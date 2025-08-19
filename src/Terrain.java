@@ -46,4 +46,11 @@ public class Terrain {
         sunlightMap = abioticFactors.getSunlightMap();
         moistureMap = abioticFactors.getMoistureMap();
     }
+
+    public void testTerrain()
+    {
+        for(int i = 0; i < 13; i++) {
+            System.out.println("Terrain at (0, "+i+"): " + getElevation(0, i));
+        }
+    }
 }
