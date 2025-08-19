@@ -25,6 +25,13 @@ public class MoistureMap {
         
         return grid[x][y];
     }
+
+    public void testMoisture()
+    {
+        for(int i = 0; i < 13; i++) {
+            System.out.println("Moisture at (0," + i + "): " + getMoisture(0,i));
+        }
+    }
     
     public void setBase(int x, int y, float newValue) {
         // Method stub

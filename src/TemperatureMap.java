@@ -25,6 +25,13 @@ public class TemperatureMap {
         
         return grid[x][y];
     }
+
+    public void testTemperature()
+    {
+        for(int i = 0; i < 13; i++) {
+            System.out.println("Temperature at (0, "+i+"): " + getTemperature(0, i));
+        }
+    }
     
     public void setBase(int x, int y, float newValue) {
         // Method stub
