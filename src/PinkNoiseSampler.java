@@ -1,4 +1,9 @@
 
+///////
+/// THIS WAS DONE BY AI SO FEEL FREE TO DISREGARD ANYTHING AND CHANGE WHATEVER YOU WANT
+///////
+
+
 import java.util.ArrayList;
 
 public class PinkNoiseSampler {
