@@ -39,6 +39,7 @@ public class PlantSim {
         int dimY = fileManager.getDimY();
         int gridSpacing = fileManager.getGridSpacing();
 
+        // create the necessary objects that were read in from the files
         TemperatureMap temperatureMap = new TemperatureMap(dimX, dimY, gridSpacing, fileManager.getTemperatureGrid());
         MoistureMap moistureMap = new MoistureMap(dimX, dimY, gridSpacing, fileManager.getMoistureGrid());
         SunlightMap sunligntMap = new SunlightMap(dimX, dimY, gridSpacing, fileManager.getSunlightGrid());
@@ -46,7 +47,6 @@ public class PlantSim {
         Terrain terrain = new Terrain(dimX, dimY, gridSpacing, abioticFactors, fileManager.getElevationGrid());
 
         // load in data for different species
-        //Boxwood Declaration
         Species boxwood = loadBoxwood();
         Species snowyMespilus = loadSnowyMespilus();
         Species mountainPine = loadMountainPine();
