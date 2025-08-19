@@ -19,7 +19,7 @@ public class GrowthFunction {
             maxHeight = plant.getMaxHeightClosed(); 
         }
 
-        float plantHeight = (float) ((2.0 / (1.0 + Math.exp((currentAge / lifeSpan) * q))) - 1.0) * maxHeight;
+        float plantHeight = (2 / (1 + (Math.exp((currentAge/lifeSpan)*q))) - 1) * maxHeight;
         // where t is the current tree currentAge in years, tm is the maximum achievable tree currentAge in years,
         // mh is maximum achieve height in metres.
         return plantHeight;
