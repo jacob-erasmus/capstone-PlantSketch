@@ -1,48 +1,54 @@
-
-///////
-/// THIS WAS DONE BY AI SO FEEL FREE TO DISREGARD ANYTHING AND CHANGE WHATEVER YOU WANT
-///////
-
-
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class PinkNoiseSampler {
-    private long seed;
-    private float[][][] noiseArray;
-    private int width;
-    private int height;
-    private float exclusionRadius;
-    private int numPoints;
-    
-    public PinkNoiseSampler() {
-        this.seed = System.currentTimeMillis();
-        this.noiseArray = null;
-        this.width = 0;
-        this.height = 0;
-        this.exclusionRadius = 1.0f;
-        this.numPoints = 100;
-    }
-    
-    public PinkNoiseSampler(long seed, int width, int height, int numPoints) {
-        this.seed = seed;
+
+    private final int width;
+    private final int height;
+    private final float minDistance; // min spacing between points (e.g. 2m)
+    private final Random rng;
+
+    public PinkNoiseSampler(int width, int height, float minDistance, long seed) {
         this.width = width;
         this.height = height;
-        this.numPoints = numPoints;
-        this.exclusionRadius = 1.0f;
-        this.noiseArray = new float[1][height][width];
+        this.minDistance = minDistance;
+        this.rng = new Random(seed);
     }
-    
-    public ArrayList<PointSample> generatePoints(float density) {
-        // Method stub
-        return new ArrayList<>();
+
+    /**
+     * Generate N point samples using dart throwing.
+     *
+     * @param n number of points to generate
+     * @return list of PointSample
+     */
+    public List<PointSample> generateSamples(int n) {
+        List<PointSample> samples = new ArrayList<>();
+
+        int attempts = 0;
+        while (samples.size() < n && attempts < n * 1000) { 
+            float x = rng.nextFloat() * width;
+            float y = rng.nextFloat() * height;
+            PointSample candidate = new PointSample(x, y);
+
+            if (isFarEnough(candidate, samples)) {
+                samples.add(candidate);
+            }
+            attempts++;
+        }
+
+        return samples;
     }
-    
-    public float getSampleValue(int x, int y) {
-        // Method stub
-        return 0.0f;
-    }
-    
-    public void regenerate() {
-        // Method stub
+
+    private boolean isFarEnough(PointSample candidate, List<PointSample> samples) {
+        for (PointSample s : samples) {
+            float dx = candidate.getX() - s.getX();
+            float dy = candidate.getY() - s.getY();
+            float distSq = dx * dx + dy * dy;
+            if (distSq < minDistance * minDistance) {
+                return false; // too close
+            }
+        }
+        return true;
     }
 }
