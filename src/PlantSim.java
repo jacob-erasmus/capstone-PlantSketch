@@ -1,3 +1,7 @@
+import javax.swing.*;
+import java.util.List;
+import java.util.Scanner;
+
 public class PlantSim {
     private Terrain terrain;
     private Forest forest;
@@ -8,6 +12,7 @@ public class PlantSim {
     private SunlightMap sunlightMap;
     private MoistureMap moistureMap;
     private TemperatureMap temperatureMap;
+    
     
     public PlantSim() {
         this.terrain = null;
@@ -61,13 +66,21 @@ public class PlantSim {
         Species sissileOak = loadSissileOak();
         Species europeanBeech = loadEuropeanBeech();
 
-        // then generate pink noise
-        
-        // then apply a tree to each point
+                // === TESTING PINK NOISE SAMPLER ===
+        PinkNoiseSampler sampler = new PinkNoiseSampler(dimX, dimY, 2.0f, 42L); 
+        // dimX/dimY from file, 2.0f = 2m min separation, 42L = random seed
+        List<PointSample> samples = sampler.generateSamples(100); // try 100 canopy trees
 
-        // then create a forest
+        // Show results in Swing window
+        SwingUtilities.invokeLater(() -> {
+        JFrame frame = new JFrame("Pink Noise Visualization");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(new PinkNoiseVisualizer(samples, dimX, dimY));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+        });
 
-        // then render in 2D
         
     }
 
