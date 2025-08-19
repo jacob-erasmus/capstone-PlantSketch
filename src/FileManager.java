@@ -22,10 +22,10 @@ public class FileManager {
     private int dimX;
     private int dimY;
 
-    private float[][] temperatureMap; // We are going to store the maps here and have getters to get them after running the program
-    private float[][] moistureMap;
-    private float[][] sunlightMap;
-    private float[][] elevationMap;
+    private float[][] temperatureGrid; // We are going to store the maps here and have getters to get them after running the program
+    private float[][] moistureGrid;
+    private float[][] sunlightGrid;
+    private float[][] elevationGrid;
     
     public FileManager() {
         this.currentFilePath = "";
@@ -58,7 +58,7 @@ public class FileManager {
                             System.out.print("Loading Elevation file: " + name);
                             // going to have to change terrain constructoe to take in grid[][]
                             // and to take in grid spacing, dimensions and yeah
-                            elevationMap = loadElv(file);
+                            elevationGrid = loadElv(file);
                             System.out.println(name + " Loaded :)");
                         } 
                     }
@@ -75,7 +75,7 @@ public class FileManager {
                             if (name.contains("sun"))
                             {
                                 System.out.println("Loading Sunlight File: " + name);
-                                sunlightMap = loadTxt(file);
+                                sunlightGrid = loadTxt(file);
                                 // now edit constructors to allow accepting grid[][]
                                 System.out.println(name + " Loaded :)");
                             }
@@ -83,7 +83,7 @@ public class FileManager {
                             if (name.contains("temp"))
                             {
                                 System.out.println("Loading Temperature File: " + name);
-                                temperatureMap = loadTxt(file);
+                                temperatureGrid = loadTxt(file);
                                 // now edit constructors to allow accepting grid[][]
                                 System.out.println(name + " Loaded :)");
                             }
@@ -91,7 +91,7 @@ public class FileManager {
                             if (name.contains("wet"))
                             {
                                 System.out.println("Loading Moisture File: " + name);
-                                moistureMap = loadTxt(file);
+                                moistureGrid = loadTxt(file);
                                 // now edit constructors to allow accepting grid[][]
                                 System.out.println(name + " Loaded :)");
                             }
@@ -204,26 +204,40 @@ public class FileManager {
         return null;
     }
     
-    public float[][] getTemperatureMap()
+    public float[][] getTemperatureGrid()
     {
-        return temperatureMap;
+        return temperatureGrid;
     }
 
-    public float[][] getMoistureMap()
+    public float[][] getMoistureGrid()
     {
-        return moistureMap;
+        return moistureGrid;
     }
 
-    public float[][] getElevationMap()
+    public float[][] getElevationGrid()
     {
-        return elevationMap;
+        return elevationGrid;
     }
 
-    public float[][] getSunlightMap()
+    public float[][] getSunlightGrid()
     {
-        return sunlightMap;
+        return sunlightGrid;
     }
 
+    public int getDimX()
+    {
+        return dimX;
+    }
+
+    public int getDimY()
+    {
+        return dimY;
+    }
+
+    public int getGridSpacing()
+    {
+        return gridSpacing;
+    }
 
 
     // gotta do these sometime ig.
