@@ -1,11 +1,9 @@
 public class Renderer2D {
-    private Graphics2D graphics;
     private int width;
     private int height;
     private float scale;
     
     public Renderer2D() {
-        this.graphics = null;
         this.width = 0;
         this.height = 0;
         this.scale = 1.0f;
@@ -14,11 +12,10 @@ public class Renderer2D {
     public Renderer2D(int width, int height) {
         this.width = width;
         this.height = height;
-        this.graphics = null;
         this.scale = 1.0f;
     }
     
-    public void setGraphics(Graphics2D graphics) {
+    public void setGraphics() {
         // Method stub
     }
     
