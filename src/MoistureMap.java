@@ -2,7 +2,7 @@ public class MoistureMap {
     
     private int dimX;
     private int dimY;
-    private int gridSpacing;
+    private float gridSpacing;
     private float[][] grid;
     
     public MoistureMap() 
@@ -13,7 +13,7 @@ public class MoistureMap {
         this.grid = null;
     }
     
-    public MoistureMap(int width, int height, int gridSpacing, float[][] grid) 
+    public MoistureMap(int width, int height, float gridSpacing, float[][] grid) 
     {
         this.dimX = width;
         this.dimY = height;

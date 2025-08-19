@@ -17,7 +17,7 @@ public class FileManager {
     private String currentFilePath;
     private Scanner scan;
     private String pwd;
-    private int gridSpacing;
+    private float gridSpacing;
     private int gridSize;
     private int dimX;
     private int dimY;
@@ -49,13 +49,15 @@ public class FileManager {
             {
                 for (File file : files) 
                 {
+                    System.out.println("Found file: " + file.getName());
+                    // loading .elv file first for the grid spacing
                     if (file.isFile()) 
                     {
                         String name = file.getName();
 
                         if (name.endsWith(".elv")) 
                         {
-                            System.out.print("Loading Elevation file: " + name);
+                            System.out.println("Loading Elevation file: " + name);
                             // going to have to change terrain constructoe to take in grid[][]
                             // and to take in grid spacing, dimensions and yeah
                             elevationGrid = loadElv(file);
@@ -88,7 +90,7 @@ public class FileManager {
                                 System.out.println(name + " Loaded :)");
                             }
 
-                            if (name.contains("wet"))
+                            if (name.contains("wet") || name.contains("water"))
                             {
                                 System.out.println("Loading Moisture File: " + name);
                                 moistureGrid = loadTxt(file);
@@ -139,7 +141,7 @@ public class FileManager {
                 {
                     for(int month = 0; month < 12; month++)
                     {
-                        temporary += Integer.parseInt(data[month*y]); // Converting the string number for each month into an int
+                        temporary += Float.parseFloat(data[month*y]); // Converting the string number for each month into an int
                         // month*y because there are 12 numbers for each point because of the months
                     }
                     grid[x][y] = temporary/12; // the average for the year
@@ -168,16 +170,16 @@ public class FileManager {
             String[] parts = firstLine.split(" ");  // split by spaces
 
             // this is reading in the first line with all of the info
-            int[] nums = new int[parts.length];
+            float[] nums = new float[parts.length];
             for (int i = 0; i < parts.length; i++) 
             {
-                nums[i] = Integer.parseInt(parts[i]); // convert to int
+                nums[i] = Float.parseFloat(parts[i]); // convert to int
                 // nums[0] = dim x, nums[1] = dim y, nums[2] = GRIDSPACING, nums[3] = latitude(?)
             }
-            dimX = nums[0];
-            dimY = nums[1];
+            dimX = (int)nums[0];
+            dimY = (int)nums[1];
             gridSpacing = nums[2];
-            int latitude = nums[3];
+            float latitude = nums[3];
 
             String secondLine = fileScanner.nextLine();
             String[] altitudes = secondLine.split(" ");
@@ -188,7 +190,7 @@ public class FileManager {
             {
                 for(int y = 0; y < dimY; y++)
                 {
-                    grid[x][y] = Integer.parseInt(altitudes[x*y]); // x*y because that is the 1D representatino of the 2D coordinate
+                    grid[x][y] = Float.parseFloat(altitudes[x*y]); // x*y because that is the 1D representatino of the 2D coordinate
                 }
             }
             fileScanner.close();
@@ -234,7 +236,7 @@ public class FileManager {
         return dimY;
     }
 
-    public int getGridSpacing()
+    public float getGridSpacing()
     {
         return gridSpacing;
     }

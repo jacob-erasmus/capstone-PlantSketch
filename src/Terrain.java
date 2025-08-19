@@ -2,7 +2,7 @@
 public class Terrain {
     int width;
     int height;
-    int cellSize;
+    float cellSize;
     float[][] elevationMap;
     float[][] slopeMap;
     AbioticFactors abioticFactors;
@@ -11,7 +11,7 @@ public class Terrain {
     SunlightMap sunlightMap;
 
     //Constructor
-    public Terrain(int width, int height, int cellSize, AbioticFactors abioticFactors, float[][] grid){
+    public Terrain(int width, int height, float cellSize, AbioticFactors abioticFactors, float[][] grid){
         this.width = width;
         this.height = height;
         this.cellSize = cellSize; 

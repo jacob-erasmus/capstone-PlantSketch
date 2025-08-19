@@ -2,7 +2,7 @@ public class SunlightMap {
 
     private int dimX;
     private int dimY;
-    private int gridSpacing;
+    private float gridSpacing;
     private float[][] grid;
     
     public SunlightMap() 
@@ -13,7 +13,7 @@ public class SunlightMap {
         this.grid = null;
     }
     
-    public SunlightMap(int width, int height, int gridSpacing, float[][] grid) 
+    public SunlightMap(int width, int height, float gridSpacing, float[][] grid) 
     {
         this.dimX = width;
         this.dimY = height;

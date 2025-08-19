@@ -2,7 +2,7 @@ public class TemperatureMap {
     
     private int dimX;
     private int dimY;
-    private int gridSpacing;
+    private float gridSpacing;
     private float[][] grid;
     
     public TemperatureMap() 
@@ -13,7 +13,7 @@ public class TemperatureMap {
         this.grid = null;
     }
     
-    public TemperatureMap(int width, int height, int gridSpacing, float[][] grid) 
+    public TemperatureMap(int width, int height, float gridSpacing, float[][] grid) 
     {
         this.dimX = width;
         this.dimY = height;

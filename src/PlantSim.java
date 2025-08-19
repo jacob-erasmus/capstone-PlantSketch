@@ -37,7 +37,7 @@ public class PlantSim {
         fileManager.fileFinder();
         int dimX = fileManager.getDimX();
         int dimY = fileManager.getDimY();
-        int gridSpacing = fileManager.getGridSpacing();
+        float gridSpacing = fileManager.getGridSpacing();
 
         // create the necessary objects that were read in from the files
         TemperatureMap temperatureMap = new TemperatureMap(dimX, dimY, gridSpacing, fileManager.getTemperatureGrid());
@@ -97,7 +97,7 @@ public class PlantSim {
             15f,
             "L"
         );
-        System.out.println(boxwood.toString());
+        // System.out.println(boxwood.toString());
 
         return boxwood;
     }
@@ -118,7 +118,7 @@ public class PlantSim {
             22f,
             "S"
         );
-        System.out.println(snowyMespilus.toString());
+        //System.out.println(snowyMespilus.toString());
         return snowyMespilus;
     }
 
@@ -138,7 +138,7 @@ public class PlantSim {
             3f,
             "L"
         );
-        System.out.println(mountainPine.toString());
+        //System.out.println(mountainPine.toString());
         return mountainPine;
     }
 
@@ -158,7 +158,7 @@ public class PlantSim {
             22f,
             "L"
         );
-        System.out.println(silverFir.toString());
+        //System.out.println(silverFir.toString());
         return silverFir;
     }
 
@@ -178,7 +178,7 @@ public class PlantSim {
             15f,
             "S"
         );
-        System.out.println(silverBirch.toString());
+        //System.out.println(silverBirch.toString());
         return silverBirch;
     }
 
@@ -198,7 +198,7 @@ public class PlantSim {
             15f,
             "S"
         );
-        System.out.println(sissileOak.toString());
+        //System.out.println(sissileOak.toString());
         return sissileOak;
     }
 
@@ -218,7 +218,7 @@ public class PlantSim {
             15f,
             "S"
         );
-        System.out.println(europeanBeech.toString());
+        //System.out.println(europeanBeech.toString());
         return europeanBeech;
     }
     
