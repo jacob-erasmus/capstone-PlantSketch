@@ -5,6 +5,9 @@ public class PlantSim {
     private UIController uiController;
     private FileManager fileManager;
     private boolean isRunning;
+    private SunlightMap sunlightMap;
+    private MoistureMap moistureMap;
+    private TemperatureMap temperatureMap;
     
     public PlantSim() {
         this.terrain = null;
@@ -32,6 +35,15 @@ public class PlantSim {
         // read in files
         FileManager fileManager = new FileManager();
         fileManager.fileFinder();
+        int dimX = fileManager.getDimX();
+        int dimY = fileManager.getDimY();
+        int gridSpacing = fileManager.getGridSpacing();
+
+        TemperatureMap temperatureMap = new TemperatureMap(dimX, dimY, gridSpacing, fileManager.getTemperatureGrid());
+        MoistureMap moistureMap = new MoistureMap(dimX, dimY, gridSpacing, fileManager.getMoistureGrid());
+        SunlightMap sunligntMap = new SunlightMap(dimX, dimY, gridSpacing, fileManager.getSunlightGrid());
+        AbioticFactors abioticFactors = new AbioticFactors(moistureMap, temperatureMap, sunligntMap);
+        Terrain terrain = new Terrain(dimX, dimY, gridSpacing, abioticFactors, fileManager.getElevationGrid());
 
         //TESTING SECTION OF MAIN METHOD
 
