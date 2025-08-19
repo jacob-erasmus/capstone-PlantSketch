@@ -51,6 +51,12 @@ public class PlantSim {
         AbioticFactors abioticFactors = new AbioticFactors(moistureMap, temperatureMap, sunligntMap);
         Terrain terrain = new Terrain(dimX, dimY, gridSpacing, abioticFactors, fileManager.getElevationGrid());
 
+        moistureMap.testMoisture();
+        temperatureMap.testTemperature();
+        sunligntMap.testSunlight();
+        terrain.testTerrain();
+        // test completed. files read in successfully.
+
         // load in data for different species
         Species boxwood = loadBoxwood();
         Species snowyMespilus = loadSnowyMespilus();

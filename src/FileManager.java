@@ -133,7 +133,7 @@ public class FileManager {
             String[] data = secondLine.split(" ");
 
             float[][] grid = new float[dimXtxt][dimYtxt];
-            int temporary = 0;
+            float temporary = 0.0f;
 
             for(int x = 0; x < dimXtxt; x++)
             {
@@ -141,11 +141,13 @@ public class FileManager {
                 {
                     for(int month = 0; month < 12; month++)
                     {
-                        temporary += Float.parseFloat(data[month*y]); // Converting the string number for each month into an int
+                        int index = (x * dimYtxt + y) * 12 + month;
+                        temporary += Float.parseFloat(data[index]);
+                        // Converting the string number for each month into an int
                         // month*y because there are 12 numbers for each point because of the months
                     }
-                    grid[x][y] = temporary/12; // the average for the year
-                    temporary = 0; // reset now because new point
+                    grid[x][y] = temporary/12.0f; // the average for the year
+                    temporary = 0.0f; // reset now because new point
                 }
             }
             fileScanner.close();
@@ -190,7 +192,7 @@ public class FileManager {
             {
                 for(int y = 0; y < dimY; y++)
                 {
-                    grid[x][y] = Float.parseFloat(altitudes[x*y]); // x*y because that is the 1D representatino of the 2D coordinate
+                    grid[x][y] = Float.parseFloat(altitudes[x * dimY + y]); // x*dimY + y because that is the 1D representatino of the 2D coordinate
                 }
             }
             fileScanner.close();
