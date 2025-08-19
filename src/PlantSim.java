@@ -46,6 +46,12 @@ public class PlantSim {
         AbioticFactors abioticFactors = new AbioticFactors(moistureMap, temperatureMap, sunligntMap);
         Terrain terrain = new Terrain(dimX, dimY, gridSpacing, abioticFactors, fileManager.getElevationGrid());
 
+        moistureMap.testMoisture();
+        temperatureMap.testTemperature();
+        sunligntMap.testSunlight();
+        terrain.testTerrain();
+        // test completed. files read in successfully.
+
         // load in data for different species
         Species boxwood = loadBoxwood();
         Species snowyMespilus = loadSnowyMespilus();
@@ -54,6 +60,14 @@ public class PlantSim {
         Species silverBirch = loadSilverBirch();
         Species sissileOak = loadSissileOak();
         Species europeanBeech = loadEuropeanBeech();
+
+        // then generate pink noise
+        
+        // then apply a tree to each point
+
+        // then create a forest
+
+        // then render in 2D
         
     }
 
