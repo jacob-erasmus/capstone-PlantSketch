@@ -63,7 +63,7 @@ public class PlantSim {
                 // === TESTING PINK NOISE SAMPLER ===
         PinkNoiseSampler sampler = new PinkNoiseSampler(dimX, dimY, 2.0f, 42L); 
         // dimX/dimY from file, 2.0f = 2m min separation, 42L = random seed
-        List<PointSample> samples = sampler.generateSamples(100); // try 100 canopy trees
+        List<PointSample> samples = sampler.generateSamples(1000); // try 100 canopy trees
 
         // Show results in Swing window
         SwingUtilities.invokeLater(() -> {

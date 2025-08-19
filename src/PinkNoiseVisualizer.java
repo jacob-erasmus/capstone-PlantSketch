@@ -29,7 +29,7 @@ public class PinkNoiseVisualizer extends JPanel {
         }
 
         // Draw points
-        g.setColor(Color.RED);
+        g.setColor(Color.PINK);
         for (PointSample sample : samples) {
             int x = (int) sample.getX();
             int y = (int) sample.getY();
