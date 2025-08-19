@@ -9,10 +9,10 @@ public class AbioticFactors {
         this.sunlightMap = null;
     }
     
-    public AbioticFactors(int width, int height) {
-        this.moistureMap = new MoistureMap(width, height);
-        this.temperatureMap = new TemperatureMap(width, height);
-        this.sunlightMap = new SunlightMap(width, height);
+    public AbioticFactors(MoistureMap moistureMap, TemperatureMap temperatureMap, SunlightMap sunlightMap) {
+        this.moistureMap = moistureMap;
+        this.temperatureMap = temperatureMap;
+        this.sunlightMap = sunlightMap;
     }
     
 
