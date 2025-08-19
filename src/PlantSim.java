@@ -39,6 +39,7 @@ public class PlantSim {
         int dimY = fileManager.getDimY();
         int gridSpacing = fileManager.getGridSpacing();
 
+        // create the necessary objects that were read in from the files
         TemperatureMap temperatureMap = new TemperatureMap(dimX, dimY, gridSpacing, fileManager.getTemperatureGrid());
         MoistureMap moistureMap = new MoistureMap(dimX, dimY, gridSpacing, fileManager.getMoistureGrid());
         SunlightMap sunligntMap = new SunlightMap(dimX, dimY, gridSpacing, fileManager.getSunlightGrid());
@@ -46,20 +47,15 @@ public class PlantSim {
         Terrain terrain = new Terrain(dimX, dimY, gridSpacing, abioticFactors, fileManager.getElevationGrid());
 
         // load in data for different species
-        //Boxwood Declaration
-        loadBoxwood();
-
-        // Snowy Mespilus declaration
-
-        // Mountain Pine declaration
-
-        // Silver Fir declararion
-
-        // Silver Birch declaration
-
-        // Sissile Oak declaration
-
-        // European Beech declaration
+        Species boxwood = loadBoxwood();
+        Species snowyMespilus = loadSnowyMespilus();
+        Species mountainPine = loadMountainPine();
+        Species silverFir = loadSilverFir();
+        Species silverBirch = loadSilverBirch();
+        Species sissileOak = loadSissileOak();
+        Species europeanOak = loadEuropeanOak();
+        Species europeanBeech = loadEuropeanBeech();
+        
     }
 
     private static Species loadBoxwood()
@@ -83,8 +79,47 @@ public class PlantSim {
         return boxwood;
     }
 
+    private static Species loadSnowyMespilus()
+    {
 
+        return snowyMespilus;
+    }
 
+    private static Species loadMountainPine()
+    {
+
+        return mountainPine;
+    }
+
+    private static Species loadSilverFir()
+    {
+
+        return silverFir;
+    }
+
+    private static Species loadSilverBirch()
+    {
+
+        return silverBirch;
+    }
+
+    private static Species loadSissileOak()
+    {
+
+        return sissileOak;
+    }
+
+    private static Species loadEuropeanOak()
+    {
+
+        return europeanOak;
+    }
+
+    private static Species loadEuropeanBeech()
+    {
+
+        return europeanBeech;
+    }
 
     public void startSimulation() {
         // Method stub
