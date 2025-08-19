@@ -45,16 +45,29 @@ public class PlantSim {
         AbioticFactors abioticFactors = new AbioticFactors(moistureMap, temperatureMap, sunligntMap);
         Terrain terrain = new Terrain(dimX, dimY, gridSpacing, abioticFactors, fileManager.getElevationGrid());
 
-        //TESTING SECTION OF MAIN METHOD
-
+        // load in data for different species
         //Boxwood Declaration
-        ViabilityParameters boxwoodViabilityParameters = new ViabilityParameters(
-        3.75f, 4.25f, 27.5f, 12.5f, 11.75f, 23.35f, 0f, 80f);
+        loadBoxwood();
 
-        
+        // Snowy Mespilus declaration
+
+        // Mountain Pine declaration
+
+        // Silver Fir declararion
+
+        // Silver Birch declaration
+
+        // Sissile Oak declaration
+
+        // European Beech declaration
+    }
+
+    private static Species loadBoxwood()
+    {
+         ViabilityParameters boxwoodViabilityParameters = new ViabilityParameters(
+        3.75f, 4.25f, 27.5f, 12.5f, 11.75f, 23.35f, 0f, 80f);
         GrowthParameters boxwoodGrowthParameters = new GrowthParameters(9f, 9f,
                          -5f, 300f);
-
         Species boxwood = new Species("Boxwood",
             boxwoodViabilityParameters,
             boxwoodGrowthParameters,
@@ -65,9 +78,12 @@ public class PlantSim {
             15f,
             "L"
         );
-
         System.out.println(boxwood.toString());
+
+        return boxwood;
     }
+
+
 
 
     public void startSimulation() {
