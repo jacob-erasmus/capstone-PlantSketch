@@ -33,7 +33,7 @@ public class PinkNoiseSampler {
             // can add in the checks for plants here and add the plant as you create the point
             
             PointSample candidate = new PointSample(x, y);
-
+            
             if (isFarEnough(candidate, samples)) {
                 samples.add(candidate);
             }

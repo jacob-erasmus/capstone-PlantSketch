@@ -1,4 +1,7 @@
 import javax.swing.*;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -64,14 +67,23 @@ public class PlantSim {
         // test completed. files read in successfully.
 
         // load in data for different species
+        List<Species> speciesList = new ArrayList<>();
         SpeciesDictionary speciesDictionary = new SpeciesDictionary();
         Species boxwood = speciesDictionary.loadBoxwood();
+        speciesList.add(boxwood);
         Species snowyMespilus = speciesDictionary.loadSnowyMespilus();
+        speciesList.add(snowyMespilus);
         Species mountainPine = speciesDictionary.loadMountainPine();
+        speciesList.add(mountainPine);
         Species silverFir = speciesDictionary.loadSilverFir();
+        speciesList.add(silverFir);
         Species silverBirch = speciesDictionary.loadSilverBirch();
+        speciesList.add(silverBirch);
         Species sissileOak = speciesDictionary.loadSissileOak();
+        speciesList.add(sissileOak);
         Species europeanBeech = speciesDictionary.loadEuropeanBeech();
+        speciesList.add(europeanBeech);
+
 
                 // === TESTING PINK NOISE SAMPLER ===
         PinkNoiseSampler sampler = new PinkNoiseSampler(dimX, dimY, 2.0f, 42L); 
@@ -91,8 +103,58 @@ public class PlantSim {
         // add plants to pink noise :
         // run density function
         // run growth function
-        // run viability function
 
+        //viabilityCalculator setup
+        ViabilityCalculator calc = new ViabilityCalculator(terrain, abioticFactors);
+        double boxwoodViability;
+        double snowyMespilusViability;
+        double mountainPineViability;
+        double silverFirViability;
+        double silverBirchViability;
+        double sissileOakViability;
+        double europeanBeechViability;
+        float sumViabilites;
+
+        //setup species maps
+        SpeciesMap boxwodMap = new SpeciesMap(boxwood);
+        SpeciesMap snowyMespilusMap = new SpeciesMap(snowyMespilus);
+        SpeciesMap mountainPineMap = new SpeciesMap(mountainPine);
+        SpeciesMap silverFirMap = new SpeciesMap(silverFir);
+        SpeciesMap silverBirchMap = new SpeciesMap(silverBirch);
+        SpeciesMap sissileOakMap = new SpeciesMap(sissileOak);
+        SpeciesMap europeanBeechMap = new SpeciesMap(europeanBeech);
+
+
+        for (int i = 0; i < samples.size(); i++){
+            int xPos = (int)samples.get(i).getX();
+            int yPos = (int)samples.get(i).getY();
+            // run viability function
+            boxwoodViability = calc.viabililty(boxwood, xPos, yPos);
+            boxwood.setViabilityAtPoint(boxwoodViability);
+            snowyMespilusViability = calc.viabililty(snowyMespilus, xPos, yPos);
+            snowyMespilus.setViabilityAtPoint(snowyMespilusViability);
+            mountainPineViability = calc.viabililty(mountainPine, xPos, yPos);
+            mountainPine.setViabilityAtPoint(mountainPineViability);
+            silverFirViability = calc.viabililty(silverFir, xPos, yPos);
+            silverFir.setViabilityAtPoint(silverFirViability);
+            silverBirchViability = calc.viabililty(silverBirch, xPos, yPos);
+            silverBirch.setViabilityAtPoint(silverBirchViability);
+            sissileOakViability = calc.viabililty(sissileOak, xPos, yPos);
+            sissileOak.setViabilityAtPoint(sissileOakViability);
+            europeanBeechViability = calc.viabililty(europeanBeech, xPos, yPos);
+            europeanBeech.setViabilityAtPoint(europeanBeechViability);
+
+            //sum of all viabilites
+            sumViabilites = (float)(boxwoodViability + snowyMespilusViability + mountainPineViability + silverBirchViability + silverFirViability + sissileOakViability + europeanBeechViability);
+            //run roulette wheel
+            RouletteWheelSelector rw = new RouletteWheelSelector(sumViabilites);
+            String speciesSelected = rw.selectSpecies(speciesList);
+            //need age, size etc, allometry etc...
+            if (speciesSelected == "Boxwood"){
+                boxwodMap.setPlantAt(new Plant(i, xPos, yPos, age, boxwood, size, true, i, false), xPos, yPos);
+            
+            }
+        }
         // add plants to forest object
         // create forest object
         // overlay forest on terrain

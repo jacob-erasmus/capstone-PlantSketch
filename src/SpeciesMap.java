@@ -15,7 +15,7 @@ public class SpeciesMap {
         this.map = new ArrayList<>();
     }
     
-    public void setPlantAt(Plant plant) {
+    public void setPlantAt(Plant plant, int dimX, int dimY) {
         // Method stub
     }
     
