@@ -82,6 +82,16 @@ public class PlantSim {
         frame.setVisible(true);
         });
 
+        // add plants to pink noise :
+        // run density function
+        // run growth function
+        // run viability function
+
+        // add plants to forest object
+        // create forest object
+        // overlay forest on terrain
+        // export to 2D renderer
+
         
     }
 

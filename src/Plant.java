@@ -18,6 +18,9 @@ public class Plant {
     // Constructor
     // ============================
 
+    //
+    // I think get rid of the coordinates and just use the point sample coordinates
+    //
     public Plant(int id, float x, float y, int currentAge, Species species,
                  float size, boolean isAlive, float vigour, boolean allometryIsOpen) {
         this.id = id;
