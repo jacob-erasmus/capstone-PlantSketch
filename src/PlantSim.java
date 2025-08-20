@@ -51,6 +51,12 @@ public class PlantSim {
         AbioticFactors abioticFactors = new AbioticFactors(moistureMap, temperatureMap, sunligntMap);
         Terrain terrain = new Terrain(dimX, dimY, gridSpacing, abioticFactors, fileManager.getElevationGrid());
 
+        //vizualizer for the abiotic factors
+        GridVisualizer.showGrid(fileManager.getMoistureGrid(), "Moisture Map");
+        GridVisualizer.showGrid(fileManager.getTemperatureGrid(), "Temperature Map");
+        GridVisualizer.showGrid(fileManager.getSunlightGrid(), "Sunlight Map");
+        GridVisualizer.showGrid(fileManager.getElevationGrid(), "Elevation Map");
+
         moistureMap.testMoisture();
         temperatureMap.testTemperature();
         sunligntMap.testSunlight();
@@ -70,7 +76,7 @@ public class PlantSim {
                 // === TESTING PINK NOISE SAMPLER ===
         PinkNoiseSampler sampler = new PinkNoiseSampler(dimX, dimY, 2.0f, 42L); 
         // dimX/dimY from file, 2.0f = 2m min separation, 42L = random seed
-        List<PointSample> samples = sampler.generateSamples(1000); // try 100 canopy trees
+        List<PointSample> samples = sampler.generateSamples(1000); // try 1000 canopy trees
 
         // Show results in Swing window
         SwingUtilities.invokeLater(() -> {
