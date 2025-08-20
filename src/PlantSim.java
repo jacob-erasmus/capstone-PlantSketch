@@ -51,6 +51,12 @@ public class PlantSim {
         AbioticFactors abioticFactors = new AbioticFactors(moistureMap, temperatureMap, sunligntMap);
         Terrain terrain = new Terrain(dimX, dimY, gridSpacing, abioticFactors, fileManager.getElevationGrid());
 
+        //vizualizer for the abiotic factors
+        GridVisualizer.showGrid(fileManager.getMoistureGrid(), "Moisture Map");
+        GridVisualizer.showGrid(fileManager.getTemperatureGrid(), "Temperature Map");
+        GridVisualizer.showGrid(fileManager.getSunlightGrid(), "Sunlight Map");
+        GridVisualizer.showGrid(fileManager.getElevationGrid(), "Elevation Map");
+
         moistureMap.testMoisture();
         temperatureMap.testTemperature();
         sunligntMap.testSunlight();
