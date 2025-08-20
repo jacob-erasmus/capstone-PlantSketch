@@ -1,7 +1,7 @@
+// this class is used to store species data for the simulation
+
 public class SpeciesDictionary {
     
-    // This class is a placeholder for the species dictionary.
-    // It will be used to manage species data in the future.
     
     public SpeciesDictionary() {
         // Constructor
