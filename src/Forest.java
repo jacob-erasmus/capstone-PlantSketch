@@ -17,6 +17,10 @@ public class Forest {
         this.speciesMap = new ArrayList<>();
     }
     
+    public void addSpeciesMap(SpeciesMap speciesMap){
+        this.speciesMap.add(speciesMap);
+    }
+
     public void addPlant(Plant plant) {
         // Method stub
     }

@@ -3,18 +3,23 @@ import java.util.Random;
 
 public class RouletteWheelSelector {
     private float random;
-    
+    private float density;
+    private Random r = new Random();
+
     public RouletteWheelSelector() {
         this.random = 0.0f;
     }
     
     public RouletteWheelSelector(float density) {
-        Random r = new Random();
+        this.density = density;
         this.random = (density) * r.nextFloat();
     }
     
     public String selectSpecies(List<Species> speciesList) {
         // Method stub
+        if (random > density){
+            return "none";
+        }
         int indexOfSpecies = -1;
         float closestProbability = 1000000000;
         for (int i = 0; i < speciesList.size(); i++){
