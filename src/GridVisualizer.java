@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -9,7 +8,10 @@ public class GridVisualizer extends JPanel {
 
     public GridVisualizer(float[][] grid) {
         this.grid = grid;
-        setPreferredSize(new Dimension(grid.length * cellSize, grid[0].length * cellSize));
+        //setPreferredSize(new Dimension(grid.length * cellSize, grid[0].length * cellSize));
+
+        setPreferredSize(new Dimension(grid[0].length * cellSize, grid.length * cellSize));
+
     }
 
     @Override
@@ -35,7 +37,7 @@ public class GridVisualizer extends JPanel {
                 Color color = new Color(intensity, 0, 255 - intensity);
                 g.setColor(color);
 
-                g.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                g.fillRect(y * cellSize, x * cellSize, cellSize, cellSize);
             }
         }
     }
@@ -49,4 +51,3 @@ public class GridVisualizer extends JPanel {
         frame.setVisible(true);
     }
 }
-
