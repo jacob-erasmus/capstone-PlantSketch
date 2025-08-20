@@ -22,8 +22,8 @@ public class SpeciesDictionary {
             0.42f,
             0.70f,
             15f,
-            "L"
-        );
+            "L",
+        0f);
         // System.out.println(boxwood.toString());
 
         return boxwood;
@@ -43,7 +43,8 @@ public class SpeciesDictionary {
             0.17f,
             0.52f,
             22f,
-            "S"
+            "S",
+            0f
         );
         //System.out.println(snowyMespilus.toString());
         return snowyMespilus;
@@ -64,6 +65,7 @@ public class SpeciesDictionary {
             0.43f,
             3f,
             "L"
+            ,0f
         );
         //System.out.println(mountainPine.toString());
         return mountainPine;
@@ -83,7 +85,8 @@ public class SpeciesDictionary {
             0.07f,
             0.47f,
             22f,
-            "L"
+            "L",
+            0f
         );
         //System.out.println(silverFir.toString());
         return silverFir;
@@ -103,7 +106,8 @@ public class SpeciesDictionary {
             0.1f,
             0.30f,
             15f,
-            "S"
+            "S",
+            0f
         );
         //System.out.println(silverBirch.toString());
         return silverBirch;
@@ -123,7 +127,8 @@ public class SpeciesDictionary {
             0.21f,
             0.35f,
             15f,
-            "S"
+            "S",
+            0f
         );
         //System.out.println(sissileOak.toString());
         return sissileOak;
@@ -143,7 +148,8 @@ public class SpeciesDictionary {
             0.13f,
             0.37f,
             15f,
-            "S"
+            "S",
+            0f
         );
         //System.out.println(europeanBeech.toString());
         return europeanBeech;

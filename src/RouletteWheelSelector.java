@@ -13,7 +13,7 @@ public class RouletteWheelSelector {
         this.random = (density) * r.nextFloat();
     }
     
-    public int selectSpecies(List<Species> speciesList) {
+    public String selectSpecies(List<Species> speciesList) {
         // Method stub
         int indexOfSpecies = -1;
         float closestProbability = 1000000000;
@@ -26,6 +26,10 @@ public class RouletteWheelSelector {
                 }
             }
         }
-        return indexOfSpecies;
+        if (indexOfSpecies == -1){
+            return "none";
+        }
+        
+        return speciesList.get(indexOfSpecies).getName();
     }
 }

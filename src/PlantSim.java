@@ -151,8 +151,21 @@ public class PlantSim {
             String speciesSelected = rw.selectSpecies(speciesList);
             //need age, size etc, allometry etc...
             if (speciesSelected == "Boxwood"){
-                boxwodMap.setPlantAt(new Plant(i, xPos, yPos, age, boxwood, size, true, i, false), xPos, yPos);
-            
+                boxwodMap.setPlantAt(new Plant(i, xPos, yPos, age, boxwood, size, true, vigour, false), xPos, yPos);
+            }else if (speciesSelected == "Snowy Mespilus"){
+                snowyMespilusMap.setPlantAt(new Plant(i, xPos, yPos, age, snowyMespilus, size, true, vigour, true), xPos, yPos);
+            }else if (speciesSelected == "Mountain Pine"){
+                mountainPineMap.setPlantAt(new Plant(i, xPos, yPos, age, mountainPine, size, true, vigour, true), xPos, yPos);
+            }else if (speciesSelected == "Silver Fir"){
+                silverFirMap.setPlantAt(new Plant(i, xPos, yPos, age, silverFir, size, true, vigour, true), xPos, yPos);
+            }else if (speciesSelected == "Silver Birch"){
+                silverBirchMap.setPlantAt(new Plant(i, xPos, yPos, age, silverBirch, size, true, vigour, true), xPos, yPos);
+            }else if (speciesSelected == "Sissile Oak"){
+                sissileOakMap.setPlantAt(new Plant(i, xPos, yPos, age, sissileOak, size, true, vigour, true), xPos, yPos);
+            }else if (speciesSelected == "European Beech"){
+                europeanBeechMap.setPlantAt(new Plant(i, xPos, yPos, age, europeanBeech, size, true, vigour, true), xPos, yPos);
+            }
+
             }
         }
         // add plants to forest object
