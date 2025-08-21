@@ -227,6 +227,8 @@ public class PlantSim {
 
         // export to 2D renderer
         ForestVisualizer.showForest(forest, dimX, dimY, 3);
+        ForestOnTerrainVisualizer.showForestOnTerrain(forest, fileManager.getElevationGrid());
+
 
         
     }
