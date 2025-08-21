@@ -16,7 +16,8 @@ public class GridVisualizer extends JPanel {
         int gridMax = Math.max(grid.length, grid[0].length);
 
         // Compute cell size so that the grid fits in half-screen square
-        cellSize = halfSize / gridMax;
+        cellSize = Math.max(1, halfSize / gridMax);
+
 
         // Set preferred size
         setPreferredSize(new Dimension(grid[0].length * cellSize, grid.length * cellSize));
