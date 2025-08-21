@@ -15,14 +15,14 @@ public class RouletteWheelSelector {
         this.random = (sumViabilites) * r.nextFloat();
     }
     
-    public String selectSpecies(Table[] rouletteTable, int count) {
+    public Species selectSpecies(Table[] rouletteTable, int count) {
         // Method stub
         for (int i = 0; i < count; i++){
             if(random > rouletteTable[i].getAddedViability()){
             }else{
-                return rouletteTable[i].getSpecies().getName();
+                return rouletteTable[i].getSpecies();
             }
         }
-        return "none";
+        return null;
     }
 }

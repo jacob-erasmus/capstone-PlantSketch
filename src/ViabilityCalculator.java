@@ -36,7 +36,7 @@ public class ViabilityCalculator {
 
 
 
-    public double viabililty(Species species, int x, int y)
+    public float viabililty(Species species, int x, int y)
     {
         // calculating the viablility wrt slope
         double cs = species.getSlopeC();
@@ -63,6 +63,6 @@ public class ViabilityCalculator {
         double fm = calculateViability(rm, cm, moist);
 
         // now we take the minimum as that is the deciding factor on the viability of the species
-        return Math.min(Math.min(fs,ft),Math.min(fe,fm));
+        return (float)Math.min(Math.min(fs,ft),Math.min(fe,fm));
     }
 }

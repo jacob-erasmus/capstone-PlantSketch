@@ -8,7 +8,7 @@ public class SpeciesDictionary {
     }
 
 
-    public static Species loadBoxwood()
+    public Species loadBoxwood()
     {
          ViabilityParameters boxwoodViabilityParameters = new ViabilityParameters(
         3.75f, 4.25f, 27.5f, 12.5f, 11.75f, 23.35f, 0f, 80f);
@@ -29,7 +29,7 @@ public class SpeciesDictionary {
         return boxwood;
     }
 
-    public static Species loadSnowyMespilus()
+    public Species loadSnowyMespilus()
     {
         ViabilityParameters snowyMespilusViabilityParameters = new ViabilityParameters(
         7f, 5f, 31f, 9f, 19.25f, 15.75f, 0f, 80f);
@@ -50,7 +50,7 @@ public class SpeciesDictionary {
         return snowyMespilus;
     }
 
-    public static Species loadMountainPine()
+    public Species loadMountainPine()
     {
         ViabilityParameters mountainPineViabilityParameters = new ViabilityParameters(
         7f, 5f, 21.5f, 18.5f, 11.75f, 23.25f, 0f, 80f);
@@ -71,7 +71,7 @@ public class SpeciesDictionary {
         return mountainPine;
     }
 
-    public static Species loadSilverFir()
+    public Species loadSilverFir()
     {
         ViabilityParameters silverFirViabilityParameters = new ViabilityParameters(
         5f, 3f, 31f, 9f, 11.75f, 23.25f, 0f, 80f);
@@ -92,7 +92,7 @@ public class SpeciesDictionary {
         return silverFir;
     }
 
-    public static Species loadSilverBirch()
+    public Species loadSilverBirch()
     {
         ViabilityParameters silverBirchViabilityParameters = new ViabilityParameters(
         8.25f, 3.75f, 27.5f, 12.5f, 19.25f, 15.75f, 0f, 70f);
@@ -113,7 +113,7 @@ public class SpeciesDictionary {
         return silverBirch;
     }
 
-    public static Species loadSissileOak()
+    public Species loadSissileOak()
     {
         ViabilityParameters sissileOakViabilityParameters = new ViabilityParameters(
         5f, 3f, 37.5f, 22.5f, 19.25f, 15.75f, 0f, 70f);
