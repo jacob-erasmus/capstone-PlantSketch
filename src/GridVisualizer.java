@@ -2,16 +2,24 @@ import javax.swing.*;
 import java.awt.*;
 
 public class GridVisualizer extends JPanel {
-
     private float[][] grid;
-    private int cellSize = 10; // pixels per cell
+    private int cellSize; // dynamically computed
 
     public GridVisualizer(float[][] grid) {
         this.grid = grid;
-        //setPreferredSize(new Dimension(grid.length * cellSize, grid[0].length * cellSize));
 
+        // Get screen size
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int halfSize = Math.min(screenSize.width, screenSize.height) / 2; // half of smaller dimension
+
+        // Find the larger grid dimension
+        int gridMax = Math.max(grid.length, grid[0].length);
+
+        // Compute cell size so that the grid fits in half-screen square
+        cellSize = halfSize / gridMax;
+
+        // Set preferred size
         setPreferredSize(new Dimension(grid[0].length * cellSize, grid.length * cellSize));
-
     }
 
     @Override
@@ -31,19 +39,13 @@ public class GridVisualizer extends JPanel {
         for (int x = 0; x < grid.length; x++) {
             for (int y = 0; y < grid[0].length; y++) {
                 float value = grid[x][y];
-                int intensity = (int) ((value - min) / (max - min) * 255); // scale 0–255
-
-                // invert if you want dark = older (max -> 0, min -> 255)
-                intensity = 255 - intensity;
-
-                // greyscale color
+                int intensity = (int) ((value - min) / (max - min) * 255);
+                intensity = 255 - intensity; // invert
                 Color color = new Color(intensity, intensity, intensity);
                 g.setColor(color);
-
                 g.fillRect(y * cellSize, x * cellSize, cellSize, cellSize);
             }
         }
-
     }
 
     // quick test method
@@ -52,6 +54,7 @@ public class GridVisualizer extends JPanel {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(new JScrollPane(new GridVisualizer(grid)));
         frame.pack();
+        frame.setLocationRelativeTo(null); // center window
         frame.setVisible(true);
     }
 }
