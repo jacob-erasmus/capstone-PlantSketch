@@ -3,6 +3,7 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Scanner;
 
 public class PlantSim {
     public PlantSim() {
@@ -13,6 +14,10 @@ public class PlantSim {
         // option 1: upload all files
         // 2: upload .pdb file
         // read in files
+        Scanner userInput = new Scanner(System.in);
+        System.out.println("How many plant do you want to place?");
+        int plantCount = userInput.nextInt();
+
         FileManager fileManager = new FileManager();
         fileManager.fileFinder();
         int dimX = fileManager.getDimX();
@@ -74,7 +79,7 @@ public class PlantSim {
         
         PinkNoiseSampler sampler = new PinkNoiseSampler(metersX, metersY, 2.0f, 42L); 
         // dimX/dimY from file, 2.0f = 2m min separation, 42L = random seed
-        List<PointSample> samples = sampler.generateSamples(1000); // try 1000 canopy trees
+        List<PointSample> samples = sampler.generateSamples(plantCount); // try 1000 canopy trees
 
         // Show results in Swing window
         SwingUtilities.invokeLater(() -> {
