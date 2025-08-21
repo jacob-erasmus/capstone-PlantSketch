@@ -93,7 +93,7 @@ public class PlantSim {
         float density = 0.0f;
 
         //setup species maps
-        SpeciesMap boxwodMap = new SpeciesMap(boxwood);
+        SpeciesMap boxwoodMap = new SpeciesMap(boxwood);
         SpeciesMap snowyMespilusMap = new SpeciesMap(snowyMespilus);
         SpeciesMap mountainPineMap = new SpeciesMap(mountainPine);
         SpeciesMap silverFirMap = new SpeciesMap(silverFir);
@@ -174,7 +174,7 @@ public class PlantSim {
             
             //placing plant
             if (speciesSelected.getName() == "Boxwood"){
-                boxwodMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, boxwood, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
+                boxwoodMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, boxwood, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
             }else if (speciesSelected.getName() == "Snowy Mespilus"){
                 snowyMespilusMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, snowyMespilus, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
             }else if (speciesSelected.getName() == "Mountain Pine"){    
@@ -194,7 +194,7 @@ public class PlantSim {
 
         //Setup forest
         Forest forest = new Forest(dimX, dimY);
-        forest.addSpeciesMap(boxwodMap);
+        forest.addSpeciesMap(boxwoodMap);
         forest.addSpeciesMap(snowyMespilusMap);
         forest.addSpeciesMap(mountainPineMap);
         forest.addSpeciesMap(silverFirMap);
