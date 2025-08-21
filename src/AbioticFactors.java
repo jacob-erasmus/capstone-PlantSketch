@@ -33,7 +33,6 @@ public class AbioticFactors {
     }
 
 
-    
     public float getAdjustedMoisture(int x, int y) {
         // Method stub
         return 0.0f;

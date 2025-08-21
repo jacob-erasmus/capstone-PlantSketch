@@ -31,13 +31,11 @@ public class PinkNoiseVisualizer extends JPanel {
         // Draw points
         g.setColor(Color.PINK);
         for (PointSample sample : samples) {
-            int x = (int) sample.getX();
-            int y = (int) sample.getY();
+        int px = Math.round(sample.getX() / (float) width * getWidth());
+        int py = getHeight() - Math.round(sample.getY() / (float) height * getHeight()); // flip y
 
-            // flip y so origin is bottom-left instead of top-left
-            int yInverted = height - y; 
+        g.fillOval(px - 2, py - 2, 4, 4);
 
-            g.fillOval(x - 2, yInverted - 2, 4, 4);
         }
     }
 }

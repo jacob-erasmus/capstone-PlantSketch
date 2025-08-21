@@ -15,7 +15,7 @@ public class PlantSim {
         // 2: upload .pdb file
         // read in files
         Scanner userInput = new Scanner(System.in);
-        System.out.println("How many plant do you want to place?");
+        System.out.println("How many plants would you like to try place?");
         int plantCount = userInput.nextInt();
 
         FileManager fileManager = new FileManager();
