@@ -14,6 +14,7 @@ public class Species {
     private float moistureAbsorbtion;
     private String growthPeriod;
     private String colour;
+    private float viabilityAtPoint;
 
     // Constructor
     public Species(String name,
@@ -24,7 +25,8 @@ public class Species {
                    float radiusMultiplierClosed,
                    float leafTransparency,
                    float moistureAbsorbtion,
-                   String growthPeriod) {
+                   String growthPeriod,
+                   float viabilityAtPoint) {
 
         this.name = name;
         this.viabilityParameters = viabilityParameters;
@@ -35,6 +37,7 @@ public class Species {
         this.leafTransparency = leafTransparency;
         this.moistureAbsorbtion = moistureAbsorbtion;
         this.growthPeriod = growthPeriod;
+        this.viabilityAtPoint = viabilityAtPoint;
     }
 
     // ===== Core getters =====
@@ -116,6 +119,15 @@ public class Species {
         return growthParameters.getLifeSpan();
     }
 
+    //point set & get
+    public void setViabilityAtPoint(double viabililty){
+        viabilityAtPoint = (float)viabililty;
+    }
+
+    public float getViabilityAtPoint(){
+        return viabilityAtPoint;
+    }
+    
     @Override
     public String toString() {
         return "Species {" +

@@ -7,9 +7,10 @@ public class Plant {
     private int id;
     private float x;
     private float y;
-    private int currentAge;
+    private float currentAge;
     private Species species;
-    private float size;             // e.g. canopy radius or height
+    private float canopyRadius;
+    private float height;
     private boolean isAlive;
     private float vigour;
     private boolean allometryIsOpen; // open vs closed growth mode
@@ -21,14 +22,15 @@ public class Plant {
     //
     // I think get rid of the coordinates and just use the point sample coordinates
     //
-    public Plant(int id, float x, float y, int currentAge, Species species,
-                 float size, boolean isAlive, float vigour, boolean allometryIsOpen) {
+    public Plant(int id, float x, float y, float currentAge, Species species,
+                 float canopyRadius, float height, boolean isAlive, float vigour, boolean allometryIsOpen) {
         this.id = id;
         this.x = x;
         this.y = y;
         this.currentAge = currentAge;
         this.species = species; // link to shared species data
-        this.size = size;
+        this.canopyRadius = canopyRadius;
+        this.height = height;
         this.isAlive = isAlive;
         this.vigour = vigour;
         this.allometryIsOpen = allometryIsOpen;
@@ -50,7 +52,7 @@ public class Plant {
         return y;
     }
 
-    public int getAge() {
+    public float getAge() {
         return currentAge;
     }
 
@@ -58,8 +60,12 @@ public class Plant {
         return species;
     }
 
-    public float getSize() {
-        return size;
+    public float getCanopyRadius() {
+        return canopyRadius;
+    }
+
+    public float getHeight(){
+        return height;
     }
 
     public boolean isAlive() {
@@ -82,8 +88,12 @@ public class Plant {
         this.currentAge = currentAge;
     }
 
-    public void setSize(float size) {
-        this.size = size;
+    public void setCanopyRadius(float canopyRadius) {
+        this.canopyRadius = canopyRadius;
+    }
+
+    public void setHeight(float height){
+        this.height = height;
     }
 
     public void setAlive(boolean alive) {
@@ -190,7 +200,8 @@ public class Plant {
                 ",\n  y=" + y +
                 ",\n  currentAge=" + currentAge +
                 ",\n  species=" + getSpeciesName() +
-                ",\n  size=" + size +
+                ",\n  canopyRadius=" + canopyRadius +
+                ",\n  height=" + height +
                 ",\n  isAlive=" + isAlive +
                 ",\n  vigour=" + vigour +
                 ",\n  allometryIsOpen=" + allometryIsOpen +

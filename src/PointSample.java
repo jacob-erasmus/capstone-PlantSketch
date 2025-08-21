@@ -9,7 +9,7 @@ public class PointSample {
         this.plant = null;
     }
 
-    public PointSample(float x, float y, Plant plant) {
+    public PointSample(float x, float y) {
         this.x = x;
         this.y = y;
     }
@@ -25,16 +25,6 @@ public class PointSample {
 
     public float getY() {
         return this.y;
-    }
-
-
-    // getters and setters for plant
-    public Plant getPlant() {
-        return this.plant;
-    }
-
-    public void setPlant(Plant plant) {
-        this.plant = plant;
     }
 
     @Override

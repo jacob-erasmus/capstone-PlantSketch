@@ -4,12 +4,12 @@ import java.util.Random;
 
 public class PinkNoiseSampler {
 
-    private final int width;
-    private final int height;
+    private final float width;
+    private final float height;
     private final float minDistance; // min spacing between points (e.g. 2m)
     private final Random rng;
 
-    public PinkNoiseSampler(int width, int height, float minDistance, long seed) {
+    public PinkNoiseSampler(float width, float height, float minDistance, long seed) {
         this.width = width;
         this.height = height;
         this.minDistance = minDistance;
@@ -33,7 +33,7 @@ public class PinkNoiseSampler {
             // can add in the checks for plants here and add the plant as you create the point
             
             PointSample candidate = new PointSample(x, y);
-
+            
             if (isFarEnough(candidate, samples)) {
                 samples.add(candidate);
             }
