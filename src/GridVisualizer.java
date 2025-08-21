@@ -33,13 +33,17 @@ public class GridVisualizer extends JPanel {
                 float value = grid[x][y];
                 int intensity = (int) ((value - min) / (max - min) * 255); // scale 0–255
 
-                // color mapping: blue(low) -> red(high)
-                Color color = new Color(intensity, 0, 255 - intensity);
+                // invert if you want dark = older (max -> 0, min -> 255)
+                intensity = 255 - intensity;
+
+                // greyscale color
+                Color color = new Color(intensity, intensity, intensity);
                 g.setColor(color);
 
                 g.fillRect(y * cellSize, x * cellSize, cellSize, cellSize);
             }
         }
+
     }
 
     // quick test method
