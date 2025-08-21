@@ -141,7 +141,9 @@ public class PlantSim {
             //Step 2: run roulette wheel
             RouletteWheelSelector rw = new RouletteWheelSelector(sumViabilites);
             Species speciesSelected = rw.selectSpecies(rouletteTable, count);
-
+            if (speciesSelected == null){
+                continue;
+            }
             //Step 3: need age, size etc, allometry etc...
             //filler cohort age as max bound:
     //FIX with AGE MAP
