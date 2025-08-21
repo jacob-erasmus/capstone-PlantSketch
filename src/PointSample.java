@@ -14,10 +14,6 @@ public class PointSample {
         this.y = y;
     }
 
-    public PointSample(float x, float y) {
-        this.x = x;
-        this.y = y;
-    }
 
     public float getX() {
         return this.x;
