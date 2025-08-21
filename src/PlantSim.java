@@ -102,7 +102,9 @@ public class PlantSim {
         SpeciesMap europeanBeechMap = new SpeciesMap(europeanBeech);
 
         //Per Sample Point placement
+        int plantsPlacedCount = 0;
         for (int i = 0; i < samples.size(); i++){
+            System.out.println("Sample point: " + i);
             float xPos = samples.get(i).getX();
             float yPos = samples.get(i).getY();
             int xCell = (int)xPos;
@@ -113,9 +115,12 @@ public class PlantSim {
             for(Species species: speciesList){
                 viabililty = calc.viabililty(species, xCell, yCell);
                 species.setViabilityAtPoint(viabililty);
+                
                 if (viabililty > 0){
                     speciesTemp.add(species);
                     count++;
+                    System.out.println(species.getName() + " viability: " + viabililty);
+                    System.out.println("count:" + count);
                 }
             }
 
@@ -132,8 +137,10 @@ public class PlantSim {
             }
 
             //density function, if larger than random then no plant at point
+            System.out.println("Density: " + density);
             Random r = new Random();
             if(density > r.nextFloat()){
+                System.out.println("No placement due to density");
                 continue;
             }
 
@@ -164,8 +171,10 @@ public class PlantSim {
                 upperBound = speciesSelected.getLifeSpan();
             }
             float plantAge = r.nextFloat(upperBound) * speciesSelected.getViabilityAtPoint();
+            System.out.println("Plant age: " + plantAge);
             //setting height
             float height = growthCalc.calculateSize(speciesSelected, plantAge, isAllometryOpen);
+            System.out.println("height:" + height);
             //setting canopy radius
             float canopyRadius;
             if(isAllometryOpen){
@@ -173,27 +182,28 @@ public class PlantSim {
             }else{
                 canopyRadius = height * speciesSelected.getRadiusMultiplierClosed();
             }
-            
+            System.out.println("canopyRadius: " + canopyRadius);
             //placing plant
+            plantsPlacedCount++;
             if (speciesSelected.getName() == "Boxwood"){
-                boxwoodMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, boxwood, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
+                boxwoodMap.setPlantAt(new Plant(plantsPlacedCount, xPos, yPos, plantAge, boxwood, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
             }else if (speciesSelected.getName() == "Snowy Mespilus"){
-                snowyMespilusMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, snowyMespilus, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
+                snowyMespilusMap.setPlantAt(new Plant(plantsPlacedCount, xPos, yPos, plantAge, snowyMespilus, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
             }else if (speciesSelected.getName() == "Mountain Pine"){    
-                mountainPineMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, mountainPine, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
+                mountainPineMap.setPlantAt(new Plant(plantsPlacedCount, xPos, yPos, plantAge, mountainPine, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
             }else if (speciesSelected.getName() == "Silver Fir"){  
-                silverFirMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, silverFir, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
+                silverFirMap.setPlantAt(new Plant(plantsPlacedCount, xPos, yPos, plantAge, silverFir, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
             }else if (speciesSelected.getName() == "Silver Birch"){
-                silverBirchMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, silverBirch, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
+                silverBirchMap.setPlantAt(new Plant(plantsPlacedCount, xPos, yPos, plantAge, silverBirch, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
             }else if (speciesSelected.getName() == "Sissile Oak"){
-                sissileOakMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, sissileOak, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
+                sissileOakMap.setPlantAt(new Plant(plantsPlacedCount, xPos, yPos, plantAge, sissileOak, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
             }else if (speciesSelected.getName() == "European Beech"){
-                europeanBeechMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, europeanBeech, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
+                europeanBeechMap.setPlantAt(new Plant(plantsPlacedCount, xPos, yPos, plantAge, europeanBeech, canopyRadius, height, true, speciesSelected.getViabilityAtPoint(), isAllometryOpen));
             }
             //else do nothing - no species choosen, no plant placed at this sample.
         //Point sample placement done.
         }
-
+        System.out.println("Sampling done. Plants placed: " + plantsPlacedCount + " and samples points total: " + samples.size());
         //Setup forest
         Forest forest = new Forest(dimX, dimY);
         forest.addSpeciesMap(boxwoodMap);
