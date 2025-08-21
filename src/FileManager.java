@@ -8,6 +8,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOError;
 import java.util.Scanner;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
 
 
 
@@ -26,6 +30,7 @@ public class FileManager {
     private float[][] moistureGrid;
     private float[][] sunlightGrid;
     private float[][] elevationGrid;
+    private float[][] ageGrid;
     
     public FileManager() {
         this.currentFilePath = "";
@@ -98,6 +103,12 @@ public class FileManager {
                                 System.out.println(name + " Loaded :)");
                             }
                         } 
+                        else if (name.endsWith(".png") && (name.contains("age") || name.contains("Age"))) 
+                        {
+                            System.out.println("Loading Age File: " + name);
+                            this.ageGrid = loadPng(file);
+                            System.out.println(name + " Loaded :)");
+                        }
                         else 
                         {
                             System.out.println("Unknown file in directory. Ignoring it." + name);
@@ -207,6 +218,46 @@ public class FileManager {
         }
         return null;
     }
+
+    public float[][] loadPng(File file) {
+        try {
+            BufferedImage img = ImageIO.read(file);
+            int width = img.getWidth();
+            int height = img.getHeight();
+
+            // check consistency with elevation grid dimensions
+            if (this.dimX != 0 && this.dimY != 0) {
+                if (width != this.dimX || height != this.dimY) {
+                    System.out.println("Oh no!: PNG dimensions (" + width + "x" + height +
+                                    ") do not match .elv dimensions (" + dimX + "x" + dimY + ")");
+                }
+            } else {
+                // if no .elv loaded yet, fall back to image dims
+                this.dimX = width;
+                this.dimY = height;
+            }
+
+            float[][] grid = new float[width][height];
+
+            // normalize red [0–255] → age [0–600]
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    int rgb = img.getRGB(x, y);
+                    int red = (rgb >> 16) & 0xFF;
+                    float age = (red / 255.0f) * 600.0f;
+                    grid[x][y] = age;
+                }
+            }
+
+            return grid;
+
+        } catch (IOException e) {
+            System.out.println("Error reading PNG: " + e.getMessage());
+            return null;
+        }
+    }
+
+
     
     public float[][] getTemperatureGrid()
     {
@@ -226,6 +277,10 @@ public class FileManager {
     public float[][] getSunlightGrid()
     {
         return sunlightGrid;
+    }
+
+    public float[][] getAgeGrid() {
+        return ageGrid;
     }
 
     public int getDimX()
