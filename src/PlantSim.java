@@ -145,7 +145,7 @@ public class PlantSim {
             //Step 3: need age, size etc, allometry etc...
             //filler cohort age as max bound:
     //FIX with AGE MAP
-            float cohortAge = 80;
+            float cohortAge = ageMap.getAge(xCell, yCell);
             //growth function intialise
             GrowthFunction growthCalc = new GrowthFunction();
             //setting allometry
@@ -161,7 +161,7 @@ public class PlantSim {
             if (upperBound > speciesSelected.getLifeSpan()){
                 upperBound = speciesSelected.getLifeSpan();
             }
-            float plantAge = r.nextFloat(upperBound+1) * (float)speciesSelected.getViabilityAtPoint();
+            float plantAge = r.nextFloat(upperBound) * speciesSelected.getViabilityAtPoint();
             //setting height
             float height = growthCalc.calculateSize(speciesSelected, plantAge, isAllometryOpen);
             //setting canopy radius
