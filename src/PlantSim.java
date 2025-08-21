@@ -207,6 +207,7 @@ public class PlantSim {
         // overlay forest on terrain
 
         // export to 2D renderer
+        ForestVisualizer.showForest(forest, dimX, dimY, 10);
 
         
     }
