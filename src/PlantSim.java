@@ -51,6 +51,16 @@ public class PlantSim {
         AbioticFactors abioticFactors = new AbioticFactors(moistureMap, temperatureMap, sunligntMap);
         Terrain terrain = new Terrain(dimX, dimY, gridSpacing, abioticFactors, fileManager.getElevationGrid());
 
+        // === AGE MAP ===
+        AgeMap ageMap = new AgeMap(dimX, dimY, gridSpacing, fileManager.getAgeGrid());
+
+        // test printing a few ages
+        ageMap.testAge();
+
+        // visualize as grid (darker = older)
+        GridVisualizer.showGrid(fileManager.getAgeGrid(), "Age Map");
+
+
         //vizualizer for the abiotic factors
         GridVisualizer.showGrid(fileManager.getMoistureGrid(), "Moisture Map");
         GridVisualizer.showGrid(fileManager.getTemperatureGrid(), "Temperature Map");
