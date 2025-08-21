@@ -35,7 +35,6 @@ public class PlantSim {
         this.fileManager = fileManager;
         this.isRunning = false;
     }
-    
 
     public static void main(String[] args)
     {
@@ -103,7 +102,8 @@ public class PlantSim {
         double silverBirchViability;
         double sissileOakViability;
         double europeanBeechViability;
-        float sumViabilites;
+        float sumViabilites = 0.0f;
+        float density = 0.0f;
 
         //setup species maps
         SpeciesMap boxwodMap = new SpeciesMap(boxwood);
@@ -116,61 +116,86 @@ public class PlantSim {
 
         //Per Sample Point placement
         for (int i = 0; i < samples.size(); i++){
-            int xPos = (int)samples.get(i).getX();
-            int yPos = (int)samples.get(i).getY();
-
+            float xPos = samples.get(i).getX();
+            float yPos = samples.get(i).getY();
+            int xCell = (int)xPos;
+            int yCell = (int)yPos;
+            int count = 0;
             //Step 1: run viability function for all species
-            boxwoodViability = calc.viabililty(boxwood, xPos, yPos);
+            boxwoodViability = calc.viabililty(boxwood, xCell, yCell);
             boxwood.setViabilityAtPoint(boxwoodViability);
             if (boxwoodViability > 0){
                 speciesList.add(boxwood);
+                count++;
             }
-            snowyMespilusViability = calc.viabililty(snowyMespilus, xPos, yPos);
+            snowyMespilusViability = calc.viabililty(snowyMespilus, xCell, yCell);
             snowyMespilus.setViabilityAtPoint(snowyMespilusViability);
             if (snowyMespilusViability > 0){
-                speciesList.add(boxwood);
+                speciesList.add(snowyMespilus);
+                count++;
             }
-            mountainPineViability = calc.viabililty(mountainPine, xPos, yPos);
+            mountainPineViability = calc.viabililty(mountainPine, xCell, yCell);
             mountainPine.setViabilityAtPoint(mountainPineViability);
             if (mountainPineViability > 0){
-                speciesList.add(boxwood);
+                speciesList.add(mountainPine);
+                count++;
             }
-            silverFirViability = calc.viabililty(silverFir, xPos, yPos);
+            silverFirViability = calc.viabililty(silverFir, xCell, yCell);
             silverFir.setViabilityAtPoint(silverFirViability);
             if (silverFirViability > 0){
-                speciesList.add(boxwood);
+                speciesList.add(silverFir);
+                count++;
             }
-            silverBirchViability = calc.viabililty(silverBirch, xPos, yPos);
+            silverBirchViability = calc.viabililty(silverBirch, xCell, yCell);
             silverBirch.setViabilityAtPoint(silverBirchViability);
             if (silverBirchViability > 0){
-                speciesList.add(boxwood);
+                speciesList.add(silverBirch);
+                count++;
             }
-            sissileOakViability = calc.viabililty(sissileOak, xPos, yPos);
+            sissileOakViability = calc.viabililty(sissileOak, xCell, yCell);
             sissileOak.setViabilityAtPoint(sissileOakViability);
             if (sissileOakViability > 0){
-                speciesList.add(boxwood);
+                speciesList.add(sissileOak);
+                count++;
             }
-            europeanBeechViability = calc.viabililty(europeanBeech, xPos, yPos);
+            europeanBeechViability = calc.viabililty(europeanBeech, xCell, yCell);
             europeanBeech.setViabilityAtPoint(europeanBeechViability);
             if (europeanBeechViability > 0){
-                speciesList.add(boxwood);
+                speciesList.add(europeanBeech);
+                count++;
             }
-            //sum of all viabilites (also known as density)
-            sumViabilites = (float)(boxwoodViability + snowyMespilusViability + mountainPineViability + silverBirchViability + silverFirViability + sissileOakViability + europeanBeechViability);
-            
+
+            //sum of all viabilites
+            //sumViabilites = (float)(boxwoodViability + snowyMespilusViability + mountainPineViability + silverBirchViability + silverFirViability + sissileOakViability + europeanBeechViability);
+            Table[] rouletteTable = new Table[count];
+            for (int y = 0; y < count; y++){
+                float viabililtyCur = speciesList.get(y).getViabilityAtPoint();
+                if (density < viabililtyCur){
+                    density = viabililtyCur;
+                }
+                sumViabilites += viabililtyCur;
+                rouletteTable[y] = new Table(speciesList.get(y), sumViabilites);
+            }
+
+            //density function, if larger than random then no plant at point
+            Random r = new Random();
+            if(density > r.nextFloat()){
+                continue;
+            }
+
+            //
             //Step 2: run roulette wheel
             RouletteWheelSelector rw = new RouletteWheelSelector(sumViabilites);
-            String speciesSelected = rw.selectSpecies(speciesList);
+            String speciesSelected = rw.selectSpecies(rouletteTable, count);
 
             //Step 3: need age, size etc, allometry etc...
             //filler cohort age as max bound:
-            Random r = new Random();
             float cohortAge = 80;
             //growth function intialise
             GrowthFunction growthCalc = new GrowthFunction();
             //setting allometry
             boolean isAllometryOpen;
-            if(sumViabilites > 0.5){
+            if(density > 0.8){
                 isAllometryOpen = true;
             }else{
                 isAllometryOpen = false;
@@ -179,7 +204,7 @@ public class PlantSim {
             if (speciesSelected == "Boxwood"){
                 //setting age
                 float upperBound = cohortAge;
-                if (cohortAge > boxwood.getLifeSpan()){
+                if (upperBound > boxwood.getLifeSpan()){
                     upperBound = boxwood.getLifeSpan();
                 }
                 float plantAge = r.nextFloat(upperBound+1) * (float)boxwoodViability;
@@ -192,6 +217,7 @@ public class PlantSim {
                 }else{
                     canopyRadius = height * boxwood.getRadiusMultiplierClosed();
                 }
+                //xPos is correct
                 boxwodMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, boxwood, canopyRadius, height, true, (float)boxwoodViability, isAllometryOpen));
             }else if (speciesSelected == "Snowy Mespilus"){
                 //setting age
@@ -209,7 +235,7 @@ public class PlantSim {
                 }else{
                     canopyRadius = height * snowyMespilus.getRadiusMultiplierClosed();
                 }
-                snowyMespilusMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, snowyMespilus, canopyRadius, height, true, (float)snowyMespilusViability, isAllometryOpen));
+                snowyMespilusMap.setPlantAt(new Plant(i, xCell, yCell, plantAge, snowyMespilus, canopyRadius, height, true, (float)snowyMespilusViability, isAllometryOpen));
             }else if (speciesSelected == "Mountain Pine"){
                 //setting age
                 float upperBound = cohortAge;
@@ -226,7 +252,7 @@ public class PlantSim {
                 }else{
                     canopyRadius = height * mountainPine.getRadiusMultiplierClosed();
                 }    
-                mountainPineMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, mountainPine, canopyRadius, height, true, (float)mountainPineViability, isAllometryOpen));
+                mountainPineMap.setPlantAt(new Plant(i, xCell, yCell, plantAge, mountainPine, canopyRadius, height, true, (float)mountainPineViability, isAllometryOpen));
             }else if (speciesSelected == "Silver Fir"){
                 //setting age
                 float upperBound = cohortAge;
@@ -243,7 +269,7 @@ public class PlantSim {
                 }else{
                     canopyRadius = height * silverFir.getRadiusMultiplierClosed();
                 }    
-                silverFirMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, silverFir, canopyRadius, height, true, (float)silverFirViability, isAllometryOpen));
+                silverFirMap.setPlantAt(new Plant(i, xCell, yCell, plantAge, silverFir, canopyRadius, height, true, (float)silverFirViability, isAllometryOpen));
             }else if (speciesSelected == "Silver Birch"){
                 //setting age
                 float upperBound = cohortAge;
@@ -260,7 +286,7 @@ public class PlantSim {
                 }else{
                     canopyRadius = height * silverBirch.getRadiusMultiplierClosed();
                 }
-                silverBirchMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, silverBirch, canopyRadius, height, true, (float)silverBirchViability, isAllometryOpen));
+                silverBirchMap.setPlantAt(new Plant(i, xCell, yCell, plantAge, silverBirch, canopyRadius, height, true, (float)silverBirchViability, isAllometryOpen));
             }else if (speciesSelected == "Sissile Oak"){
                 //setting age
                 float upperBound = cohortAge;
@@ -277,7 +303,7 @@ public class PlantSim {
                 }else{
                     canopyRadius = height * sissileOak.getRadiusMultiplierClosed();
                 }
-                sissileOakMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, sissileOak, canopyRadius, height, true, (float)sissileOakViability, isAllometryOpen));
+                sissileOakMap.setPlantAt(new Plant(i, xCell, yCell, plantAge, sissileOak, canopyRadius, height, true, (float)sissileOakViability, isAllometryOpen));
             }else if (speciesSelected == "European Beech"){
                 //setting age
                 float upperBound = cohortAge;
@@ -294,7 +320,7 @@ public class PlantSim {
                 }else{
                     canopyRadius = height * europeanBeech.getRadiusMultiplierClosed();
                 }
-                europeanBeechMap.setPlantAt(new Plant(i, xPos, yPos, plantAge, europeanBeech, canopyRadius, height, true, (float)europeanBeechViability, isAllometryOpen));
+                europeanBeechMap.setPlantAt(new Plant(i, xCell, yCell, plantAge, europeanBeech, canopyRadius, height, true, (float)europeanBeechViability, isAllometryOpen));
             }
             //else do nothing - no species choosen, no plant placed at this sample.
         //Point sample placement done.
