@@ -111,6 +111,10 @@ public class PlantSim {
             int yCell = (int)yPos;
             int count = 0;
 
+            density = 0.0f;
+            sumViabilites = 0.0f;
+            speciesTemp.clear();
+
             //Step 1: run viability function for all species
             for(Species species: speciesList){
                 viabililty = calc.viabililty(species, xCell, yCell);
