@@ -1,0 +1,38 @@
+# === Maven build === GENERATED USING AI
+/target/
+/bin/
+/out/
+
+# === IntelliJ / Eclipse / VSCode project files ===
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+*.classpath
+*.project
+*.settings/
+
+# === Logs & temp ===
+*.log
+*.tmp
+*.bak
+*.swp
+
+# === OS-specific ===
+.DS_Store
+Thumbs.db
+
+# === Generated files ===
+*.class
+*.jar
+*.war
+*.ear
+
+# === Maven wrapper (if you add it later) ===
+.mvn/
+mvnw
+mvnw.cmd
+
+# === Environment files ===
+.env
