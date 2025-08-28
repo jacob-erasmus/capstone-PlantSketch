@@ -1,6 +1,10 @@
+package plantsketch;
+
 public class AgeMap extends GridMap {
 
-    public AgeMap() { super(); }
+    public AgeMap() {
+        super();
+    }
 
     public AgeMap(int width, int height, float gridSpacing, float[][] grid) {
         super(width, height, gridSpacing, grid);
@@ -14,4 +18,3 @@ public class AgeMap extends GridMap {
         testGrid("Age");
     }
 }
-

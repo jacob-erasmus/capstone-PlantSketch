@@ -1,3 +1,5 @@
+package plantsketch;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -26,14 +28,15 @@ public class PinkNoiseSampler {
         List<PointSample> samples = new ArrayList<>();
 
         int attempts = 0;
-        while (samples.size() < n && attempts < n * 1000) { 
+        while (samples.size() < n && attempts < n * 1000) {
             float x = rng.nextFloat() * width;
             float y = rng.nextFloat() * height;
 
-            // can add in the checks for plants here and add the plant as you create the point
-            
+            // can add in the checks for plants here and add the plant as you create the
+            // point
+
             PointSample candidate = new PointSample(x, y);
-            
+
             if (isFarEnough(candidate, samples)) {
                 samples.add(candidate);
             }

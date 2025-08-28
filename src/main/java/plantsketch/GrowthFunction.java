@@ -1,10 +1,11 @@
-public class GrowthFunction {
-    
+package plantsketch;
 
-    public GrowthFunction() {  
-        
+public class GrowthFunction {
+
+    public GrowthFunction() {
+
     }
-    
+
     public float calculateSize(Species species, float currentAge, boolean allometryIsOpen) {
         float q = species.getQ();
         float lifeSpan = species.getLifeSpan();

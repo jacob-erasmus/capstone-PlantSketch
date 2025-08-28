@@ -1,4 +1,6 @@
 // Handles tolerance ranges for abiotic conditions
+package plantsketch;
+
 public class ViabilityParameters {
     private float sunlightC;
     private float sunlightR;
@@ -10,9 +12,9 @@ public class ViabilityParameters {
     private float slopeR;
 
     public ViabilityParameters(float sunlightC, float sunlightR,
-                            float moistureC, float moistureR,
-                            float temperatureC, float temperatureR,
-                            float slopeC, float slopeR) {
+            float moistureC, float moistureR,
+            float temperatureC, float temperatureR,
+            float slopeC, float slopeR) {
         this.sunlightC = sunlightC;
         this.sunlightR = sunlightR;
         this.moistureC = moistureC;
@@ -24,14 +26,37 @@ public class ViabilityParameters {
     }
 
     // Getters
-    public float getSunlightC() { return sunlightC; }
-    public float getSunlightR() { return sunlightR; }
-    public float getMoistureC() { return moistureC; }
-    public float getMoistureR() { return moistureR; }
-    public float getTemperatureC() { return temperatureC; }
-    public float getTemperatureR() { return temperatureR; }
-    public float getSlopeC() { return slopeC; }
-    public float getSlopeR() { return slopeR; }
+    public float getSunlightC() {
+        return sunlightC;
+    }
+
+    public float getSunlightR() {
+        return sunlightR;
+    }
+
+    public float getMoistureC() {
+        return moistureC;
+    }
+
+    public float getMoistureR() {
+        return moistureR;
+    }
+
+    public float getTemperatureC() {
+        return temperatureC;
+    }
+
+    public float getTemperatureR() {
+        return temperatureR;
+    }
+
+    public float getSlopeC() {
+        return slopeC;
+    }
+
+    public float getSlopeR() {
+        return slopeR;
+    }
 
     @Override
     public String toString() {

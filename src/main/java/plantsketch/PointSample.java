@@ -1,3 +1,5 @@
+package plantsketch;
+
 public class PointSample {
     private float x;
     private float y;
@@ -13,7 +15,6 @@ public class PointSample {
         this.x = x;
         this.y = y;
     }
-
 
     public float getX() {
         return this.x;

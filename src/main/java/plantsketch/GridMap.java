@@ -1,3 +1,5 @@
+package plantsketch;
+
 public class GridMap {
     protected int dimX;
     protected int dimY;

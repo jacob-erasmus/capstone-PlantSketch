@@ -1,4 +1,6 @@
 // Handles growth function parameters
+package plantsketch;
+
 public class GrowthParameters {
     private float maxHeightOpen;
     private float maxHeightClosed;
@@ -6,7 +8,7 @@ public class GrowthParameters {
     private float lifeSpan;
 
     public GrowthParameters(float maxHeightOpen, float maxHeightClosed,
-                         float q, float lifeSpan) {
+            float q, float lifeSpan) {
         this.maxHeightOpen = maxHeightOpen;
         this.maxHeightClosed = maxHeightClosed;
         this.q = q;
@@ -14,16 +16,19 @@ public class GrowthParameters {
     }
 
     // Getters
-    public float getMaxHeightOpen() { 
+    public float getMaxHeightOpen() {
         return maxHeightOpen;
     }
-    public float getMaxHeightClosed() { 
-        return maxHeightClosed; 
+
+    public float getMaxHeightClosed() {
+        return maxHeightClosed;
     }
-    public float getQ() { 
+
+    public float getQ() {
         return q;
     }
-    public float getLifeSpan() { 
+
+    public float getLifeSpan() {
         return lifeSpan;
     }
 

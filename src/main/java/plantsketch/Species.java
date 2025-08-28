@@ -1,3 +1,5 @@
+package plantsketch;
+
 public class Species {
 
     // Basic info
@@ -18,15 +20,15 @@ public class Species {
 
     // Constructor
     public Species(String name,
-                   ViabilityParameters viabilityParameters,
-                   GrowthParameters growthParameters,
-                   String colour,
-                   float radiusMultiplierOpen,
-                   float radiusMultiplierClosed,
-                   float leafTransparency,
-                   float moistureAbsorbtion,
-                   String growthPeriod,
-                   float viabilityAtPoint) {
+            ViabilityParameters viabilityParameters,
+            GrowthParameters growthParameters,
+            String colour,
+            float radiusMultiplierOpen,
+            float radiusMultiplierClosed,
+            float leafTransparency,
+            float moistureAbsorbtion,
+            String growthPeriod,
+            float viabilityAtPoint) {
 
         this.name = name;
         this.viabilityParameters = viabilityParameters;
@@ -69,7 +71,7 @@ public class Species {
         return growthPeriod;
     }
 
-    //Viability getters
+    // Viability getters
     public float getSunlightC() {
         return viabilityParameters.getSunlightC();
     }
@@ -102,7 +104,7 @@ public class Species {
         return viabilityParameters.getSlopeR();
     }
 
-    //Growth getters
+    // Growth getters
     public float getMaxHeightOpen() {
         return growthParameters.getMaxHeightOpen();
     }
@@ -119,15 +121,15 @@ public class Species {
         return growthParameters.getLifeSpan();
     }
 
-    //point set & get
-    public void setViabilityAtPoint(double viabililty){
-        viabilityAtPoint = (float)viabililty;
+    // point set & get
+    public void setViabilityAtPoint(double viabililty) {
+        viabilityAtPoint = (float) viabililty;
     }
 
-    public float getViabilityAtPoint(){
+    public float getViabilityAtPoint() {
         return viabilityAtPoint;
     }
-    
+
     @Override
     public String toString() {
         return "Species {" +

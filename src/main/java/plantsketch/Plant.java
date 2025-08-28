@@ -1,3 +1,5 @@
+package plantsketch;
+
 public class Plant {
 
     // ============================
@@ -23,7 +25,7 @@ public class Plant {
     // I think get rid of the coordinates and just use the point sample coordinates
     //
     public Plant(int id, float x, float y, float currentAge, Species species,
-                 float canopyRadius, float height, boolean isAlive, float vigour, boolean allometryIsOpen) {
+            float canopyRadius, float height, boolean isAlive, float vigour, boolean allometryIsOpen) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -64,7 +66,7 @@ public class Plant {
         return canopyRadius;
     }
 
-    public float getHeight(){
+    public float getHeight() {
         return height;
     }
 
@@ -92,7 +94,7 @@ public class Plant {
         this.canopyRadius = canopyRadius;
     }
 
-    public void setHeight(float height){
+    public void setHeight(float height) {
         this.height = height;
     }
 
