@@ -16,7 +16,7 @@ public class GrowthFunction {
         } else {
             maxHeight = species.getMaxHeightClosed();
         }
-
+        
         float plantHeight = (float) ((2.0 / (1.0 + Math.exp((currentAge / lifeSpan) * q))) - 1.0) * maxHeight;
         return plantHeight;
     }
