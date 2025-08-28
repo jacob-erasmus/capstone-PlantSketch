@@ -29,8 +29,8 @@ public class Terrain {
     // Get Slope Method
     public float getSlope(int x, int y) {
         // Boundary checking - use forward/backward differences for edges
-        int maxX = width - 1;
-        int maxY = height - 1;
+        int maxX = width-1;
+        int maxY = height-1;
 
         if (x < 0 || x > maxX || y < 0 || y > maxY) {
             throw new IllegalArgumentException("Coordinates out of bounds");
