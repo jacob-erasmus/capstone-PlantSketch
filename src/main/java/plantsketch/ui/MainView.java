@@ -145,12 +145,12 @@ public class MainView extends BorderPane {
                     continue;
 
                 Table[] wheel = new Table[candidates.size()];
-                float cum = 0f;
+                float cumulativeWeights = 0f;
                 for (int i = 0; i < candidates.size(); i++) {
-                    cum += candidates.get(i).getViabilityAtPoint();
-                    wheel[i] = new Table(candidates.get(i), cum);
+                    cumulativeWeights += candidates.get(i).getViabilityAtPoint();
+                    wheel[i] = new Table(candidates.get(i), cumulativeWeights);
                 }
-                Species chosen = new RouletteWheelSelector(cum).selectSpecies(wheel, wheel.length);
+                Species chosen = new RouletteWheelSelector(cumulativeWeights).selectSpecies(wheel, wheel.length);
                 if (chosen == null)
                     continue;
 
