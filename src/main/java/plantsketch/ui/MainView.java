@@ -122,8 +122,8 @@ public class MainView extends BorderPane {
             List<Species> candidates = new ArrayList<>();
 
             for (PointSample s : samples) {
-                int xCell = (int) s.getX();
-                int yCell = (int) s.getY();
+                int xCell = (int) (s.getX()/gridSpacing);
+                int yCell = (int) (s.getY()/gridSpacing);
 
                 float density = 0f;
                 float sumV = 0f;
