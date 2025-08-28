@@ -1,6 +1,7 @@
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import java.util.*;
+import plantsketch.*;
 
 public class PinkNoiseSamplerTest {
 
