@@ -36,10 +36,10 @@ public class PinkNoiseView extends Region {
         canvas.setHeight(h);
         GraphicsContext g = canvas.getGraphicsContext2D();
 
-        g.setFill(Color.WHITE);
+        g.setFill(Color.DEEPSKYBLUE);
         g.fillRect(0, 0, w, h);
 
-        g.setFill(Color.DEEPSKYBLUE);
+        g.setFill(Color.PINK);
         double r = Math.max(1, cell * 0.4); // point radius
 
         for (PointSample s : samples) {
