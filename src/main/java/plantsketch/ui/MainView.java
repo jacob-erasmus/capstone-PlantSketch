@@ -95,7 +95,8 @@ public class MainView extends BorderPane {
             float metersY = dimY * gridSpacing;
             PinkNoiseSampler sampler = new PinkNoiseSampler(metersX, metersY, 2.0f, 42L);
             List<PointSample> samples = sampler.generateSamples(n);
-            tabs.getTabs().add(makeTab("Pink Noise", new PinkNoiseView(samples, dimX, dimY)));
+            tabs.getTabs().add(makeTab("Pink Noise", new PinkNoiseView(samples, dimX, dimY, gridSpacing)));
+
 
             // 5) Species + viability + placement (same logic as your main)
             SpeciesDictionary dict = new SpeciesDictionary();
@@ -186,8 +187,8 @@ public class MainView extends BorderPane {
             forest.addSpeciesMap(mapSissile);
             forest.addSpeciesMap(mapBeech);
 
-            tabs.getTabs().add(makeTab("Forest", new ForestView(forest, dimX, dimY, 3)));
-            tabs.getTabs().add(makeTab("Forest + Elevation", new ForestOnTerrainView(forest, fm.getElevationGrid())));
+            tabs.getTabs().add(makeTab("Forest", new ForestView(forest, dimX, dimY, gridSpacing)));
+            tabs.getTabs().add(makeTab("Forest + Elevation", new ForestOnTerrainView(forest, fm.getElevationGrid(), gridSpacing)));
 
         } catch (Exception ex) {
             ex.printStackTrace();

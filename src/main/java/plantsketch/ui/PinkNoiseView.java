@@ -5,52 +5,46 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
-
 import java.util.List;
 
 public class PinkNoiseView extends Region {
     private final List<PointSample> samples;
-    private final int dimX, dimY;
+    private final ViewTransform vt;
     private final Canvas canvas = new Canvas();
 
-    public PinkNoiseView(List<PointSample> samples, int dimX, int dimY) {
+    public PinkNoiseView(List<PointSample> samples, int dimX, int dimY, float gridSpacing) {
         this.samples = samples;
-        this.dimX = dimX;
-        this.dimY = dimY;
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, 900); // choose a max size you like
         getChildren().add(canvas);
         draw();
         setPrefSize(canvas.getWidth(), canvas.getHeight());
     }
 
     private void draw() {
-        if (samples == null)
-            return;
+        if (samples == null) return;
 
-        int rows = dimY, cols = dimX;
-        int maxPixels = 800;
-        double cell = Math.max(1, Math.floor((double) maxPixels / Math.max(rows, cols)));
-        double w = cols * cell;
-        double h = rows * cell;
-
-        canvas.setWidth(w);
-        canvas.setHeight(h);
+        canvas.setWidth(vt.widthPx);
+        canvas.setHeight(vt.heightPx);
         GraphicsContext g = canvas.getGraphicsContext2D();
 
-        g.setFill(Color.DEEPSKYBLUE);
-        g.fillRect(0, 0, w, h);
+        // background + frame
+        g.setFill(Color.web("#0b1e2b"));
+        g.fillRect(0, 0, vt.widthPx, vt.heightPx);
+        g.setStroke(Color.GRAY);
+        g.strokeRect(0.5, 0.5, vt.widthPx - 1, vt.heightPx - 1);
 
+        // draw points (meters → pixels)
         g.setFill(Color.PINK);
-        double r = Math.max(1, cell * 0.4); // point radius
-
+        double r = Math.max(1, vt.cellPx * 0.40); // point diameter ~40% of a cell
         for (PointSample s : samples) {
-            double x = s.getX() * cell;
-            double y = s.getY() * cell;
-            g.fillOval(x - r / 2, y - r / 2, r, r);
+            double xPx = vt.meterXtoPx(s.getX());
+            double yPx = vt.meterYtoPx(s.getY());
+            // clamp for safety
+            xPx = Math.max(0, Math.min(vt.widthPx - 1, xPx));
+            yPx = Math.max(0, Math.min(vt.heightPx - 1, yPx));
+            g.fillOval(xPx - r / 2, yPx - r / 2, r, r);
         }
     }
 
-    @Override
-    protected void layoutChildren() {
-        canvas.relocate(0, 0);
-    }
+    @Override protected void layoutChildren() { canvas.relocate(0, 0); }
 }
