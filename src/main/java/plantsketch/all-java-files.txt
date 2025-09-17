@@ -1,0 +1,2289 @@
+﻿
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\AbioticFactors.java ---
+package plantsketch;
+
+public class AbioticFactors {
+    public MoistureMap moistureMap;
+    public TemperatureMap temperatureMap;
+    public SunlightMap sunlightMap;
+
+    public AbioticFactors() {
+        this.moistureMap = null;
+        this.temperatureMap = null;
+        this.sunlightMap = null;
+    }
+
+    public AbioticFactors(MoistureMap moistureMap, TemperatureMap temperatureMap, SunlightMap sunlightMap) {
+        this.moistureMap = moistureMap;
+        this.temperatureMap = temperatureMap;
+        this.sunlightMap = sunlightMap;
+    }
+
+    // i had to add in these three getters becaue we did not have them
+    public MoistureMap getMoistureMap() {
+        return moistureMap;
+    }
+
+    public TemperatureMap getTemperatureMap() {
+        return temperatureMap;
+    }
+
+    public SunlightMap getSunlightMap() {
+        return sunlightMap;
+    }
+
+    public float getAdjustedMoisture(int x, int y) {
+        // Method stub
+        return 0.0f;
+    }
+
+    public float getAdjustedTemperature(int x, int y) {
+        // Method stub
+        return 0.0f;
+    }
+
+    public float getAdjustedSunlight(int x, int y) {
+        // Method stub
+        return 0.0f;
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\AgeMap.java ---
+package plantsketch;
+
+public class AgeMap extends GridMap {
+
+    public AgeMap() {
+        super();
+    }
+
+    public AgeMap(int width, int height, float gridSpacing, float[][] grid) {
+        super(width, height, gridSpacing, grid);
+    }
+
+    public float getAge(int x, int y) {
+        return getValue(x, y);
+    }
+
+    public void testAge() {
+        testGrid("Age");
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\Brush.java ---
+package plantsketch;
+
+public class Brush {
+    private float radius;
+    private Species selectedSpecies;
+
+    public Brush() {
+        this.radius = 5.0f;
+        this.selectedSpecies = null;
+    }
+
+    public Brush(float radius) {
+        this.radius = radius;
+        this.selectedSpecies = null;
+    }
+
+    public void applyBrush(int x, int y, Forest forest) {
+        // Method stub
+    }
+
+    public void setRadius(float radius) {
+        // Method stub
+    }
+
+    public void setSelectedSpecies(Species species) {
+        // Method stub
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\FileManager.java ---
+/*
+ * This class is going to load in the files.
+ * There is a method for each file type
+ * William Marketos 17 Aug 2025
+ */
+package plantsketch;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOError;
+import java.util.Scanner;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+
+public class FileManager {
+
+    private String currentFilePath;
+    private Scanner scan;
+    private String pwd;
+    private float gridSpacing;
+    private int gridSize;
+    private int dimX;
+    private int dimY;
+
+    private float[][] temperatureGrid; // We are going to store the maps here and have getters to get them after
+                                       // running the program
+    private float[][] moistureGrid;
+    private float[][] sunlightGrid;
+    private float[][] elevationGrid;
+    private float[][] ageGrid;
+
+    public FileManager() {
+        this.currentFilePath = "";
+    }
+
+    // used chatgpt for the general format and to understand reading in multiple
+    // files
+    public void fileFinder() {
+        System.out.println("Please enter the path for the directory containing your files");
+        scan = new Scanner(System.in);
+        pwd = scan.nextLine();
+        File directory = new File(pwd);
+
+        if (directory.isDirectory()) {
+            File[] files = directory.listFiles();
+
+            if (files != null) {
+                for (File file : files) {
+                    System.out.println("Found file: " + file.getName());
+                    // loading .elv file first for the grid spacing
+                    if (file.isFile()) {
+                        String name = file.getName();
+
+                        if (name.endsWith(".elv")) {
+                            System.out.println("Loading Elevation file: " + name);
+                            // going to have to change terrain constructoe to take in grid[][]
+                            // and to take in grid spacing, dimensions and yeah
+                            elevationGrid = loadElv(file);
+                            System.out.println(name + " Loaded :)");
+                        }
+                    }
+                }
+                // loading .elv file first for the grid spacing
+                for (File file : files) {
+                    if (file.isFile()) {
+                        String name = file.getName();
+
+                        if (name.endsWith(".txt")) {
+                            if (name.contains("sun")) {
+                                System.out.println("Loading Sunlight File: " + name);
+                                sunlightGrid = loadTxt(file);
+                                // now edit constructors to allow accepting grid[][]
+                                System.out.println(name + " Loaded :)");
+                            }
+
+                            if (name.contains("temp")) {
+                                System.out.println("Loading Temperature File: " + name);
+                                temperatureGrid = loadTxt(file);
+                                // now edit constructors to allow accepting grid[][]
+                                System.out.println(name + " Loaded :)");
+                            }
+
+                            if (name.contains("wet") || name.contains("water")) {
+                                System.out.println("Loading Moisture File: " + name);
+                                moistureGrid = loadTxt(file);
+                                // now edit constructors to allow accepting grid[][]
+                                System.out.println(name + " Loaded :)");
+                            }
+                        } else if (name.endsWith(".png") && (name.contains("age") || name.contains("Age"))) {
+                            System.out.println("Loading Age File: " + name);
+                            this.ageGrid = loadPng(file);
+                            System.out.println(name + " Loaded :)");
+                        } else {
+                            System.out.println("Unknown file in directory. Ignoring it." + name);
+                        }
+                    }
+                }
+            } else {
+                System.out.println("Not a valid directory :(");
+            }
+        }
+
+    }
+
+    public float[][] loadTxt(File file) {
+        // the abiotics seem to have inconsistent top lines, with grid spacing often
+        // missing
+        // so i am going to always read the .elv file first as that one is consistent
+        // and then take the data from that. the grid spacing and dimensions will be the
+        // same for all the abiotics as well as the elevation
+
+        try {
+            Scanner fileScanner = new Scanner(file);
+            String firstLine = fileScanner.nextLine();
+            String[] parts = firstLine.split(" "); // split by spaces
+
+            // this is reading in the first line with all of the info
+            int dimXtxt = Integer.parseInt(parts[0]);
+            int dimYtxt = Integer.parseInt(parts[1]);
+
+            // gonna ignore first line as inconsistent. taking data from .elv file as
+            // consistent
+            String secondLine = fileScanner.nextLine();
+            String[] data = secondLine.split(" ");
+
+            float[][] grid = new float[dimXtxt][dimYtxt];
+            float temporary = 0.0f;
+
+            for (int x = 0; x < dimXtxt; x++) {
+                for (int y = 0; y < dimYtxt; y++) {
+                    for (int month = 0; month < 12; month++) {
+                        int index = (x * dimYtxt + y) * 12 + month;
+                        temporary += Float.parseFloat(data[index]);
+                        // Converting the string number for each month into an int
+                        // month*y because there are 12 numbers for each point because of the months
+                    }
+                    grid[x][y] = temporary / 12.0f; // the average for the year
+                    temporary = 0.0f; // reset now because new point
+                }
+            }
+            fileScanner.close();
+            return grid;
+
+        } catch (FileNotFoundException e) {
+            System.out.println("Error reading in the file: " + e);
+        }
+
+        return null;
+
+    }
+
+    public float[][] loadElv(File file) {
+        try {
+
+            Scanner fileScanner = new Scanner(file);
+            String firstLine = fileScanner.nextLine();
+            String[] parts = firstLine.split(" "); // split by spaces
+
+            // this is reading in the first line with all of the info
+            float[] nums = new float[parts.length];
+            for (int i = 0; i < parts.length; i++) {
+                nums[i] = Float.parseFloat(parts[i]); // convert to int
+                // nums[0] = dim x, nums[1] = dim y, nums[2] = GRIDSPACING, nums[3] =
+                // latitude(?)
+            }
+            dimX = (int) nums[0];
+            dimY = (int) nums[1];
+            gridSpacing = nums[2];
+            float latitude = nums[3];
+
+            String secondLine = fileScanner.nextLine();
+            String[] altitudes = secondLine.split(" ");
+
+            float[][] grid = new float[dimX][dimY];
+
+            for (int x = 0; x < dimX; x++) {
+                for (int y = 0; y < dimY; y++) {
+                    grid[x][y] = Float.parseFloat(altitudes[x * dimY + y]); // x*dimY + y because that is the 1D
+                                                                            // representatino of the 2D coordinate
+                }
+            }
+            fileScanner.close();
+            return grid;
+
+        } catch (FileNotFoundException e) {
+            System.out.println("Error reading in the file: " + e);
+        }
+        return null;
+    }
+
+    public float[][] loadPng(File file) {
+        try {
+            BufferedImage img = ImageIO.read(file);
+            int width = img.getWidth();
+            int height = img.getHeight();
+
+            // check consistency with elevation grid dimensions
+            if (this.dimX != 0 && this.dimY != 0) {
+                if (width != this.dimX || height != this.dimY) {
+                    System.out.println("Oh no!: PNG dimensions (" + width + "x" + height +
+                            ") do not match .elv dimensions (" + dimX + "x" + dimY + ")");
+                }
+            } else {
+                // if no .elv loaded yet, fall back to image dims
+                this.dimX = width;
+                this.dimY = height;
+            }
+
+            float[][] grid = new float[width][height];
+
+            // normalize red [0â€“255] â†’ age [0â€“600]
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    int rgb = img.getRGB(x, y);
+                    int red = (rgb >> 16) & 0xFF;
+                    float age = (red / 255.0f) * 600.0f;
+                    grid[x][y] = age;
+                }
+            }
+
+            return grid;
+
+        } catch (IOException e) {
+            System.out.println("Error reading PNG: " + e.getMessage());
+            return null;
+        }
+    }
+
+    public float[][] getTemperatureGrid() {
+        return temperatureGrid;
+    }
+
+    public float[][] getMoistureGrid() {
+        return moistureGrid;
+    }
+
+    public float[][] getElevationGrid() {
+        return elevationGrid;
+    }
+
+    public float[][] getSunlightGrid() {
+        return sunlightGrid;
+    }
+
+    public float[][] getAgeGrid() {
+        return ageGrid;
+    }
+
+    public int getDimX() {
+        return dimX;
+    }
+
+    public int getDimY() {
+        return dimY;
+    }
+
+    public float getGridSpacing() {
+        return gridSpacing;
+    }
+
+    // gotta do these sometime ig.
+
+    public void loadXlsx(File file) {
+        // Method stub
+    }
+
+    public void loadPdb(File file) {
+        // Method stub
+    }
+
+    public boolean saveSimulation(Forest forest, String filePath) {
+        // Method stub
+        return false;
+    }
+
+    public Forest loadSimulation(String filePath) {
+        // Method stub
+        return null;
+    }
+
+    public void setCurrentFilePath(String filePath) {
+        // Method stub
+    }
+
+    // ADD THIS in FileManager (same package: plantsketch)
+    public void fileFinder(String directoryPath) {
+        File directory = new File(directoryPath);
+        if (!directory.isDirectory()) {
+            System.out.println("Not a valid directory :(");
+            return;
+        }
+        File[] files = directory.listFiles();
+        if (files == null)
+            return;
+
+        // 1st pass: load .elv first
+        for (File file : files) {
+            if (!file.isFile())
+                continue;
+            String name = file.getName();
+            if (name.endsWith(".elv")) {
+                System.out.println("Loading Elevation file: " + name);
+                elevationGrid = loadElv(file);
+                System.out.println(name + " Loaded :)");
+            }
+        }
+        // 2nd pass: others
+        for (File file : files) {
+            if (!file.isFile())
+                continue;
+            String name = file.getName();
+            if (name.endsWith(".txt")) {
+                if (name.contains("sun")) {
+                    System.out.println("Loading Sunlight File: " + name);
+                    sunlightGrid = loadTxt(file);
+                    System.out.println(name + " Loaded :)");
+                } else if (name.contains("temp")) {
+                    System.out.println("Loading Temperature File: " + name);
+                    temperatureGrid = loadTxt(file);
+                    System.out.println(name + " Loaded :)");
+                } else if (name.contains("wet") || name.contains("water")) {
+                    System.out.println("Loading Moisture File: " + name);
+                    moistureGrid = loadTxt(file);
+                    System.out.println(name + " Loaded :)");
+                }
+            } else if (name.endsWith(".png") && (name.toLowerCase().contains("age"))) {
+                System.out.println("Loading Age File: " + name);
+                this.ageGrid = loadPng(file);
+                System.out.println(name + " Loaded :)");
+            }
+        }
+    }
+
+}
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\Forest.java ---
+package plantsketch;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class Forest {
+    private final ArrayList<Plant> plants;
+    private final ArrayList<SpeciesMap> speciesMap;
+
+    public Forest() {
+        this.plants = new ArrayList<>();
+        this.speciesMap = new ArrayList<>();
+    }
+
+    public Forest(int width, int height) {
+        this.plants = new ArrayList<>();
+        this.speciesMap = new ArrayList<>();
+    }
+
+    public void addSpeciesMap(SpeciesMap speciesMap) {
+        this.speciesMap.add(speciesMap);
+    }
+
+    // for local changes
+    public void addPlant(Plant plant) {
+        for (int i = 0; i < 7; i++) {
+            if (speciesMap.get(i).getSpecies() == plant.getSpecies()) {
+                speciesMap.get(i).setPlantAt(plant);
+                break;
+            }
+        }
+    }
+
+    // for local changes
+    public void removePlant(Plant plant) {
+        for (int i = 0; i < 7; i++) {
+            if (speciesMap.get(i).getSpecies() == plant.getSpecies()) {
+                speciesMap.get(i).setPlantAt(plant);
+                break;
+            }
+        }
+    }
+
+    public ArrayList<Plant> getAllPlants() {
+        for (int i = 0; i < 7; i++) {
+            plants.addAll(speciesMap.get(i).getPlants());
+        }
+        return plants;
+    }
+
+    // global change
+    public void removeSpecies(Species species) {
+        speciesMap.remove(getSpeciesMap(species));
+    }
+
+    public SpeciesMap getSpeciesMap(Species species) {
+        // Method stub
+        for (int i = 0; i < 7; i++) {
+            if (speciesMap.get(i).getSpecies() == species) {
+                return speciesMap.get(i);
+            }
+        }
+        return null;
+    }
+
+    public void applyBrushChange(Brush brush) {
+        // Method stub
+    }
+
+    public void regenerateForest() {
+        // Method stub
+
+    }
+
+      public List<SpeciesMap> getSpeciesMapList() {
+        return Collections.unmodifiableList(speciesMap);
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\GridMap.java ---
+package plantsketch;
+
+public class GridMap {
+    protected int dimX;
+    protected int dimY;
+    protected float gridSpacing;
+    protected float[][] grid;
+
+    // Default constructor
+    public GridMap() {
+        this.dimX = 0;
+        this.dimY = 0;
+        this.gridSpacing = 0;
+        this.grid = null;
+    }
+
+    // Parameterized constructor
+    public GridMap(int width, int height, float gridSpacing, float[][] grid) {
+        this.dimX = width;
+        this.dimY = height;
+        this.gridSpacing = gridSpacing;
+        this.grid = grid;
+    }
+
+    // Generic getter
+    public float getValue(int x, int y) {
+        return grid[x][y];
+    }
+
+    // Generic tester
+    public void testGrid(String name) {
+        for (int i = 0; i < 13; i++) {
+            System.out.println(name + " at (0," + i + "): " + getValue(0, i));
+        }
+    }
+
+    // Grid modification methods
+    public void setBase(int x, int y, float newValue) {
+        grid[x][y] = newValue;
+    }
+
+    public void setAdjustment(int x, int y, float delta) {
+        grid[x][y] += delta;
+    }
+
+    public void resetAdjustment(int x, int y, float originalValue) {
+        grid[x][y] = originalValue;
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\GrowthFunction.java ---
+package plantsketch;
+
+public class GrowthFunction {
+
+    public GrowthFunction() {
+
+    }
+
+    public float calculateSize(Species species, float currentAge, boolean allometryIsOpen) {
+        float q = species.getQ();
+        float lifeSpan = species.getLifeSpan();
+        float maxHeight;
+
+        if (allometryIsOpen) {
+            maxHeight = species.getMaxHeightOpen();
+        } else {
+            maxHeight = species.getMaxHeightClosed();
+        }
+        
+        float plantHeight = (float) ((2.0 / (1.0 + Math.exp((currentAge / lifeSpan) * q))) - 1.0) * maxHeight;
+        return plantHeight;
+    }
+}
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\GrowthParameters.java ---
+// Handles growth function parameters
+package plantsketch;
+
+public class GrowthParameters {
+    private float maxHeightOpen;
+    private float maxHeightClosed;
+    private float q;
+    private float lifeSpan;
+
+    public GrowthParameters(float maxHeightOpen, float maxHeightClosed,
+            float q, float lifeSpan) {
+        this.maxHeightOpen = maxHeightOpen;
+        this.maxHeightClosed = maxHeightClosed;
+        this.q = q;
+        this.lifeSpan = lifeSpan;
+    }
+
+    // Getters
+    public float getMaxHeightOpen() {
+        return maxHeightOpen;
+    }
+
+    public float getMaxHeightClosed() {
+        return maxHeightClosed;
+    }
+
+    public float getQ() {
+        return q;
+    }
+
+    public float getLifeSpan() {
+        return lifeSpan;
+    }
+
+    @Override
+    public String toString() {
+        return "GrowthParameters{" +
+                "maxHeightOpen=" + maxHeightOpen +
+                ", maxHeightClosed=" + maxHeightClosed +
+                ", q=" + q +
+                ", lifeSpan=" + lifeSpan +
+                '}';
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\MoistureMap.java ---
+package plantsketch;
+
+public class MoistureMap extends GridMap {
+
+    public MoistureMap() {
+        super();
+    }
+
+    public MoistureMap(int width, int height, float gridSpacing, float[][] grid) {
+        super(width, height, gridSpacing, grid);
+    }
+
+    public float getMoisture(int x, int y) {
+        return getValue(x, y);
+    }
+
+    public void testMoisture() {
+        testGrid("Moisture");
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\PinkNoiseSampler.java ---
+package plantsketch;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class PinkNoiseSampler {
+
+    private final float width;
+    private final float height;
+    private final float minDistance; // min spacing between points (e.g. 2m)
+    private final Random rng;
+
+    public PinkNoiseSampler(float width, float height, float minDistance, long seed) {
+        this.width = width;
+        this.height = height;
+        this.minDistance = minDistance;
+        this.rng = new Random(seed);
+    }
+
+    /**
+     * Generate N point samples using dart throwing.
+     *
+     * @param n number of points to generate
+     * @return list of PointSample
+     */
+    public List<PointSample> generateSamples(int n) {
+        List<PointSample> samples = new ArrayList<>();
+
+        int attempts = 0;
+        while (samples.size() < n && attempts < n * 1000) {
+            float x = rng.nextFloat() * width;
+            float y = rng.nextFloat() * height;
+
+            // can add in the checks for plants here and add the plant as you create the
+            // point
+
+            PointSample candidate = new PointSample(x, y);
+
+            if (isFarEnough(candidate, samples)) {
+                samples.add(candidate);
+            }
+            attempts++;
+        }
+
+        return samples;
+    }
+
+    private boolean isFarEnough(PointSample candidate, List<PointSample> samples) {
+        for (PointSample s : samples) {
+            float dx = candidate.getX() - s.getX();
+            float dy = candidate.getY() - s.getY();
+            float distSq = dx * dx + dy * dy;
+            if (distSq < minDistance * minDistance) {
+                return false; // too close
+            }
+        }
+        return true;
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\Plant.java ---
+package plantsketch;
+
+public class Plant {
+
+    // ============================
+    // Attributes
+    // ============================
+
+    private int id;
+    private float x;
+    private float y;
+    private float currentAge;
+    private Species species;
+    private float canopyRadius;
+    private float height;
+    private boolean isAlive;
+    private float vigour;
+    private boolean allometryIsOpen; // open vs closed growth mode
+
+    // ============================
+    // Constructor
+    // ============================
+
+    //
+    // I think get rid of the coordinates and just use the point sample coordinates
+    //
+    public Plant(int id, float x, float y, float currentAge, Species species,
+            float canopyRadius, float height, boolean isAlive, float vigour, boolean allometryIsOpen) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
+        this.currentAge = currentAge;
+        this.species = species; // link to shared species data
+        this.canopyRadius = canopyRadius;
+        this.height = height;
+        this.isAlive = isAlive;
+        this.vigour = vigour;
+        this.allometryIsOpen = allometryIsOpen;
+    }
+
+    // ============================
+    // Plant getters
+    // ============================
+
+    public int getId() {
+        return id;
+    }
+
+    public float getX() {
+        return x;
+    }
+
+    public float getY() {
+        return y;
+    }
+
+    public float getAge() {
+        return currentAge;
+    }
+
+    public Species getSpecies() {
+        return species;
+    }
+
+    public float getCanopyRadius() {
+        return canopyRadius;
+    }
+
+    public float getHeight() {
+        return height;
+    }
+
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    public float getVigour() {
+        return vigour;
+    }
+
+    public boolean isAllometryOpen() {
+        return allometryIsOpen;
+    }
+
+    // ============================
+    // Plant setters
+    // ============================
+
+    public void setAge(int currentAge) {
+        this.currentAge = currentAge;
+    }
+
+    public void setCanopyRadius(float canopyRadius) {
+        this.canopyRadius = canopyRadius;
+    }
+
+    public void setHeight(float height) {
+        this.height = height;
+    }
+
+    public void setAlive(boolean alive) {
+        isAlive = alive;
+    }
+
+    public void setVigour(float vigour) {
+        this.vigour = vigour;
+    }
+
+    public void setAllometryIsOpen(boolean open) {
+        this.allometryIsOpen = open;
+    }
+
+    // ============================
+    // Delegated Species accessors
+    // ============================
+
+    public String getSpeciesName() {
+        return species.getName();
+    }
+
+    public float getLifeSpan() {
+        return species.getLifeSpan();
+    }
+
+    public float getSunlightC() {
+        return species.getSunlightC();
+    }
+
+    public float getSunlightR() {
+        return species.getSunlightR();
+    }
+
+    public float getMoistureC() {
+        return species.getMoistureC();
+    }
+
+    public float getMoistureR() {
+        return species.getMoistureR();
+    }
+
+    public float getTemperatureC() {
+        return species.getTemperatureC();
+    }
+
+    public float getTemperatureR() {
+        return species.getTemperatureR();
+    }
+
+    public float getSlopeC() {
+        return species.getSlopeC();
+    }
+
+    public float getSlopeR() {
+        return species.getSlopeR();
+    }
+
+    public String getColour() {
+        return species.getColour();
+    }
+
+    public float getMaxHeightOpen() {
+        return species.getMaxHeightOpen();
+    }
+
+    public float getMaxHeightClosed() {
+        return species.getMaxHeightClosed();
+    }
+
+    public float getQ() {
+        return species.getQ();
+    }
+
+    public float getRadiusMultiplierOpen() {
+        return species.getRadiusMultiplierOpen();
+    }
+
+    public float getRadiusMultiplierClosed() {
+        return species.getRadiusMultiplierClosed();
+    }
+
+    public float getLeafTransparency() {
+        return species.getLeafTransparency();
+    }
+
+    public float getMoistureAbsorbtion() {
+        return species.getMoistureAbsorbtion();
+    }
+
+    public String getGrowthPeriod() {
+        return species.getGrowthPeriod();
+    }
+
+    // ============================
+    // Utility
+    // ============================
+
+    @Override
+    public String toString() {
+        return "Plant {" +
+                "\n  id=" + id +
+                ",\n  x=" + x +
+                ",\n  y=" + y +
+                ",\n  currentAge=" + currentAge +
+                ",\n  species=" + getSpeciesName() +
+                ",\n  canopyRadius=" + canopyRadius +
+                ",\n  height=" + height +
+                ",\n  isAlive=" + isAlive +
+                ",\n  vigour=" + vigour +
+                ",\n  allometryIsOpen=" + allometryIsOpen +
+                "\n}";
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\PointSample.java ---
+package plantsketch;
+
+public class PointSample {
+    private float x;
+    private float y;
+    private Plant plant;
+
+    public PointSample() {
+        this.x = 0.0f;
+        this.y = 0.0f;
+        this.plant = null;
+    }
+
+    public PointSample(float x, float y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public float getX() {
+        return this.x;
+    }
+
+    public float getY() {
+        return this.y;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + x + ", " + y + ")";
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\Renderer2D.java ---
+package plantsketch;
+
+public class Renderer2D {
+    private int width;
+    private int height;
+    private float scale;
+
+    public Renderer2D() {
+        this.width = 0;
+        this.height = 0;
+        this.scale = 1.0f;
+    }
+
+    public Renderer2D(int width, int height) {
+        this.width = width;
+        this.height = height;
+        this.scale = 1.0f;
+    }
+
+    public void setGraphics() {
+        // Method stub
+    }
+
+    public void renderTerrain(Terrain terrain) {
+        // Method stub
+    }
+
+    public void renderForest(Forest forest) {
+        // Method stub
+    }
+
+    public void renderSpeciesMap(SpeciesMap speciesMap) {
+        // Method stub
+    }
+
+    public void renderPlant(Plant plant) {
+        // Method stub
+    }
+
+    public void setScale(float scale) {
+        // Method stub
+    }
+
+    public void clear() {
+        // Method stub
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\RouletteWheelSelector.java ---
+package plantsketch;
+
+import java.util.List;
+import java.util.Random;
+
+public class RouletteWheelSelector {
+    private float random;
+    private float sumViabilites;
+    private Random r = new Random();
+
+    public RouletteWheelSelector() {
+        this.random = 0.0f;
+    }
+
+    public RouletteWheelSelector(float sumViabilites) {
+        this.sumViabilites = sumViabilites;
+        this.random = (sumViabilites) * r.nextFloat();
+    }
+
+    public Species selectSpecies(Table[] rouletteTable, int count) {
+        // Method stub
+        for (int i = 0; i < count; i++) {
+            if (random > rouletteTable[i].getAddedViability()) {
+            } else {
+                return rouletteTable[i].getSpecies();
+            }
+        }
+        return null;
+    }
+}
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\Species.java ---
+package plantsketch;
+
+public class Species {
+
+    // Basic info
+    private String name;
+
+    // Encapsulated parameter objects
+    private ViabilityParameters viabilityParameters;
+    private GrowthParameters growthParameters;
+
+    // Other traits
+    private float radiusMultiplierOpen;
+    private float radiusMultiplierClosed;
+    private float leafTransparency;
+    private float moistureAbsorbtion;
+    private String growthPeriod;
+    private String colour;
+    private float viabilityAtPoint;
+
+    // Constructor
+    public Species(String name,
+            ViabilityParameters viabilityParameters,
+            GrowthParameters growthParameters,
+            String colour,
+            float radiusMultiplierOpen,
+            float radiusMultiplierClosed,
+            float leafTransparency,
+            float moistureAbsorbtion,
+            String growthPeriod,
+            float viabilityAtPoint) {
+
+        this.name = name;
+        this.viabilityParameters = viabilityParameters;
+        this.growthParameters = growthParameters;
+        this.colour = colour;
+        this.radiusMultiplierOpen = radiusMultiplierOpen;
+        this.radiusMultiplierClosed = radiusMultiplierClosed;
+        this.leafTransparency = leafTransparency;
+        this.moistureAbsorbtion = moistureAbsorbtion;
+        this.growthPeriod = growthPeriod;
+        this.viabilityAtPoint = viabilityAtPoint;
+    }
+
+    // ===== Core getters =====
+    public String getName() {
+        return name;
+    }
+
+    public String getColour() {
+        return colour;
+    }
+
+    public float getRadiusMultiplierOpen() {
+        return radiusMultiplierOpen;
+    }
+
+    public float getRadiusMultiplierClosed() {
+        return radiusMultiplierClosed;
+    }
+
+    public float getLeafTransparency() {
+        return leafTransparency;
+    }
+
+    public float getMoistureAbsorbtion() {
+        return moistureAbsorbtion;
+    }
+
+    public String getGrowthPeriod() {
+        return growthPeriod;
+    }
+
+    // Viability getters
+    public float getSunlightC() {
+        return viabilityParameters.getSunlightC();
+    }
+
+    public float getSunlightR() {
+        return viabilityParameters.getSunlightR();
+    }
+
+    public float getMoistureC() {
+        return viabilityParameters.getMoistureC();
+    }
+
+    public float getMoistureR() {
+        return viabilityParameters.getMoistureR();
+    }
+
+    public float getTemperatureC() {
+        return viabilityParameters.getTemperatureC();
+    }
+
+    public float getTemperatureR() {
+        return viabilityParameters.getTemperatureR();
+    }
+
+    public float getSlopeC() {
+        return viabilityParameters.getSlopeC();
+    }
+
+    public float getSlopeR() {
+        return viabilityParameters.getSlopeR();
+    }
+
+    // Growth getters
+    public float getMaxHeightOpen() {
+        return growthParameters.getMaxHeightOpen();
+    }
+
+    public float getMaxHeightClosed() {
+        return growthParameters.getMaxHeightClosed();
+    }
+
+    public float getQ() {
+        return growthParameters.getQ();
+    }
+
+    public float getLifeSpan() {
+        return growthParameters.getLifeSpan();
+    }
+
+    // point set & get
+    public void setViabilityAtPoint(double viabililty) {
+        viabilityAtPoint = (float) viabililty;
+    }
+
+    public float getViabilityAtPoint() {
+        return viabilityAtPoint;
+    }
+
+    @Override
+    public String toString() {
+        return "Species {" +
+                "\n  name='" + name + '\'' +
+                ",\n  viability=" + viabilityParameters +
+                ",\n  growth=" + growthParameters +
+                ",\n  colour='" + colour + '\'' +
+                ",\n  radiusMultiplierOpen=" + radiusMultiplierOpen +
+                ",\n  radiusMultiplierClosed=" + radiusMultiplierClosed +
+                ",\n  leafTransparency=" + leafTransparency +
+                ",\n  moistureAbsorbtion=" + moistureAbsorbtion +
+                ",\n  growthPeriod='" + growthPeriod + '\'' +
+                "\n}";
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\SpeciesDictionary.java ---
+// this class is used to store species data for the simulation
+package plantsketch;
+
+public class SpeciesDictionary {
+
+    public SpeciesDictionary() {
+        // Constructor
+    }
+
+    public Species loadBoxwood() {
+        ViabilityParameters boxwoodViabilityParameters = new ViabilityParameters(
+                3.75f, 4.25f, 27.5f, 12.5f, 11.75f, 23.35f, 0f, 80f);
+        GrowthParameters boxwoodGrowthParameters = new GrowthParameters(9f, 9f,
+                -5f, 300f);
+        Species boxwood = new Species("Boxwood",
+                boxwoodViabilityParameters,
+                boxwoodGrowthParameters,
+                "Red",
+                0.42f,
+                0.42f,
+                0.70f,
+                15f,
+                "L",
+                0f);
+        // System.out.println(boxwood.toString());
+
+        return boxwood;
+    }
+
+    public Species loadSnowyMespilus() {
+        ViabilityParameters snowyMespilusViabilityParameters = new ViabilityParameters(
+                7f, 5f, 31f, 9f, 19.25f, 15.75f, 0f, 80f);
+        GrowthParameters snowyMespilusGrowthParameters = new GrowthParameters(6f, 6f,
+                -4f, 50f);
+        Species snowyMespilus = new Species("Snowy Mespilus",
+                snowyMespilusViabilityParameters,
+                snowyMespilusGrowthParameters,
+                "Blue",
+                0.41f,
+                0.17f,
+                0.52f,
+                22f,
+                "S",
+                0f);
+        // System.out.println(snowyMespilus.toString());
+        return snowyMespilus;
+    }
+
+    public Species loadMountainPine() {
+        ViabilityParameters mountainPineViabilityParameters = new ViabilityParameters(
+                7f, 5f, 21.5f, 18.5f, 11.75f, 23.25f, 0f, 80f);
+        GrowthParameters mountainPineGrowthParameters = new GrowthParameters(15f, 20f,
+                -4f, 400f);
+        Species mountainPine = new Species("Mountain Pine",
+                mountainPineViabilityParameters,
+                mountainPineGrowthParameters,
+                "Green",
+                0.16f,
+                0.14f,
+                0.43f,
+                3f,
+                "L", 0f);
+        // System.out.println(mountainPine.toString());
+        return mountainPine;
+    }
+
+    public Species loadSilverFir() {
+        ViabilityParameters silverFirViabilityParameters = new ViabilityParameters(
+                5f, 3f, 31f, 9f, 11.75f, 23.25f, 0f, 80f);
+        GrowthParameters silverFirGrowthParameters = new GrowthParameters(40f, 50f,
+                -6f, 550f);
+        Species silverFir = new Species("Silver Fir",
+                silverFirViabilityParameters,
+                silverFirGrowthParameters,
+                "Purple",
+                0.12f,
+                0.07f,
+                0.47f,
+                22f,
+                "L",
+                0f);
+        // System.out.println(silverFir.toString());
+        return silverFir;
+    }
+
+    public Species loadSilverBirch() {
+        ViabilityParameters silverBirchViabilityParameters = new ViabilityParameters(
+                8.25f, 3.75f, 27.5f, 12.5f, 19.25f, 15.75f, 0f, 70f);
+        GrowthParameters silverBirchGrowthParameters = new GrowthParameters(18f, 25f,
+                -4f, 120f);
+        Species silverBirch = new Species("Silver Birch",
+                silverBirchViabilityParameters,
+                silverBirchGrowthParameters,
+                "Pink",
+                0.2f,
+                0.1f,
+                0.30f,
+                15f,
+                "S",
+                0f);
+        // System.out.println(silverBirch.toString());
+        return silverBirch;
+    }
+
+    public Species loadSissileOak() {
+        ViabilityParameters sissileOakViabilityParameters = new ViabilityParameters(
+                5f, 3f, 37.5f, 22.5f, 19.25f, 15.75f, 0f, 70f);
+        GrowthParameters sissileOakGrowthParameters = new GrowthParameters(30f, 45f,
+                -7f, 600f);
+        Species sissileOak = new Species("Sissile Oak",
+                sissileOakViabilityParameters,
+                sissileOakGrowthParameters,
+                "Yellow",
+                0.38f,
+                0.21f,
+                0.35f,
+                15f,
+                "S",
+                0f);
+        // System.out.println(sissileOak.toString());
+        return sissileOak;
+    }
+
+    public Species loadEuropeanBeech() {
+        ViabilityParameters europeanBeechViabilityParameters = new ViabilityParameters(
+                5.75f, 6.25f, 37.5f, 22.5f, 19.25f, 15.75f, 0f, 70f);
+        GrowthParameters europeanBeechGrowthParameters = new GrowthParameters(35f, 50f,
+                -4f, 400f);
+        Species europeanBeech = new Species("European Beech",
+                europeanBeechViabilityParameters,
+                europeanBeechGrowthParameters,
+                "Brown",
+                0.3f,
+                0.13f,
+                0.37f,
+                15f,
+                "S",
+                0f);
+        // System.out.println(europeanBeech.toString());
+        return europeanBeech;
+    }
+
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\SpeciesMap.java ---
+package plantsketch;
+
+import java.util.ArrayList;
+
+public class SpeciesMap {
+    private Species species;
+    private ArrayList<Plant> map;
+
+    public SpeciesMap() {
+        this.species = null;
+        this.map = new ArrayList<>();
+    }
+
+    public SpeciesMap(Species species) {
+        this.species = species;
+        this.map = new ArrayList<>();
+    }
+
+    public void setPlantAt(Plant plant) {
+        // Method stub
+        map.add(plant);
+    }
+
+    public boolean isPlantAt(float x, float y) {
+        // Method stub
+        for (int i = 0; i < map.size(); i++) {
+            if (map.get(i).getX() == x && map.get(i).getY() == y) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ArrayList<Plant> getPlants() {
+        return map;
+    }
+
+    public Species getSpecies() {
+        return species;
+    }
+
+    public void removePlantAt(float x, float y) {
+        // Method stub
+        for (int i = 0; i < map.size(); i++) {
+            if (map.get(i).getX() == x && map.get(i).getY() == y) {
+                map.remove(i);
+                break;
+            }
+        }
+    }
+
+    public Plant getPlantAt(float x, float y) {
+        // Method stub
+        for (int i = 0; i < map.size(); i++) {
+            if (map.get(i).getX() == x && map.get(i).getY() == y) {
+                return map.get(i);
+            }
+        }
+        return null;
+    }
+
+    public void clearMap() {
+        // Method stub
+        map.clear();
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\SunlightMap.java ---
+package plantsketch;
+
+public class SunlightMap extends GridMap {
+
+    public SunlightMap() {
+        super();
+    }
+
+    public SunlightMap(int width, int height, float gridSpacing, float[][] grid) {
+        super(width, height, gridSpacing, grid);
+    }
+
+    public float getSunlight(int x, int y) {
+        return getValue(x, y);
+    }
+
+    public void testSunlight() {
+        testGrid("Sunlight");
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\Table.java ---
+package plantsketch;
+
+public class Table {
+    Species species;
+    float addedViability;
+
+    public Table(Species species, float addedViability) {
+        this.species = species;
+        this.addedViability = addedViability;
+    }
+
+    public float getAddedViability() {
+        return addedViability;
+    }
+
+    public Species getSpecies() {
+        return species;
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\TemperatureMap.java ---
+package plantsketch;
+
+public class TemperatureMap extends GridMap {
+
+    public TemperatureMap() {
+        super();
+    }
+
+    public TemperatureMap(int width, int height, float gridSpacing, float[][] grid) {
+        super(width, height, gridSpacing, grid);
+    }
+
+    public float getTemperature(int x, int y) {
+        return getValue(x, y);
+    }
+
+    public void testTemperature() {
+        testGrid("Temperature");
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\Terrain.java ---
+package plantsketch;
+
+public class Terrain {
+    int width;
+    int height;
+    float gridSpacing;
+    float[][] elevationMap;
+    float[][] slopeMap;
+    AbioticFactors abioticFactors;
+    TemperatureMap temperatureMap;
+    MoistureMap moistureMap;
+    SunlightMap sunlightMap;
+
+    // Constructor
+    public Terrain(int width, int height, float gridSpacing, AbioticFactors abioticFactors, float[][] grid) {
+        this.width = width;
+        this.height = height;
+        this.gridSpacing = gridSpacing;
+        this.elevationMap = grid;
+        this.slopeMap = new float[width][height];
+        this.abioticFactors = abioticFactors;
+    }
+
+    // Get Elevation Method
+    public float getElevation(int x, int y) {
+        return elevationMap[x][y];
+    }
+
+    // Get Slope Method
+    public float getSlope(int x, int y) {
+        // Boundary checking - use forward/backward differences for edges
+        int maxX = width-1;
+        int maxY = height-1;
+
+        if (x < 0 || x > maxX || y < 0 || y > maxY) {
+            throw new IllegalArgumentException("Coordinates out of bounds");
+        }
+
+        // Approximate partial derivatives using appropriate differences
+        float dzdx, dzdy;
+
+        // Handle x-direction derivative
+        if (x == 0) {
+            // Forward difference at left boundary
+            dzdx = (elevationMap[x + 1][y] - elevationMap[x][y]) / gridSpacing;
+        } else if (x == maxX) {
+            // Backward difference at right boundary
+            dzdx = (elevationMap[x][y] - elevationMap[x - 1][y]) / gridSpacing;
+        } else {
+            // Central difference for interior points
+            dzdx = (elevationMap[x + 1][y] - elevationMap[x - 1][y]) / (2 * gridSpacing);
+        }
+
+        // Handle y-direction derivative
+        if (y == 0) {
+            // Forward difference at bottom boundary
+            dzdy = (elevationMap[x][y + 1] - elevationMap[x][y]) / gridSpacing;
+        } else if (y == maxY) {
+            // Backward difference at top boundary
+            dzdy = (elevationMap[x][y] - elevationMap[x][y - 1]) / gridSpacing;
+        } else {
+            // Central difference for interior points
+            dzdy = (elevationMap[x][y + 1] - elevationMap[x][y - 1]) / (2 * gridSpacing);
+        }
+        // normal vector
+        Vector n = new Vector(-dzdx, -dzdy, 1);
+        n.normalise();
+        // vertical vector
+        Vector vertical = new Vector(0, 0, 1);
+        double dotProduct = n.dot(vertical);
+        float slope = (float) Math.toDegrees(Math.acos(dotProduct));
+        return slope;
+    }
+
+    // Set Abiotic Factors
+    public void setAbioticFactors() {
+        temperatureMap = abioticFactors.getTemperatureMap();
+        sunlightMap = abioticFactors.getSunlightMap();
+        moistureMap = abioticFactors.getMoistureMap();
+    }
+
+    public void testTerrain() {
+        for (int i = 0; i < 13; i++) {
+            System.out.println("Terrain at (0, " + i + "): " + getElevation(0, i));
+        }
+    }
+}
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\Vector.java ---
+package plantsketch;
+
+public class Vector {
+    float x;
+    float y;
+    float z;
+
+    // constructor
+    public Vector(float x, float y, float z) {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+
+    // Normalise (want a unit vector)
+    public void normalise() {
+        double vectorLength = Math.sqrt(x * x + y * y + z * z);
+        if (vectorLength > 0) {
+            x /= vectorLength;
+            y /= vectorLength;
+            z /= vectorLength;
+        }
+    }
+
+    // Find Dot Product
+    public double dot(Vector b) {
+        return this.x * b.x + this.y * b.y + this.z * b.z;
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\ViabilityCalculator.java ---
+package plantsketch;
+
+public class ViabilityCalculator {
+
+    private Terrain terrain;
+    private AbioticFactors abioticFactors;
+    private SunlightMap sunlightMap;
+    private TemperatureMap temperatureMap;
+    private MoistureMap moistureMap;
+    double a = 0.2; // maximal stress value, constant
+
+    public ViabilityCalculator() {
+        this.terrain = null;
+        this.abioticFactors = null;
+    }
+
+    public ViabilityCalculator(Terrain terrain, AbioticFactors abioticFactors) {
+        // now we have the calculator loaded with all the info about everything
+        // so for each random pink noise point we simply call one of the methods and
+        // return the viabilities of each species
+        this.terrain = terrain;
+        this.abioticFactors = abioticFactors;
+        this.temperatureMap = abioticFactors.getTemperatureMap();
+        this.sunlightMap = abioticFactors.getSunlightMap();
+        this.moistureMap = abioticFactors.getMoistureMap();
+    }
+
+    public double calculateViability(double r, double c, double value) {
+        double dx = Math.abs(value - c);
+        double f = (1 + a) * (Math.pow(Math.E, Math.pow(dx / r, 4.5) * (Math.log(0.2)))) - a;
+        // here is the calculateViability in all its glory. it is the same calc for all
+        // abiotic factors.
+        // r and c come from the plants files, and value is the abiotic value from the
+        // terrain
+
+        return f;
+    }
+
+    public float viabililty(Species species, int x, int y) {
+        // calculating the viablility wrt slope
+        double cs = species.getSlopeC();
+        double rs = species.getSlopeR();
+        float slope = terrain.getSlope(x, y);
+        double fs = calculateViability(rs, cs, slope);
+
+        // calculating the viablility wrt temperature
+        double ct = species.getTemperatureC();
+        double rt = species.getTemperatureR();
+        float temp = temperatureMap.getTemperature(x, y);
+        double ft = calculateViability(rt, ct, temp);
+
+        // calculating the viablility wrt sunlight
+        double ce = species.getSunlightC();
+        double re = species.getSunlightR();
+        float sunl = sunlightMap.getSunlight(x, y);
+        double fe = calculateViability(re, ce, sunl);
+
+        // calculating the viablility wrt moisture
+        double cm = species.getMoistureC();
+        double rm = species.getMoistureR();
+        float moist = moistureMap.getMoisture(x, y);
+        double fm = calculateViability(rm, cm, moist);
+
+        // now we take the minimum as that is the deciding factor on the viability of
+        // the species
+        return (float) Math.min(Math.min(fs, ft), Math.min(fe, fm));
+    }
+}
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\ViabilityParameters.java ---
+// Handles tolerance ranges for abiotic conditions
+package plantsketch;
+
+public class ViabilityParameters {
+    private float sunlightC;
+    private float sunlightR;
+    private float moistureC;
+    private float moistureR;
+    private float temperatureC;
+    private float temperatureR;
+    private float slopeC;
+    private float slopeR;
+
+    public ViabilityParameters(float sunlightC, float sunlightR,
+            float moistureC, float moistureR,
+            float temperatureC, float temperatureR,
+            float slopeC, float slopeR) {
+        this.sunlightC = sunlightC;
+        this.sunlightR = sunlightR;
+        this.moistureC = moistureC;
+        this.moistureR = moistureR;
+        this.temperatureC = temperatureC;
+        this.temperatureR = temperatureR;
+        this.slopeC = slopeC;
+        this.slopeR = slopeR;
+    }
+
+    // Getters
+    public float getSunlightC() {
+        return sunlightC;
+    }
+
+    public float getSunlightR() {
+        return sunlightR;
+    }
+
+    public float getMoistureC() {
+        return moistureC;
+    }
+
+    public float getMoistureR() {
+        return moistureR;
+    }
+
+    public float getTemperatureC() {
+        return temperatureC;
+    }
+
+    public float getTemperatureR() {
+        return temperatureR;
+    }
+
+    public float getSlopeC() {
+        return slopeC;
+    }
+
+    public float getSlopeR() {
+        return slopeR;
+    }
+
+    @Override
+    public String toString() {
+        return "ViabilityParameters{" +
+                "sunlightC=" + sunlightC +
+                ", sunlightR=" + sunlightR +
+                ", moistureC=" + moistureC +
+                ", moistureR=" + moistureR +
+                ", temperatureC=" + temperatureC +
+                ", temperatureR=" + temperatureR +
+                ", slopeC=" + slopeC +
+                ", slopeR=" + slopeR +
+                '}';
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\ui\ForestOnTerrainView.java ---
+package plantsketch.ui;
+
+import plantsketch.*;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+
+public class ForestOnTerrainView extends Region {
+    private final Forest forest;
+    private final float[][] elevation; // [dimX][dimY]
+    private final ViewTransform vt;
+    private final Canvas canvas = new Canvas();
+
+    public ForestOnTerrainView(Forest forest, float[][] elevation, float gridSpacing) {
+        this.forest = forest;
+        this.elevation = elevation;
+        int dimX = elevation.length;
+        int dimY = elevation[0].length;
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, 900);
+        getChildren().add(canvas);
+        draw();
+        setPrefSize(canvas.getWidth(), canvas.getHeight());
+    }
+
+    private static Color parseColour(String hexOrName) {
+        try { return Color.web(hexOrName); } catch (Exception e) { return Color.LIMEGREEN; }
+    }
+
+    private void draw() {
+        canvas.setWidth(vt.widthPx);
+        canvas.setHeight(vt.heightPx);
+        GraphicsContext g = canvas.getGraphicsContext2D();
+
+        // 1) draw elevation as grayscale (cells)
+        float min = Float.MAX_VALUE, max = -Float.MAX_VALUE;
+        for (int x = 0; x < vt.dimX; x++) {
+            for (int y = 0; y < vt.dimY; y++) {
+                float v = elevation[x][y];
+                if (v < min) min = v;
+                if (v > max) max = v;
+            }
+        }
+        double cs = vt.cellPx;
+        for (int x = 0; x < vt.dimX; x++) {
+            for (int y = 0; y < vt.dimY; y++) {
+                double t = (elevation[x][y] - min) / Math.max(1e-9, (max - min));
+                int gray = (int) Math.round(t * 255);
+                g.setFill(Color.rgb(gray, gray, gray));
+                double px = vt.cellXtoPx(x);
+                double py = vt.cellYtoPx(y);
+                g.fillRect(px, py, cs, cs);
+            }
+        }
+
+        // 2) draw plants on top (meters)
+        for (SpeciesMap sm : forest.getSpeciesMapList()) {
+            Color c = parseColour(sm.getSpecies().getColour()).deriveColor(0, 1, 1, 0.85);
+            g.setFill(c);
+            for (Plant p : sm.getPlants()) {
+                double xPx = vt.meterXtoPx(p.getX());
+                double yPx = vt.meterYtoPx(p.getY());
+                double rPx = Math.max(2.0, vt.metersToPx(p.getCanopyRadius()));
+                g.fillOval(xPx - rPx, yPx - rPx, rPx * 2, rPx * 2);
+            }
+        }
+
+        g.setStroke(Color.BLACK);
+        g.strokeRect(0.5, 0.5, vt.widthPx - 1, vt.heightPx - 1);
+    }
+
+    @Override protected void layoutChildren() { canvas.relocate(0, 0); }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\ui\ForestView.java ---
+package plantsketch.ui;
+
+import plantsketch.*;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+
+public class ForestView extends Region {
+    private final Forest forest;
+    private final ViewTransform vt;
+    private final Canvas canvas = new Canvas();
+    private final double minCirclePx = 2.0; // keep plants visible
+
+    public ForestView(Forest forest, int dimX, int dimY, float gridSpacing) {
+        this.forest = forest;
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, 900);
+        getChildren().add(canvas);
+        draw();
+        setPrefSize(canvas.getWidth(), canvas.getHeight());
+    }
+
+    private static Color parseColour(String hexOrName) {
+        try { return Color.web(hexOrName); } catch (Exception e) { return Color.LIMEGREEN; }
+    }
+
+    private void draw() {
+        canvas.setWidth(vt.widthPx);
+        canvas.setHeight(vt.heightPx);
+        GraphicsContext g = canvas.getGraphicsContext2D();
+
+        // background
+        g.setFill(Color.BLACK);
+        g.fillRect(0, 0, vt.widthPx, vt.heightPx);
+
+        // draw plants per species map
+        for (SpeciesMap sm : forest.getSpeciesMapList()) { // you may need to add a getter returning the list
+            Color c = parseColour(sm.getSpecies().getColour());
+            g.setFill(c.deriveColor(0, 1, 1, 0.85));
+
+            for (Plant p : sm.getPlants()) {
+                double xPx = vt.meterXtoPx(p.getX());
+                double yPx = vt.meterYtoPx(p.getY());
+                double rPx = Math.max(minCirclePx, vt.metersToPx(p.getCanopyRadius()));
+                g.fillOval(xPx - rPx, yPx - rPx, rPx * 2, rPx * 2);
+            }
+        }
+
+        g.setStroke(Color.GRAY);
+        g.strokeRect(0.5, 0.5, vt.widthPx - 1, vt.heightPx - 1);
+    }
+
+    @Override protected void layoutChildren() { canvas.relocate(0, 0); }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\ui\GridHeatMapView.java ---
+package plantsketch.ui;
+
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+
+public class GridHeatMapView extends Region {
+    private final float[][] grid;
+    private final Canvas canvas = new Canvas();
+
+    public GridHeatMapView(float[][] grid) {
+        this.grid = grid;
+        getChildren().add(canvas);
+        draw();
+        // size to content
+        setPrefSize(canvas.getWidth(), canvas.getHeight());
+    }
+
+    private void draw() {
+        if (grid == null || grid.length == 0 || grid[0].length == 0)
+            return;
+
+        int rows = grid.length;
+        int cols = grid[0].length;
+
+        // fit into a reasonable pixel size (auto scale cell size)
+        int maxPixels = 800; // longest side
+        double cell = Math.max(1, Math.floor((double) maxPixels / Math.max(rows, cols)));
+        double w = cols * cell;
+        double h = rows * cell;
+
+        canvas.setWidth(w);
+        canvas.setHeight(h);
+        GraphicsContext g = canvas.getGraphicsContext2D();
+
+        // min/max
+        float min = Float.MAX_VALUE, max = -Float.MAX_VALUE;
+        for (int r = 0; r < rows; r++)
+            for (int c = 0; c < cols; c++) {
+                float v = grid[r][c];
+                if (v < min)
+                    min = v;
+                if (v > max)
+                    max = v;
+            }
+        double range = Math.max(1e-12, max - min);
+
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                double t = (grid[r][c] - min) / range; // 0..1
+                // grayscale (dark = low, bright = high) â€“ invert if you want
+                double gray = t;
+                g.setFill(Color.color(gray, gray, gray));
+                g.fillRect(c * cell, r * cell, cell, cell);
+            }
+        }
+    }
+
+    @Override
+    protected void layoutChildren() {
+        canvas.relocate(0, 0);
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\ui\MainApp.java ---
+package plantsketch.ui;
+
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+public class MainApp extends Application {
+
+    @Override
+    public void start(Stage stage) {
+        var root = new MainView(); // our JavaFX UI
+        var scene = new Scene(root, 1200, 800);
+        stage.setTitle("PlantSketch");
+        stage.setScene(scene);
+        stage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\ui\MainView.java ---
+package plantsketch.ui;
+
+import plantsketch.*; // reuse your domain classes
+
+import javafx.geometry.Insets;
+import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Window;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+public class MainView extends BorderPane {
+
+    // Top controls
+    private final TextField folderField = new TextField();
+    private final Button browseBtn = new Button("Browseâ€¦");
+    private final Spinner<Integer> plantCount = new Spinner<>(1, 50_000, 500, 100);
+    private final Button runBtn = new Button("Run");
+
+    // Center tabs
+    private final TabPane tabs = new TabPane();
+
+    public MainView() {
+        setPadding(new Insets(8));
+
+        var bar = new ToolBar(
+                new Label("Data folder:"), folderField, browseBtn,
+                new Separator(),
+                new Label("Plant count:"), plantCount,
+                new Separator(),
+                runBtn);
+        folderField.setPrefColumnCount(36);
+        setTop(bar);
+        setCenter(tabs);
+
+        browseBtn.setOnAction(e -> chooseFolder(getScene() == null ? null : getScene().getWindow()));
+        runBtn.setOnAction(e -> runSimulation());
+    }
+
+    private void chooseFolder(Window owner) {
+        DirectoryChooser dc = new DirectoryChooser();
+        dc.setTitle("Select data folder");
+        File f = dc.showDialog(owner);
+        if (f != null) {
+            folderField.setText(f.getAbsolutePath());
+        }
+    }
+
+    private void runSimulation() {
+        runBtn.setDisable(true);
+        tabs.getTabs().clear();
+
+        try {
+            String path = folderField.getText().trim();
+            if (path.isEmpty()) {
+                alert("Please choose a data folder.");
+                return;
+            }
+
+            // 1) Load data (using a new overload we add to FileManager below)
+            FileManager fm = new FileManager();
+            fm.fileFinder(path);
+
+            int dimX = fm.getDimX();
+            int dimY = fm.getDimY();
+            float gridSpacing = fm.getGridSpacing();
+
+            // 2) Show grids
+            if (fm.getAgeGrid() != null)
+                tabs.getTabs().add(makeTab("Age", new GridHeatMapView(fm.getAgeGrid())));
+            if (fm.getMoistureGrid() != null)
+                tabs.getTabs().add(makeTab("Moisture", new GridHeatMapView(fm.getMoistureGrid())));
+            if (fm.getTemperatureGrid() != null)
+                tabs.getTabs().add(makeTab("Temperature", new GridHeatMapView(fm.getTemperatureGrid())));
+            if (fm.getSunlightGrid() != null)
+                tabs.getTabs().add(makeTab("Sunlight", new GridHeatMapView(fm.getSunlightGrid())));
+            if (fm.getElevationGrid() != null)
+                tabs.getTabs().add(makeTab("Elevation", new GridHeatMapView(fm.getElevationGrid())));
+
+            // 3) Build domain objects
+            TemperatureMap temperatureMap = new TemperatureMap(dimX, dimY, gridSpacing, fm.getTemperatureGrid());
+            MoistureMap moistureMap = new MoistureMap(dimX, dimY, gridSpacing, fm.getMoistureGrid());
+            SunlightMap sunlightMap = new SunlightMap(dimX, dimY, gridSpacing, fm.getSunlightGrid());
+            AbioticFactors abiotic = new AbioticFactors(moistureMap, temperatureMap, sunlightMap);
+            Terrain terrain = new Terrain(dimX, dimY, gridSpacing, abiotic, fm.getElevationGrid());
+            AgeMap ageMap = new AgeMap(dimX, dimY, gridSpacing, fm.getAgeGrid());
+
+            // 4) Pink noise samples
+            int n = plantCount.getValue(); //change this to get input from a text field rather
+            float metersX = dimX * gridSpacing;
+            float metersY = dimY * gridSpacing;
+            PinkNoiseSampler sampler = new PinkNoiseSampler(metersX, metersY, 2.0f, 42L);
+            List<PointSample> samples = sampler.generateSamples(n);
+            tabs.getTabs().add(makeTab("Pink Noise", new PinkNoiseView(samples, dimX, dimY, gridSpacing)));
+
+
+            // 5) Species + viability
+            SpeciesDictionary dict = new SpeciesDictionary();
+            List<Species> allSpecies = List.of(
+                    dict.loadBoxwood(),
+                    dict.loadSnowyMespilus(),
+                    dict.loadMountainPine(),
+                    dict.loadSilverFir(),
+                    dict.loadSilverBirch(),
+                    dict.loadSissileOak(),
+                    dict.loadEuropeanBeech());
+
+            SpeciesMap mapBoxwood = new SpeciesMap(allSpecies.get(0));
+            SpeciesMap mapSnowy = new SpeciesMap(allSpecies.get(1));
+            SpeciesMap mapPine = new SpeciesMap(allSpecies.get(2));
+            SpeciesMap mapFir = new SpeciesMap(allSpecies.get(3));
+            SpeciesMap mapBirch = new SpeciesMap(allSpecies.get(4));
+            SpeciesMap mapSissile = new SpeciesMap(allSpecies.get(5));
+            SpeciesMap mapBeech = new SpeciesMap(allSpecies.get(6));
+
+            ViabilityCalculator calc = new ViabilityCalculator(terrain, abiotic);
+            Random r = new Random();
+            int placed = 0;
+            List<Species> candidates = new ArrayList<>();
+
+            for (PointSample s : samples) {
+                int xCell = (int) (s.getX()/gridSpacing);
+                int yCell = (int) (s.getY()/gridSpacing);
+
+                float density = 0f;
+                float sumV = 0f;
+                candidates.clear();
+
+                for (Species sp : allSpecies) {
+                    float v = calc.viabililty(sp, xCell, yCell);
+                    sp.setViabilityAtPoint(v);
+                    if (v > 0) {
+                        candidates.add(sp);
+                        density = Math.max(density, v);
+                        sumV += v;
+                    }
+                }
+                if (candidates.isEmpty())
+                    continue;
+
+                if (density > r.nextFloat())
+                    continue;
+
+                Table[] wheel = new Table[candidates.size()];
+                float cumulativeWeights = 0f;
+                for (int i = 0; i < candidates.size(); i++) {
+                    cumulativeWeights += candidates.get(i).getViabilityAtPoint();
+                    wheel[i] = new Table(candidates.get(i), cumulativeWeights);
+                }
+                Species chosen = new RouletteWheelSelector(cumulativeWeights).selectSpecies(wheel, wheel.length);
+                if (chosen == null)
+                    continue;
+
+                float cohortAge = ageMap.getAge(xCell, yCell);
+                float cap = Math.min(cohortAge, chosen.getLifeSpan());
+                float plantAge = r.nextFloat() * cap * chosen.getViabilityAtPoint();
+
+                boolean isOpen = density > 0.8f;
+                float height = new GrowthFunction().calculateSize(chosen, plantAge, isOpen);
+                float canopy = height
+                        * (isOpen ? chosen.getRadiusMultiplierOpen() : chosen.getRadiusMultiplierClosed());
+
+                Plant p = new Plant(++placed, s.getX(), s.getY(), plantAge, chosen, canopy, height, true,
+                        chosen.getViabilityAtPoint(), isOpen);
+
+                switch (chosen.getName()) {
+                    case "Boxwood" -> mapBoxwood.setPlantAt(p);
+                    case "Snowy Mespilus" -> mapSnowy.setPlantAt(p);
+                    case "Mountain Pine" -> mapPine.setPlantAt(p);
+                    case "Silver Fir" -> mapFir.setPlantAt(p);
+                    case "Silver Birch" -> mapBirch.setPlantAt(p);
+                    case "Sissile Oak" -> mapSissile.setPlantAt(p);
+                    case "European Beech" -> mapBeech.setPlantAt(p);
+                }
+            }
+
+            Forest forest = new Forest(dimX, dimY);
+            forest.addSpeciesMap(mapBoxwood);
+            forest.addSpeciesMap(mapSnowy);
+            forest.addSpeciesMap(mapPine);
+            forest.addSpeciesMap(mapFir);
+            forest.addSpeciesMap(mapBirch);
+            forest.addSpeciesMap(mapSissile);
+            forest.addSpeciesMap(mapBeech);
+
+            tabs.getTabs().add(makeTab("Forest", new ForestView(forest, dimX, dimY, gridSpacing)));
+            tabs.getTabs().add(makeTab("Forest + Elevation", new ForestOnTerrainView(forest, fm.getElevationGrid(), gridSpacing)));
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            alert("Run failed: " + ex.getMessage());
+        } finally {
+            runBtn.setDisable(false);
+        }
+    }
+
+    private Tab makeTab(String name, javafx.scene.Node content) {
+        Tab t = new Tab(name, new ScrollPane(content));
+        t.setClosable(false);
+        return t;
+    }
+
+    private void alert(String msg) {
+        new Alert(Alert.AlertType.INFORMATION, msg).showAndWait();
+    }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\ui\PinkNoiseView.java ---
+package plantsketch.ui;
+
+import plantsketch.PointSample;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.Region;
+import javafx.scene.paint.Color;
+import java.util.List;
+
+public class PinkNoiseView extends Region {
+    private final List<PointSample> samples;
+    private final ViewTransform vt;
+    private final Canvas canvas = new Canvas();
+
+    public PinkNoiseView(List<PointSample> samples, int dimX, int dimY, float gridSpacing) {
+        this.samples = samples;
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, 900); // choose a max size you like
+        getChildren().add(canvas);
+        draw();
+        setPrefSize(canvas.getWidth(), canvas.getHeight());
+    }
+
+    private void draw() {
+        if (samples == null) return;
+
+        canvas.setWidth(vt.widthPx);
+        canvas.setHeight(vt.heightPx);
+        GraphicsContext g = canvas.getGraphicsContext2D();
+
+        // background + frame
+        g.setFill(Color.web("#0b1e2b"));
+        g.fillRect(0, 0, vt.widthPx, vt.heightPx);
+        g.setStroke(Color.GRAY);
+        g.strokeRect(0.5, 0.5, vt.widthPx - 1, vt.heightPx - 1);
+
+        // draw points (meters â†’ pixels)
+        g.setFill(Color.PINK);
+        double r = Math.max(1, vt.cellPx * 0.40); // point diameter ~40% of a cell
+        for (PointSample s : samples) {
+            double xPx = vt.meterXtoPx(s.getX());
+            double yPx = vt.meterYtoPx(s.getY());
+            // clamp for safety
+            xPx = Math.max(0, Math.min(vt.widthPx - 1, xPx));
+            yPx = Math.max(0, Math.min(vt.heightPx - 1, yPx));
+            g.fillOval(xPx - r / 2, yPx - r / 2, r, r);
+        }
+    }
+
+    @Override protected void layoutChildren() { canvas.relocate(0, 0); }
+}
+
+
+--- C:\Users\99ell\plantsketch\src\main\java\plantsketch\ui\ViewTransform.java ---
+package plantsketch.ui;
+import plantsketch.*;
+/** Consistent transform for drawing grids and meter-based points. */
+public final class ViewTransform {
+    public final int dimX;          // columns (cells)
+    public final int dimY;          // rows (cells)
+    public final float gridSpacing; // meters per cell
+    public final double cellPx;     // pixels per cell
+    public final double widthPx;    // canvas width in pixels
+    public final double heightPx;   // canvas height in pixels
+
+    public ViewTransform(int dimX, int dimY, float gridSpacing, int maxPixels) {
+        this.dimX = dimX;
+        this.dimY = dimY;
+        this.gridSpacing = gridSpacing;
+        this.cellPx = Math.max(1, Math.floor((double) maxPixels / Math.max(dimX, dimY)));
+        this.widthPx  = dimX * cellPx;
+        this.heightPx = dimY * cellPx;
+    }
+
+    // --- cells â†’ pixels (top-left origin) ---
+    public double cellXtoPx(double cellX) { return cellX * cellPx; }
+    public double cellYtoPx(double cellY) { return cellY * cellPx; }
+
+    // --- meters â†’ pixels (top-left origin) ---
+    public double meterXtoPx(double meterX) { return (meterX / gridSpacing) * cellPx; }
+    public double meterYtoPx(double meterY) { return (meterY / gridSpacing) * cellPx; }
+
+    // --- meters â†’ pixels for sizes (e.g., radius) ---
+    public double metersToPx(double meters) { return (meters / gridSpacing) * cellPx; }
+}
+
