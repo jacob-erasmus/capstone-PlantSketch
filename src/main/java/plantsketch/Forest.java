@@ -1,10 +1,12 @@
 package plantsketch;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class Forest {
-    private ArrayList<Plant> plants;
-    private ArrayList<SpeciesMap> speciesMap;
+    private final ArrayList<Plant> plants;
+    private final ArrayList<SpeciesMap> speciesMap;
 
     public Forest() {
         this.plants = new ArrayList<>();
@@ -69,5 +71,9 @@ public class Forest {
     public void regenerateForest() {
         // Method stub
 
+    }
+
+      public List<SpeciesMap> getSpeciesMapList() {
+        return Collections.unmodifiableList(speciesMap);
     }
 }
