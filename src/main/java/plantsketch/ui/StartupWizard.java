@@ -153,6 +153,17 @@ public class StartupWizard extends BorderPane {
         onComplete.handle(chosenRoot, env, n);
     }
 
+// williams 2x2 test mode stuff
+/*
+    public void testMode(Stage stage)
+    {
+        Button test = new Button("Enter test mode:");
+
+        test.setOnAction(e -> {
+
+        })
+    }
+
     /* ---------- Step 1: Pick data root ---------- */
     private Node step1() {
         VBox box = new VBox(10);
@@ -249,4 +260,6 @@ public class StartupWizard extends BorderPane {
         a.setTitle("PlantSketch");
         a.showAndWait();
     }
+
+
 }
