@@ -17,9 +17,11 @@ public class Species {
     private String growthPeriod;
     private String colour;
     private float viabilityAtPoint;
+    private String mnemonic; 
 
     // Constructor
-    public Species(String name,
+    public Species(String name, 
+            String mnemonic,
             ViabilityParameters viabilityParameters,
             GrowthParameters growthParameters,
             String colour,
@@ -31,6 +33,7 @@ public class Species {
             float viabilityAtPoint) {
 
         this.name = name;
+        this.mnemonic = mnemonic;
         this.viabilityParameters = viabilityParameters;
         this.growthParameters = growthParameters;
         this.colour = colour;
@@ -45,6 +48,10 @@ public class Species {
     // ===== Core getters =====
     public String getName() {
         return name;
+    }
+
+    public String getMnemonic() {
+        return mnemonic;
     }
 
     public String getColour() {
@@ -134,6 +141,7 @@ public class Species {
     public String toString() {
         return "Species {" +
                 "\n  name='" + name + '\'' +
+                ",\n  mnemonic='" + mnemonic + '\'' +
                 ",\n  viability=" + viabilityParameters +
                 ",\n  growth=" + growthParameters +
                 ",\n  colour='" + colour + '\'' +

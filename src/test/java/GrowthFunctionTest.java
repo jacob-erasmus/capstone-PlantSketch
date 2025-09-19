@@ -10,7 +10,7 @@ public class GrowthFunctionTest {
         // Arrange: build a simple species + params
         GrowthParameters gp = new GrowthParameters(10f, 8f, -4f, 100f); // maxHeightOpen=10, q=4, lifeSpan=100
         ViabilityParameters vp = new ViabilityParameters(0, 0, 0, 0, 0, 0, 0, 0); // not used here
-        Species sp = new Species("TestTree", vp, gp, "Green", 0.5f, 0.4f, 0.5f, 1.0f, "L", 1.0f);
+        Species sp = new Species("TestTree", "test", vp, gp, "Green", 0.5f, 0.4f, 0.5f, 1.0f, "L", 1.0f);
 
         GrowthFunction gf = new GrowthFunction();
 
@@ -28,7 +28,7 @@ public class GrowthFunctionTest {
     void respectsClosedAllometryMax() {
         GrowthParameters gp = new GrowthParameters(12f, 6f, 4f, 80f);
         ViabilityParameters vp = new ViabilityParameters(0, 0, 0, 0, 0, 0, 0, 0);
-        Species sp = new Species("TestTree", vp, gp, "Green", 0.5f, 0.4f, 0.5f, 1.0f, "L", 1.0f);
+        Species sp = new Species("TestTree", "test", vp, gp, "Green", 0.5f, 0.4f, 0.5f, 1.0f, "L", 1.0f);
 
         GrowthFunction gf = new GrowthFunction();
 

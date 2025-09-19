@@ -16,6 +16,7 @@ public class Plant {
     private boolean isAlive;
     private float vigour;
     private boolean allometryIsOpen; // open vs closed growth mode
+    private String mnemonic;
 
     // ============================
     // Constructor
@@ -24,9 +25,10 @@ public class Plant {
     //
     // I think get rid of the coordinates and just use the point sample coordinates
     //
-    public Plant(int id, float x, float y, float currentAge, Species species,
+    public Plant(int id, String mnemonic, float x, float y, float currentAge, Species species,
             float canopyRadius, float height, boolean isAlive, float vigour, boolean allometryIsOpen) {
         this.id = id;
+        this.mnemonic = mnemonic;
         this.x = x;
         this.y = y;
         this.currentAge = currentAge;
@@ -44,6 +46,10 @@ public class Plant {
 
     public int getId() {
         return id;
+    }
+
+    public String getMnemonic() {
+        return mnemonic;
     }
 
     public float getX() {

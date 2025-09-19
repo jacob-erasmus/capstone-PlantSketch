@@ -5,58 +5,59 @@ import java.util.Collections;
 import java.util.List;
 
 public class Forest {
-    private final ArrayList<Plant> plants;
-    private final ArrayList<SpeciesMap> speciesMap;
+    private final ArrayList<SpeciesMap> OverallSpeciesMap;
 
     public Forest() {
-        this.plants = new ArrayList<>();
-        this.speciesMap = new ArrayList<>();
+        this.OverallSpeciesMap = new ArrayList<>();
     }
 
     public Forest(int width, int height) {
-        this.plants = new ArrayList<>();
-        this.speciesMap = new ArrayList<>();
+        this.OverallSpeciesMap = new ArrayList<>();
     }
 
     public void addSpeciesMap(SpeciesMap speciesMap) {
-        this.speciesMap.add(speciesMap);
+        this.OverallSpeciesMap.add(speciesMap);
     }
 
     // for local changes
-public void addPlant(Plant plant) {
-    speciesMap.stream()
-        .filter(sm -> sm.getSpecies() == plant.getSpecies())
-        .findFirst()
-        .ifPresent(sm -> sm.setPlantAt(plant));
-}
+    public void addPlant(Plant plant) {
+        OverallSpeciesMap.stream()
+            .filter(sm -> sm.getSpecies() == plant.getSpecies())
+            .findFirst()
+            .ifPresent(sm -> sm.setPlantAt(plant));
+    }
 
     // for local changes
 public void removePlant(Plant plant) {
-    speciesMap.stream()
+    OverallSpeciesMap.stream()
         .filter(sm -> sm.getSpecies() == plant.getSpecies())
         .findFirst()
         .ifPresent(sm -> sm.removePlantAt(plant.getX(), plant.getY()));
 }
 
 public List<Plant> getAllPlants() {
-    return speciesMap.stream()
+    return OverallSpeciesMap.stream()
             .flatMap(sm -> sm.getPlants().stream())
             .toList(); // Java 16+
 }
 
     // global change
     public void removeSpecies(Species species) {
-        speciesMap.remove(getSpeciesMap(species));
+        OverallSpeciesMap.remove(getSpeciesMap(species));
     }
 
     public SpeciesMap getSpeciesMap(Species species) {
         // Method stub
         for (int i = 0; i < 7; i++) {
-            if (speciesMap.get(i).getSpecies() == species) {
-                return speciesMap.get(i);
+            if (OverallSpeciesMap.get(i).getSpecies() == species) {
+                return OverallSpeciesMap.get(i);
             }
         }
         return null;
+    }
+
+    public ArrayList<SpeciesMap> getOverallSpeciesMap() {
+        return OverallSpeciesMap;
     }
 
     public void applyBrushChange(Brush brush) {
@@ -69,6 +70,6 @@ public List<Plant> getAllPlants() {
     }
 
       public List<SpeciesMap> getSpeciesMapList() {
-        return Collections.unmodifiableList(speciesMap);
+        return Collections.unmodifiableList(OverallSpeciesMap);
     }
 }
