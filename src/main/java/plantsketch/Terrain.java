@@ -84,4 +84,8 @@ public class Terrain {
             System.out.println("Terrain at (0, " + i + "): " + getElevation(0, i));
         }
     }
+
+    public float[][] getElevationGrid() {
+        return elevationMap;
+    }   
 }
