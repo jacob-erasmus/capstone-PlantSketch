@@ -13,6 +13,7 @@ public class SpeciesDictionary {
         GrowthParameters boxwoodGrowthParameters = new GrowthParameters(9f, 9f,
                 -5f, 300f);
         Species boxwood = new Species("Boxwood",
+                "buse",
                 boxwoodViabilityParameters,
                 boxwoodGrowthParameters,
                 "Red",
@@ -33,6 +34,7 @@ public class SpeciesDictionary {
         GrowthParameters snowyMespilusGrowthParameters = new GrowthParameters(6f, 6f,
                 -4f, 50f);
         Species snowyMespilus = new Species("Snowy Mespilus",
+                "amov",
                 snowyMespilusViabilityParameters,
                 snowyMespilusGrowthParameters,
                 "Blue",
@@ -52,6 +54,7 @@ public class SpeciesDictionary {
         GrowthParameters mountainPineGrowthParameters = new GrowthParameters(15f, 20f,
                 -4f, 400f);
         Species mountainPine = new Species("Mountain Pine",
+                "pimu",
                 mountainPineViabilityParameters,
                 mountainPineGrowthParameters,
                 "Green",
@@ -70,6 +73,7 @@ public class SpeciesDictionary {
         GrowthParameters silverFirGrowthParameters = new GrowthParameters(40f, 50f,
                 -6f, 550f);
         Species silverFir = new Species("Silver Fir",
+                "abal",
                 silverFirViabilityParameters,
                 silverFirGrowthParameters,
                 "Purple",
@@ -89,6 +93,7 @@ public class SpeciesDictionary {
         GrowthParameters silverBirchGrowthParameters = new GrowthParameters(18f, 25f,
                 -4f, 120f);
         Species silverBirch = new Species("Silver Birch",
+                "bepe",
                 silverBirchViabilityParameters,
                 silverBirchGrowthParameters,
                 "Pink",
@@ -108,6 +113,7 @@ public class SpeciesDictionary {
         GrowthParameters sissileOakGrowthParameters = new GrowthParameters(30f, 45f,
                 -7f, 600f);
         Species sissileOak = new Species("Sissile Oak",
+                "qupe",
                 sissileOakViabilityParameters,
                 sissileOakGrowthParameters,
                 "Yellow",
@@ -127,6 +133,7 @@ public class SpeciesDictionary {
         GrowthParameters europeanBeechGrowthParameters = new GrowthParameters(35f, 50f,
                 -4f, 400f);
         Species europeanBeech = new Species("European Beech",
+                "fasy",
                 europeanBeechViabilityParameters,
                 europeanBeechGrowthParameters,
                 "Brown",

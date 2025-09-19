@@ -167,7 +167,7 @@ public class TestGrid
             float height = new GrowthFunction().calculateSize(chosen, plantAge, isOpen);
             float canopy = height * (isOpen ? chosen.getRadiusMultiplierOpen() : chosen.getRadiusMultiplierClosed());
 
-            Plant p = new Plant(++placed, s.getX(), s.getY(), plantAge, chosen, canopy, height, true,
+            Plant p = new Plant(++placed,chosen.getMnemonic() , s.getX(), s.getY(), plantAge, chosen, canopy, height, true,
                     chosen.getViabilityAtPoint(), isOpen);
 
             SpeciesMap bucket = mapBySpecies.get(chosen);

@@ -111,7 +111,7 @@ public final class SimulationRunner {
             float height = new GrowthFunction().calculateSize(chosen, plantAge, isOpen);
             float canopy = height * (isOpen ? chosen.getRadiusMultiplierOpen() : chosen.getRadiusMultiplierClosed());
 
-            Plant p = new Plant(++placed, s.getX(), s.getY(), plantAge, chosen, canopy, height, true,
+            Plant p = new Plant(++placed, chosen.getMnemonic(), s.getX(), s.getY(), plantAge, chosen, canopy, height, true,
                     chosen.getViabilityAtPoint(), isOpen);
 
             SpeciesMap bucket = mapBySpecies.get(chosen);
@@ -123,7 +123,13 @@ public final class SimulationRunner {
         mapBySpecies.values().forEach(forest::addSpeciesMap);
 
         logger.accept("Plants placed: " + forest.getAllPlants().size());
-        return new SimulationResult(forest, samples, dimX, dimY, gridSpacing, fm.getElevationGrid());
+        SimulationResult simResult = new SimulationResult(forest, samples, dimX, dimY, gridSpacing, fm.getElevationGrid());
+
+// william isi adding here to print to .pdb file for ecoviz
+        new EcoVizOutput(simResult).createFile();
+// end of william
+
+        return simResult;
     }
 
     private static int clamp(int v, int lo, int hi) {
