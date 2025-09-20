@@ -24,9 +24,9 @@ public class EcoVizOutput {
 
     // methods
 
-    public void createFile()
+    public void createFile(String filename)
     {
-        try (PrintWriter writer = new PrintWriter("output.pdb")) 
+        try (PrintWriter writer = new PrintWriter(filename)) 
         {
             // header
             writer.println("3.0");

@@ -14,7 +14,7 @@ public class PinkNoiseView extends Region {
 
     public PinkNoiseView(List<PointSample> samples, int dimX, int dimY, float gridSpacing) {
         this.samples = samples;
-        this.vt = new ViewTransform(dimX, dimY, gridSpacing, 900); // choose a max size you like
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing); // choose a max size you like
         getChildren().add(canvas);
         draw();
         setPrefSize(canvas.getWidth(), canvas.getHeight());

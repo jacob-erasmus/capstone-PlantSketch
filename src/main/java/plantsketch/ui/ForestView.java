@@ -14,7 +14,7 @@ public class ForestView extends Region {
 
     public ForestView(Forest forest, int dimX, int dimY, float gridSpacing) {
         this.forest = forest;
-        this.vt = new ViewTransform(dimX, dimY, gridSpacing, 900);
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing);
         getChildren().add(canvas);
         draw();
         setPrefSize(canvas.getWidth(), canvas.getHeight());

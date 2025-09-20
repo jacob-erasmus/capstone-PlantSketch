@@ -46,4 +46,12 @@ public class GridMap {
     public void resetAdjustment(int x, int y, float originalValue) {
         grid[x][y] = originalValue;
     }
+
+    public float[][] getGrid() {
+        return grid;
+    }
+
+    public void setGrid(float[][] newGrid) {
+        this.grid = newGrid;
+    }
 }

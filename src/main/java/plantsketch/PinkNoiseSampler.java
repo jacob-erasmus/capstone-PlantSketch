@@ -15,7 +15,8 @@ public class PinkNoiseSampler {
         this.width = width;
         this.height = height;
         this.minDistance = minDistance;
-        this.rng = new Random(seed);
+        this.rng = new Random();
+// I (WILLIAM) MADE THE SEED RANDOM WAS : new Random(seed);
     }
 
     /**

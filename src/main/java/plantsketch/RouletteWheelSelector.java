@@ -1,5 +1,6 @@
 package plantsketch;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -17,12 +18,12 @@ public class RouletteWheelSelector {
         this.random = (sumViabilites) * r.nextFloat();
     }
 
-    public Species selectSpecies(Table[] rouletteTable, int count) {
+    public Species selectSpecies(ArrayList<Table> wheel, int count) {
         // Method stub
         for (int i = 0; i < count; i++) {
-            if (random > rouletteTable[i].getAddedViability()) {
-            } else {
-                return rouletteTable[i].getSpecies();
+            if (random < wheel.get(i).getAddedViability()) 
+            {
+                return wheel.get(i).getSpecies();
             }
         }
         return null;
