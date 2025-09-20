@@ -1,0 +1,11 @@
+- negative viability scores make negative vigour scores. Clamp these to range [0,1]
+
+- tune parameters after testing and stuff to get most realistic-looking ecosystem
+
+- there is a revised version of the plant sketch algorithm on teams
+
+- Paint tool: update when mouse released. Change viability as well as abiotic directly. I think brush with mouse and then have the selected area with ability to highlight more, less, change the requirements and then press enter to initialise the changes
+
+- report: 2.2: use case diagrams and use case narratives. 2.3: design class diagram. Somewhat low-level detail not too high-level. 2.5: explain results of tests eg normal functioning. Add more detail to the table since table 2 is just an example.
+
+- ecovis instructions on GitHub apparently

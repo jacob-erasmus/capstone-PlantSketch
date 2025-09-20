@@ -17,7 +17,7 @@ public class ForestOnTerrainView extends Region {
         this.elevation = elevation;
         int dimX = elevation.length;
         int dimY = elevation[0].length;
-        this.vt = new ViewTransform(dimX, dimY, gridSpacing, 900);
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing);
         getChildren().add(canvas);
         draw();
         setPrefSize(canvas.getWidth(), canvas.getHeight());

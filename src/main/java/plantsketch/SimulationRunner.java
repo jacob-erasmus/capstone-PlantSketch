@@ -69,6 +69,7 @@ public final class SimulationRunner {
         Random r = new Random();
         int placed = 0;
         ArrayList<Species> candidates = new ArrayList<>(speciesList.size());
+        ArrayList<Table> wheel = new ArrayList<>();
 
         for (PointSample s : samples) {
             int xCell = clamp((int) (s.getX() / gridSpacing), 0, dimX - 1);
@@ -77,6 +78,7 @@ public final class SimulationRunner {
             float density = 0f;
             float sumV = 0f;
             candidates.clear();
+            wheel.clear();
 
             for (Species sp : speciesList) {
                 float v = calc.viabililty(sp, xCell, yCell);
@@ -85,6 +87,7 @@ public final class SimulationRunner {
                     candidates.add(sp);
                     density = Math.max(density, v);
                     sumV += v;
+                    wheel.add(new Table(sp, sumV));
                 }
             }
             if (candidates.isEmpty()) continue;
@@ -93,13 +96,7 @@ public final class SimulationRunner {
             if (density > r.nextFloat()) continue;
 
             // roulette wheel on cumulative viability
-            Table[] wheel = new Table[candidates.size()];
-            float cumulative = 0f;
-            for (int i = 0; i < candidates.size(); i++) {
-                cumulative += candidates.get(i).getViabilityAtPoint();
-                wheel[i] = new Table(candidates.get(i), cumulative);
-            }
-            Species chosen = new RouletteWheelSelector(cumulative).selectSpecies(wheel, wheel.length);
+            Species chosen = new RouletteWheelSelector(sumV).selectSpecies(wheel, wheel.size());
             if (chosen == null) continue;
 
             // age, height, canopy
@@ -126,7 +123,7 @@ public final class SimulationRunner {
         SimulationResult simResult = new SimulationResult(forest, samples, dimX, dimY, gridSpacing, fm.getElevationGrid());
 
 // william isi adding here to print to .pdb file for ecoviz
-        new EcoVizOutput(simResult).createFile();
+        new EcoVizOutput(simResult).createFile("output.pdb");
 // end of william
 
         return simResult;

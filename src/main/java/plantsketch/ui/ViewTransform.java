@@ -2,6 +2,10 @@ package plantsketch.ui;
 import plantsketch.*;
 /** Consistent transform for drawing grids and meter-based points. */
 public final class ViewTransform {
+
+// MAKING MAX PIXELS HERE SO THAT OUR GRIDS ARE ALWAYS THE SAME SIZE
+    private final int maxPixels = 350;
+
     public final int dimX;          // columns (cells)
     public final int dimY;          // rows (cells)
     public final float gridSpacing; // meters per cell
@@ -9,7 +13,7 @@ public final class ViewTransform {
     public final double widthPx;    // canvas width in pixels
     public final double heightPx;   // canvas height in pixels
 
-    public ViewTransform(int dimX, int dimY, float gridSpacing, int maxPixels) {
+    public ViewTransform(int dimX, int dimY, float gridSpacing) {
         this.dimX = dimX;
         this.dimY = dimY;
         this.gridSpacing = gridSpacing;
