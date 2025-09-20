@@ -93,7 +93,7 @@ public final class SimulationRunner {
             if (candidates.isEmpty()) continue;
 
             // thinning by density
-            if (density > r.nextFloat()) continue;
+            if (density < r.nextFloat()) continue;
 
             // roulette wheel on cumulative viability
             Species chosen = new RouletteWheelSelector(sumV).selectSpecies(wheel, wheel.size());

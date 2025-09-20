@@ -311,9 +311,7 @@ public class TestGrid
         
         // Clear old species maps and forest
         setupSpeciesMap();
-        // logic here potentially wrong
-        currentPlants.clear();
-        mapBySpecies.values().forEach(SpeciesMap::clearMap);
+
         
         ViabilityCalculator calc = new ViabilityCalculator(terrain, abiotics);
         Random r = new Random();
@@ -322,15 +320,19 @@ public class TestGrid
         // Store the old plants temporarily
         List<Plant> oldPlants = new ArrayList<>();
         if (forest != null) {
-            oldPlants.addAll(forest.getAllPlants());
+            oldPlants.addAll(currentPlants);
         }
+        currentPlants.clear();
+                // logic here potentially wrong
+        mapBySpecies.values().forEach(SpeciesMap::clearMap);
         
         // Re-process each pink noise point with same species
-        for (PointSample s : pinkNoise) {
+        for (Plant s : oldPlants) {
             int xCell = clamp((int) (s.getX() / gridSpacing), 0, dim - 1);
             int yCell = clamp((int) (s.getY() / gridSpacing), 0, dim - 1);
             
             // Find if there was a plant at this location
+            /*
             Plant oldPlant = null;
             for (Plant p : oldPlants) {
                 if (Math.abs(p.getX() - s.getX()) < 0.01 && Math.abs(p.getY() - s.getY()) < 0.01) {
@@ -338,11 +340,12 @@ public class TestGrid
                     break;
                 }
             }
+        
             
             if (oldPlant == null) continue;
-            
-            Species species = oldPlant.getSpecies();
-            
+              */          
+
+            Species species = s.getSpecies();
             // Recalculate viability with new conditions
             float v = calc.viabililty(species, xCell, yCell);
             //if (v < r.nextFloat()) continue;
@@ -350,7 +353,7 @@ public class TestGrid
             // Recalculate age and growth parameters
             float cohortAge = age.getAge(xCell, yCell);
             float cap = Math.min(cohortAge, species.getLifeSpan());
-            float plantAge = Math.min(oldPlant.getAge(), cap * v); // Adjust age based on new viability
+            float plantAge = Math.min(s.getAge(), cap * v); // Adjust age based on new viability
             
             boolean isOpen = v > openOrClosedDensity;
             float height = new GrowthFunction().calculateSize(species, plantAge, isOpen);
