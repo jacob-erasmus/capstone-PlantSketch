@@ -12,9 +12,9 @@ public class TestGrid
     private final Consumer<String> logger;
 
     // set values
-    int sampleCount = 100;
+    int sampleCount = 30;
     float gridSpacing = 2.5f; // in metres
-    int dim = 8; // dimensions of the grid (square)
+    int dim = 2; // dimensions of the grid (square)
     float openOrClosedDensity = 0.8f; // threshold for open or closed growth form
 
 
@@ -68,6 +68,12 @@ public class TestGrid
     public TestGrid(Consumer<String> logger)
     {
         this.logger = (logger == null) ? (s -> {}) : logger;
+        temp = new TemperatureMap(dim, dim, gridSpacing, null);
+        age = new AgeMap(dim, dim, gridSpacing, null);
+        moist = new MoistureMap(dim, dim, gridSpacing ,null);
+        sun = new SunlightMap(dim, dim, gridSpacing, null);
+        abiotics = new AbioticFactors(moist, temp, sun);
+        terrain = new Terrain(dim, dim, gridSpacing, abiotics, currentElevGrid = makeRandomGrid(minElev, maxElev));
     }
 
 
@@ -91,41 +97,44 @@ public class TestGrid
     // the random grids are made within the preset boundary values in teh instance variables above
     public void randomiseGridValues()
     {
-        temp = new TemperatureMap(dim, dim, gridSpacing, currentTempGrid = makeRandomGrid(minTemp, maxTemp));
-        age = new AgeMap(dim, dim, gridSpacing, currentAgeGrid = makeRandomGrid(minAge, maxAge));
-        moist = new MoistureMap(dim, dim, gridSpacing, currentMoistGrid = makeRandomGrid(minMoist, maxMoist));
-        sun = new SunlightMap(dim, dim, gridSpacing, currentSunGrid = makeRandomGrid(minSun, maxSun));
-        abiotics = new AbioticFactors(moist, temp, sun);
-        terrain = new Terrain(dim, dim, gridSpacing, abiotics, currentElevGrid = makeRandomGrid(minElev, maxElev));
+        temp.setGrid(currentTempGrid = makeRandomGrid(minTemp, maxTemp));
+        age.setGrid(currentAgeGrid = makeRandomGrid(minAge, maxAge));
+        moist.setGrid(currentMoistGrid = makeRandomGrid(minMoist, maxMoist));
+        sun.setGrid(currentSunGrid = makeRandomGrid(minSun, maxSun));
+        terrain.setElevationGrid(currentElevGrid = makeRandomGrid(minElev, maxElev));
 // TO DO: WOULD BE BETTER TO DIRECTLY MANIPULATE SLOPE
     }
     
     // Preset 1
     public void loadPreset1() {
         currentTempGrid = new float[][] {
-            {8.0f, 10.0f},
+            {8.0f, 12.0f},
             {9.0f, 11.0f}
         };
+        temp.setGrid(currentTempGrid);
         currentAgeGrid = new float[][] {
             {50.0f, 75.0f},
             {60.0f, 80.0f}
         };
+        age.setGrid(currentAgeGrid);
         currentMoistGrid = new float[][] {
             {35.0f, 40.0f},
             {38.0f, 42.0f}
         };
+        moist.setGrid(currentMoistGrid);
         currentSunGrid = new float[][] {
             {8.0f, 9.0f},
             {7.5f, 8.5f}
         };
+        sun.setGrid(currentSunGrid);
         currentElevGrid = new float[][] {
             {20.0f, 25.0f},
             {22.0f, 28.0f}
         };
-        currentSlopeGrid = new float[][] {
-            {5.0f, 10.0f},
-            {8.0f, 12.0f}
-        };
+        terrain.setElevationGrid(currentElevGrid);
+
+        // idk if this one works or if I should do this later as idrk when the slopes are made
+        currentSlopeGrid = terrain.getSlopeGrid();
         
         logger.accept("Loaded Preset 1: ");
     }
@@ -137,27 +146,30 @@ public class TestGrid
             {20f, 22.5f},
             {19.0f, 21f}
         };
+        temp.setGrid(currentTempGrid);
         currentAgeGrid = new float[][] {
             {400.0f, 450.0f},
             {420.0f, 500.0f}
         };
+        age.setGrid(currentAgeGrid);
         currentMoistGrid = new float[][] {
             {25.0f, 25.0f},
             {25.0f, 25.0f}
         };
+        moist.setGrid(currentMoistGrid);
         currentSunGrid = new float[][] {
             {7f, 7.5f},
             {5.0f, 6f}
         };
+        sun.setGrid(currentSunGrid);
         currentElevGrid = new float[][] {
             {60.0f, 70.0f},
             {65.0f, 75.0f}
         };
-        currentSlopeGrid = new float[][] {
-            {20.0f, 30.0f},
-            {25.0f, 35.0f}
-        };
-        
+        terrain.setElevationGrid(currentElevGrid);
+
+        currentSlopeGrid = terrain.getSlopeGrid();
+
         logger.accept("Loaded Preset 2:");
     }
 
@@ -216,6 +228,9 @@ public class TestGrid
         int placed = 0;
         ArrayList<Species> candidates = new ArrayList<>();
         ArrayList<Table> wheel = new ArrayList<>();
+// logic here potentially wrong
+        currentPlants.clear();
+        mapBySpecies.values().forEach(SpeciesMap::clearMap);
 // changed the wheel to an arraylist so that it is easier to size and also sumv was not being used
 
         for (PointSample s : pinkNoise) {
@@ -296,6 +311,9 @@ public class TestGrid
         
         // Clear old species maps and forest
         setupSpeciesMap();
+        // logic here potentially wrong
+        currentPlants.clear();
+        mapBySpecies.values().forEach(SpeciesMap::clearMap);
         
         ViabilityCalculator calc = new ViabilityCalculator(terrain, abiotics);
         Random r = new Random();
@@ -364,6 +382,7 @@ public class TestGrid
             pinkNoise();
         }
         if (updateSpecies) {
+
             placementLoop();
             assembleForest();
             makeSimResult();

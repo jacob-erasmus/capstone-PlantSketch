@@ -12,11 +12,11 @@ public class Terrain {
     SunlightMap sunlightMap;
 
     // Constructor
-    public Terrain(int width, int height, float gridSpacing, AbioticFactors abioticFactors, float[][] grid) {
+    public Terrain(int width, int height, float gridSpacing, AbioticFactors abioticFactors, float[][] elevation) {
         this.width = width;
         this.height = height;
         this.gridSpacing = gridSpacing;
-        this.elevationMap = grid;
+        this.elevationMap = elevation;
         this.slopeMap = new float[width][height];
         this.abioticFactors = abioticFactors;
     }
@@ -88,4 +88,16 @@ public class Terrain {
     public float[][] getElevationGrid() {
         return elevationMap;
     }   
+
+    public void setElevationGrid(float[][] elevation) {
+        this.elevationMap = elevation;
+    }
+
+    public float[][] getSlopeGrid() {
+        return slopeMap;
+    }
+
+    public void setSlopeGrid(float[][] slope) {
+        this.slopeMap = slope;
+    }
 }
