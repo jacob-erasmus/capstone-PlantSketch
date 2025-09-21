@@ -34,17 +34,17 @@ public class TestView extends BorderPane {
     private final Map<String, float[][]> currentGridValues = new HashMap<>();
     private final Map<String, GridEditor> gridEditors = new HashMap<>();
     
-    public TestView(Runnable onBack) {
+    public TestView(Runnable onBack, String mode) {
         this.onBack = onBack;
         this.testGrid = new TestGrid(console::log);
         
-        setupUI();
+        setupUI(mode);
         console.hookSystemStreams();
     }
     
-    private void setupUI() {
+    private void setupUI(String mode) {
         // Top toolbar
-        setTop(buildToolbar());
+        setTop(buildToolbar(mode));
         
         // Center - split between tabs and console
         var logHeader = buildLogHeader();
@@ -68,13 +68,13 @@ public class TestView extends BorderPane {
         setPadding(new Insets(8));
     }
     
-    private ToolBar buildToolbar() {
+    private ToolBar buildToolbar(String mode) {
         Button backBtn = new Button("Back to Mode Selection");
         backBtn.setOnAction(e -> {
             if (onBack != null) onBack.run();
         });
         
-        Label title = new Label("Test Mode - 2x2 Grid");
+        Label title = new Label("Test Mode: " + mode);
         title.setFont(Font.font("System", FontWeight.BOLD, 16));
         
         return new ToolBar(backBtn, new Separator(), title);

@@ -99,7 +99,7 @@ public class MainApp extends Application {
 
     /** Launch the TestView with selected configuration */
     private void launchTestView(Stage stage, String mode) {
-        TestView testView = new TestView(() -> showModeSelection(stage));
+        TestView testView = new TestView(() -> showModeSelection(stage), mode);
         Scene scene = new Scene(testView, 1400, 900);
         stage.setScene(scene);
         stage.show();
