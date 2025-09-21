@@ -12,15 +12,15 @@ public class TestGrid
     private final Consumer<String> logger;
 
     // set values
-    int sampleCount = 30;
-    float gridSpacing = 2.5f; // in metres
+    int sampleCount = 100;
+    float gridSpacing = 25f; // in metres
     int dim = 2; // dimensions of the grid (square)
     float openOrClosedDensity = 0.8f; // threshold for open or closed growth form
 
 
     // Species stuff
-    List<Species> speciesList;
     Map<Species, SpeciesMap> mapBySpecies;
+    List<Species> speciesList;
     Forest forest;
     SimulationResult simResult;
 
@@ -39,20 +39,13 @@ public class TestGrid
     float maxMoist = 55.0f; // 5 higher
     float minSun = 0.0f; // no sun
     float maxSun = 13.0f; // 1 higher
-    float minElev = 0.0f;
-    float maxElev = 0.0f;
+// arbitrary values for elev
+    float minElev = 60.0f;
+    float maxElev = 100.0f; // the problem with this is that the slop is often far too high
     // temp change with elevation? air?
     float minSlope = 0.0f; // flat
     float maxSlope = 85.0f; // 5 higher
 // TO DO: CHANGE CODE TO HAVE OPTION TO DIRECTLY MANIPULATE SLOPE
-
-    // Current grid values
-    private float[][] currentTempGrid;
-    private float[][] currentAgeGrid;
-    private float[][] currentMoistGrid;
-    private float[][] currentSunGrid;
-    private float[][] currentElevGrid;
-    private float[][] currentSlopeGrid;
 
     // abiotic maps
     List<PointSample> pinkNoise; // pink noise samples
@@ -73,7 +66,17 @@ public class TestGrid
         moist = new MoistureMap(dim, dim, gridSpacing ,null);
         sun = new SunlightMap(dim, dim, gridSpacing, null);
         abiotics = new AbioticFactors(moist, temp, sun);
-        terrain = new Terrain(dim, dim, gridSpacing, abiotics, currentElevGrid = makeRandomGrid(minElev, maxElev));
+        terrain = new Terrain(dim, dim, gridSpacing, abiotics, makeRandomGrid(minElev, maxElev));
+
+        SpeciesDictionary dict = new SpeciesDictionary();
+        speciesList = List.of(
+                dict.loadBoxwood(),
+                dict.loadSnowyMespilus(),
+                dict.loadMountainPine(),
+                dict.loadSilverFir(),
+                dict.loadSilverBirch(),
+                dict.loadSissileOak(),
+                dict.loadEuropeanBeech());
     }
 
 
@@ -97,48 +100,40 @@ public class TestGrid
     // the random grids are made within the preset boundary values in teh instance variables above
     public void randomiseGridValues()
     {
-        temp.setGrid(currentTempGrid = makeRandomGrid(minTemp, maxTemp));
-        age.setGrid(currentAgeGrid = makeRandomGrid(minAge, maxAge));
-        moist.setGrid(currentMoistGrid = makeRandomGrid(minMoist, maxMoist));
-        sun.setGrid(currentSunGrid = makeRandomGrid(minSun, maxSun));
-        terrain.setElevationGrid(currentElevGrid = makeRandomGrid(minElev, maxElev));
-// TO DO: WOULD BE BETTER TO DIRECTLY MANIPULATE SLOPE
+        temp.setGrid(makeRandomGrid(minTemp, maxTemp));
+        age.setGrid(makeRandomGrid(minAge, maxAge));
+        moist.setGrid(makeRandomGrid(minMoist, maxMoist));
+        sun.setGrid(makeRandomGrid(minSun, maxSun));
+        terrain.setElevationGrid(makeRandomGrid(minElev, maxElev));
     }
     
     // Preset 1
     public void loadPreset1() {
-        currentTempGrid = new float[][] {
+
+        temp.setGrid(new float[][] {
             {8.0f, 7.0f},
             {8.0f, 7.0f}
-        };
-        temp.setGrid(currentTempGrid);
+        });
 
-        currentAgeGrid = new float[][] {
+        age.setGrid(new float[][] {
             {300f, 300f},
             {300.0f, 300.0f}
-        };
-        age.setGrid(currentAgeGrid);
+        });
 
-        currentMoistGrid = new float[][] {
+        moist.setGrid(new float[][] {
             {25.0f, 25.0f},
             {25.0f, 25.0f}
-        };
-        moist.setGrid(currentMoistGrid);
+        });
 
-        currentSunGrid = new float[][] {
+        sun.setGrid(new float[][] {
             {6.0f, 7.0f},
             {5.5f, 6.0f}
-        };
-        sun.setGrid(currentSunGrid);
+        });
 
-        currentElevGrid = new float[][] {
+        terrain.setElevationGrid(new float[][] {
             {20.0f, 25.0f},
             {22.0f, 28.0f}
-        };
-        terrain.setElevationGrid(currentElevGrid);
-
-        // idk if this one works or if I should do this later as idrk when the slopes are made
-        currentSlopeGrid = terrain.getSlopeGrid();
+        });
         
         logger.accept("Loaded Preset 1: perfect conditions for most species");
     }
@@ -146,36 +141,35 @@ public class TestGrid
     // Preset 2
     public void loadPreset2() {
 
-        currentTempGrid = new float[][] {
+        temp.setGrid(new float[][] {
             {20f, 22.5f},
             {19.0f, 21f}
-        };
-        temp.setGrid(currentTempGrid);
-        currentAgeGrid = new float[][] {
+        });
+
+        age.setGrid(new float[][] {
             {400.0f, 450.0f},
             {420.0f, 500.0f}
-        };
-        age.setGrid(currentAgeGrid);
-        currentMoistGrid = new float[][] {
+        });
+
+        moist.setGrid(new float[][] {
             {25.0f, 25.0f},
             {25.0f, 25.0f}
-        };
-        moist.setGrid(currentMoistGrid);
-        currentSunGrid = new float[][] {
+        });
+
+
+        sun.setGrid(new float[][] {
             {7f, 7.5f},
             {5.0f, 6f}
-        };
-        sun.setGrid(currentSunGrid);
-        currentElevGrid = new float[][] {
+        });
+
+        terrain.setElevationGrid(new float[][] {
             {60.0f, 70.0f},
             {65.0f, 75.0f}
-        };
-        terrain.setElevationGrid(currentElevGrid);
-
-        currentSlopeGrid = terrain.getSlopeGrid();
+        });
 
         logger.accept("Loaded Preset 2:");
     }
+
 
 
     // generate pink noise
@@ -194,31 +188,6 @@ public class TestGrid
         return pinkNoise.size();
     }
 
-    // setup list containing all species
-    public List<Species> setupSpecies()
-    {
-        SpeciesDictionary dict = new SpeciesDictionary();
-        speciesList = List.of(
-                dict.loadBoxwood(),
-                dict.loadSnowyMespilus(),
-                dict.loadMountainPine(),
-                dict.loadSilverFir(),
-                dict.loadSilverBirch(),
-                dict.loadSissileOak(),
-                dict.loadEuropeanBeech());
-        return speciesList;
-    }
-
-    // setup species map
-    public Map<Species, SpeciesMap> setupSpeciesMap()
-    {
-        mapBySpecies = new LinkedHashMap<>();
-        for (Species sp : speciesList) {
-            mapBySpecies.put(sp, new SpeciesMap(sp));
-        }
-        return mapBySpecies;
-    }
-
     // clamp method
     private static int clamp(int v, int lo, int hi) {
         return (v < lo) ? lo : (v > hi ? hi : v);
@@ -227,6 +196,7 @@ public class TestGrid
     // Placement loop
     public void placementLoop()
     {
+        mapBySpecies = new LinkedHashMap<>();
         ViabilityCalculator calc = new ViabilityCalculator(terrain, abiotics);
         Random r = new Random();
         int placed = 0;
@@ -234,7 +204,6 @@ public class TestGrid
         ArrayList<Table> wheel = new ArrayList<>();
 // logic here potentially wrong
         currentPlants.clear();
-        mapBySpecies.values().forEach(SpeciesMap::clearMap);
 // changed the wheel to an arraylist so that it is easier to size and also sumv was not being used
 
         for (PointSample s : pinkNoise) {
@@ -259,7 +228,7 @@ public class TestGrid
             if (candidates.isEmpty()) continue;
 
             // thinning by density
-            if (density > r.nextFloat()) continue;
+            if (density < r.nextFloat()) continue;
 // changed > to < because if the float is greater than the density the plant can't exist
 
             // roulette wheel on cumulative viability
@@ -279,7 +248,8 @@ public class TestGrid
             Plant p = new Plant(++placed, chosen.getMnemonic(), s.getX(), s.getY(), plantAge, chosen, canopy, height, true,
                     chosen.getViabilityAtPoint(), isOpen);
             currentPlants.add(p);
-// the plants weren't getting added to the list of total plants
+
+            if (!mapBySpecies.containsKey(chosen)) mapBySpecies.put(chosen, new SpeciesMap(chosen));
 
             SpeciesMap bucket = mapBySpecies.get(chosen);
             if (bucket != null) bucket.setPlantAt(p);
@@ -312,11 +282,6 @@ public class TestGrid
     // Recalculate with same species positions
     // ignoring all of this hard work i reckon
     public void recalculateWithSameSpecies() {
-    
-        
-        // Clear old species maps and forest
-        setupSpeciesMap();
-
         
         ViabilityCalculator calc = new ViabilityCalculator(terrain, abiotics);
         Random r = new Random();
@@ -334,21 +299,7 @@ public class TestGrid
         // Re-process each pink noise point with same species
         for (Plant s : oldPlants) {
             int xCell = clamp((int) (s.getX() / gridSpacing), 0, dim - 1);
-            int yCell = clamp((int) (s.getY() / gridSpacing), 0, dim - 1);
-            
-            // Find if there was a plant at this location
-            /*
-            Plant oldPlant = null;
-            for (Plant p : oldPlants) {
-                if (Math.abs(p.getX() - s.getX()) < 0.01 && Math.abs(p.getY() - s.getY()) < 0.01) {
-                    oldPlant = p;
-                    break;
-                }
-            }
-        
-            
-            if (oldPlant == null) continue;
-              */          
+            int yCell = clamp((int) (s.getY() / gridSpacing), 0, dim - 1);  
 
             Species species = s.getSpecies();
             // Recalculate viability with new conditions
@@ -413,8 +364,6 @@ public class TestGrid
             randomiseGridValues();
         }
 
-        setupSpecies();
-        setupSpeciesMap();
         pinkNoise();
         placementLoop();
         assembleForest();
@@ -588,53 +537,50 @@ public class TestGrid
         this.maxSlope = maxSlope;
     }
 
-    public float[][] getTemperatureGrid() {
-        return currentTempGrid;
+   public float[][] getTemperatureGrid() {
+        return temp.getGrid();
     }
 
     public void setTemperatureGrid(float[][] currentTempGrid) {
-        this.currentTempGrid = currentTempGrid;
+        this.temp.setGrid(currentTempGrid);
     }
 
     public float[][] getAgeGrid() {
-        return currentAgeGrid;
+        return age.getGrid();
     }
 
     public void setAgeGrid(float[][] currentAgeGrid) {
-        this.currentAgeGrid = currentAgeGrid;
+        this.age.setGrid(currentAgeGrid);
     }
 
     public float[][] getMoistureGrid() {
-        return currentMoistGrid;
+        return moist.getGrid();
     }
 
     public void setMoistureGrid(float[][] currentMoistGrid) {
-        this.currentMoistGrid = currentMoistGrid;
+        this.moist.setGrid(currentMoistGrid);
     }
 
     public float[][] getSunlightGrid() {
-        return currentSunGrid;
+        return sun.getGrid();
     }
 
     public void setSunlightGrid(float[][] currentSunGrid) {
-        this.currentSunGrid = currentSunGrid;
+        this.sun.setGrid(currentSunGrid);
     }
 
     public float[][] getElevationGrid() {
-        return currentElevGrid;
+        return terrain.getElevationGrid();
     }
 
     public void setElevationGrid(float[][] currentElevGrid) {
-        this.currentElevGrid = currentElevGrid;
+        this.terrain.setElevationGrid(currentElevGrid);
     }
 
     public float[][] getSlopeGrid() {
-        return currentSlopeGrid;
+        return terrain.getSlopeGrid();
     }
 
-    public void setSlopeGrid(float[][] currentSlopeGrid) {
-        this.currentSlopeGrid = currentSlopeGrid;
-    }
 
     public int getSampleCount() {
         return sampleCount;

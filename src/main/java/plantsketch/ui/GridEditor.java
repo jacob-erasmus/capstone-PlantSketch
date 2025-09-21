@@ -7,10 +7,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.*;
 
 public class GridEditor extends VBox {
-        private final String paramName;
-        private final float min;
-        private final float max;
-        private final TextField[][] fields = new TextField[2][2];
+        private String paramName;
+        private float min;
+        private float max;
+        private TextField[][] fields = new TextField[2][2];
         
         public GridEditor(String paramName, float min, float max) {
             this.paramName = paramName;

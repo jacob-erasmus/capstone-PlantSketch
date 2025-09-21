@@ -197,12 +197,17 @@ public class TestView extends BorderPane {
                 console.log("Re-simulating with new parameters...");
             
                 // Update TestGrid with new values
-                testGrid.setTemperatureGrid(gridEditors.get("Temperature").getValues());
-                testGrid.setAgeGrid(gridEditors.get("Age").getValues());
-                testGrid.setMoistureGrid(gridEditors.get("Moisture").getValues());
-                testGrid.setSunlightGrid(gridEditors.get("Sunlight").getValues());
-                testGrid.setElevationGrid(gridEditors.get("Elevation").getValues());
-                testGrid.setSlopeGrid(gridEditors.get("Slope").getValues());
+                float[][] newTemp = gridEditors.get("Temperature").getValues();
+                float[][] newAge = gridEditors.get("Age").getValues();
+                float[][] newMoist = gridEditors.get("Moisture").getValues();
+                float[][] newSun = gridEditors.get("Sunlight").getValues();
+                float[][] newElev = gridEditors.get("Elevation").getValues();
+
+                testGrid.setTemperatureGrid(newTemp);
+                testGrid.setAgeGrid(newAge);
+                testGrid.setMoistureGrid(newMoist);
+                testGrid.setSunlightGrid(newSun);
+                testGrid.setElevationGrid(newElev);
 
                 currentResult = testGrid.runChange(regeneratePinkNoise.isSelected() 
                 // ,regenerateSpecies.isSelected()
@@ -210,15 +215,17 @@ public class TestView extends BorderPane {
             }
             else
             {
-            currentResult = testGrid.run(choice);
+                currentResult = testGrid.run(choice);
             
             }
 
             // Update grid editors with current values
             updateGridEditors();
             
-            createTabs(currentResult);
+            createTabs();
             
+
+
             updateStatusDisplay();
             console.log("✓ Test simulation complete. Plants placed: " + currentResult.forest().getAllPlants().size());
 
@@ -227,21 +234,6 @@ public class TestView extends BorderPane {
             {
                 console.log(" - " + sm.getPlants().size() + "  " + sm.getSpecies().getName() );
                 if (sm.getPlants().size() > 0) numSpecies++;
-            
-                // this is for testing and confirming purposes
-                for (Plant p : sm.getPlants()) 
-                {
-                    console.log("Plant " + p.getId() + " Species: " + p.getSpecies().getName() + " Vigour " + p.getVigour() + " Height: " + p.getHeight());
-                    
-                }
-            }
-            for (int row = 0; row < 2; row++) 
-            {
-                for (int col = 0; col < 2; col++) 
-                {
-                    console.log("Temperature gridEditor: " + gridEditors.get("Temperature").getValues()[row][col]);
-                    console.log("Temperature testGrid: " + testGrid.getTemperatureGrid()[row][col]);
-                }
             }
             
             console.log("Number of species: " + numSpecies);
@@ -254,15 +246,16 @@ public class TestView extends BorderPane {
         }
     }
     
-    public void createTabs(SimulationResult currentResult)
+
+    // Create visualization tabs at the top
+    public void createTabs()
     {
-// Create visualization tabs
 
-            tabs.getTabs().add(makeTab("Forest + Elevation", new ScrollPane(new ForestOnTerrainView(currentResult.forest(), currentResult.elevationGrid(), currentResult.gridSpacing()))));
+        tabs.getTabs().add(makeTab("Forest + Elevation", new ScrollPane(new ForestOnTerrainView(currentResult.forest(), currentResult.elevationGrid(), currentResult.gridSpacing()))));
 
-            tabs.getTabs().add(makeTab("Pink Noise", new ScrollPane(new PinkNoiseView(currentResult.samples(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
-            
-            tabs.getTabs().add(makeTab("Forest", new ScrollPane(new ForestView(currentResult.forest(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
+        tabs.getTabs().add(makeTab("Pink Noise", new ScrollPane(new PinkNoiseView(currentResult.samples(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
+        
+        tabs.getTabs().add(makeTab("Forest", new ScrollPane(new ForestView(currentResult.forest(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
             
 
     }
@@ -271,17 +264,13 @@ public class TestView extends BorderPane {
     private void updateVisualization() {
         tabs.getTabs().clear();
         
-        tabs.getTabs().add(makeTab("Forest + Elevation", new ScrollPane(new ForestOnTerrainView(currentResult.forest(), currentResult.elevationGrid(), currentResult.gridSpacing()))));
-
-        tabs.getTabs().add(makeTab("Pink Noise", new ScrollPane(new PinkNoiseView(currentResult.samples(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
-        
-        tabs.getTabs().add(makeTab("Forest", new ScrollPane(new ForestView(currentResult.forest(),  currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
+        createTabs();
     
         updateStatusDisplay();
         console.log("Plants: " + currentResult.forest().getAllPlants().size());
     }
     
-
+    // puts in the values for the right tab
     private void updateGridEditors() {
         gridEditors.get("Temperature").setValues(testGrid.getTemperatureGrid());
         gridEditors.get("Age").setValues(testGrid.getAgeGrid());
@@ -314,7 +303,8 @@ public class TestView extends BorderPane {
         if (grid == null || grid.length < 2) return "N/A";
         return String.format("[%.1f,%.1f;%.1f,%.1f]", grid[0][0], grid[0][1], grid[1][0], grid[1][1]);
     }
-    
+
+
     private Tab makeTab(String name, Node content) {
         Tab t = new Tab(name, content);
         t.setClosable(false);
