@@ -55,6 +55,7 @@ public class MainView extends BorderPane {
         this.showToolbar = showToolbar;
         this.onRenderAnotherEnvironment = onRenderAnotherEnvironment;
 
+
         setPadding(new Insets(8));
 
         if (showToolbar) {
@@ -132,6 +133,7 @@ public class MainView extends BorderPane {
             runBtn
         );
     }
+
 
     private HBox buildLogHeader() {
         var header = new HBox();
@@ -267,6 +269,9 @@ public class MainView extends BorderPane {
             folderField.setText(f.getAbsolutePath());
         }
     }
+
+    // 
+
 
     /* ---------- Execution pipeline (UI shell) ---------- */
     private void executeSimulation() {

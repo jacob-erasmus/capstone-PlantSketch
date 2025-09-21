@@ -12,9 +12,9 @@ public class TestGrid
     private final Consumer<String> logger;
 
     // set values
-    int sampleCount = 100;
+    int sampleCount = 30;
     float gridSpacing = 2.5f; // in metres
-    int dim = 8; // dimensions of the grid (square)
+    int dim = 2; // dimensions of the grid (square)
     float openOrClosedDensity = 0.8f; // threshold for open or closed growth form
 
 
@@ -68,6 +68,12 @@ public class TestGrid
     public TestGrid(Consumer<String> logger)
     {
         this.logger = (logger == null) ? (s -> {}) : logger;
+        temp = new TemperatureMap(dim, dim, gridSpacing, null);
+        age = new AgeMap(dim, dim, gridSpacing, null);
+        moist = new MoistureMap(dim, dim, gridSpacing ,null);
+        sun = new SunlightMap(dim, dim, gridSpacing, null);
+        abiotics = new AbioticFactors(moist, temp, sun);
+        terrain = new Terrain(dim, dim, gridSpacing, abiotics, currentElevGrid = makeRandomGrid(minElev, maxElev));
     }
 
 
@@ -91,43 +97,50 @@ public class TestGrid
     // the random grids are made within the preset boundary values in teh instance variables above
     public void randomiseGridValues()
     {
-        temp = new TemperatureMap(dim, dim, gridSpacing, currentTempGrid = makeRandomGrid(minTemp, maxTemp));
-        age = new AgeMap(dim, dim, gridSpacing, currentAgeGrid = makeRandomGrid(minAge, maxAge));
-        moist = new MoistureMap(dim, dim, gridSpacing, currentMoistGrid = makeRandomGrid(minMoist, maxMoist));
-        sun = new SunlightMap(dim, dim, gridSpacing, currentSunGrid = makeRandomGrid(minSun, maxSun));
-        abiotics = new AbioticFactors(moist, temp, sun);
-        terrain = new Terrain(dim, dim, gridSpacing, abiotics, currentElevGrid = makeRandomGrid(minElev, maxElev));
+        temp.setGrid(currentTempGrid = makeRandomGrid(minTemp, maxTemp));
+        age.setGrid(currentAgeGrid = makeRandomGrid(minAge, maxAge));
+        moist.setGrid(currentMoistGrid = makeRandomGrid(minMoist, maxMoist));
+        sun.setGrid(currentSunGrid = makeRandomGrid(minSun, maxSun));
+        terrain.setElevationGrid(currentElevGrid = makeRandomGrid(minElev, maxElev));
 // TO DO: WOULD BE BETTER TO DIRECTLY MANIPULATE SLOPE
     }
     
     // Preset 1
     public void loadPreset1() {
         currentTempGrid = new float[][] {
-            {8.0f, 10.0f},
-            {9.0f, 11.0f}
+            {8.0f, 7.0f},
+            {8.0f, 7.0f}
         };
+        temp.setGrid(currentTempGrid);
+
         currentAgeGrid = new float[][] {
-            {50.0f, 75.0f},
-            {60.0f, 80.0f}
+            {300f, 300f},
+            {300.0f, 300.0f}
         };
+        age.setGrid(currentAgeGrid);
+
         currentMoistGrid = new float[][] {
-            {35.0f, 40.0f},
-            {38.0f, 42.0f}
+            {25.0f, 25.0f},
+            {25.0f, 25.0f}
         };
+        moist.setGrid(currentMoistGrid);
+
         currentSunGrid = new float[][] {
-            {8.0f, 9.0f},
-            {7.5f, 8.5f}
+            {6.0f, 7.0f},
+            {5.5f, 6.0f}
         };
+        sun.setGrid(currentSunGrid);
+
         currentElevGrid = new float[][] {
             {20.0f, 25.0f},
             {22.0f, 28.0f}
         };
-        currentSlopeGrid = new float[][] {
-            {5.0f, 10.0f},
-            {8.0f, 12.0f}
-        };
+        terrain.setElevationGrid(currentElevGrid);
+
+        // idk if this one works or if I should do this later as idrk when the slopes are made
+        currentSlopeGrid = terrain.getSlopeGrid();
         
-        logger.accept("Loaded Preset 1: ");
+        logger.accept("Loaded Preset 1: perfect conditions for most species");
     }
     
     // Preset 2
@@ -137,27 +150,30 @@ public class TestGrid
             {20f, 22.5f},
             {19.0f, 21f}
         };
+        temp.setGrid(currentTempGrid);
         currentAgeGrid = new float[][] {
             {400.0f, 450.0f},
             {420.0f, 500.0f}
         };
+        age.setGrid(currentAgeGrid);
         currentMoistGrid = new float[][] {
             {25.0f, 25.0f},
             {25.0f, 25.0f}
         };
+        moist.setGrid(currentMoistGrid);
         currentSunGrid = new float[][] {
             {7f, 7.5f},
             {5.0f, 6f}
         };
+        sun.setGrid(currentSunGrid);
         currentElevGrid = new float[][] {
             {60.0f, 70.0f},
             {65.0f, 75.0f}
         };
-        currentSlopeGrid = new float[][] {
-            {20.0f, 30.0f},
-            {25.0f, 35.0f}
-        };
-        
+        terrain.setElevationGrid(currentElevGrid);
+
+        currentSlopeGrid = terrain.getSlopeGrid();
+
         logger.accept("Loaded Preset 2:");
     }
 
@@ -216,6 +232,9 @@ public class TestGrid
         int placed = 0;
         ArrayList<Species> candidates = new ArrayList<>();
         ArrayList<Table> wheel = new ArrayList<>();
+// logic here potentially wrong
+        currentPlants.clear();
+        mapBySpecies.values().forEach(SpeciesMap::clearMap);
 // changed the wheel to an arraylist so that it is easier to size and also sumv was not being used
 
         for (PointSample s : pinkNoise) {
@@ -240,7 +259,7 @@ public class TestGrid
             if (candidates.isEmpty()) continue;
 
             // thinning by density
-            if (density < r.nextFloat()) continue;
+            if (density > r.nextFloat()) continue;
 // changed > to < because if the float is greater than the density the plant can't exist
 
             // roulette wheel on cumulative viability
@@ -291,11 +310,13 @@ public class TestGrid
 // TO DO: FINISH THIS METHOD
 // this method is for when the values are changed for the grid!!
     // Recalculate with same species positions
+    // ignoring all of this hard work i reckon
     public void recalculateWithSameSpecies() {
     
         
         // Clear old species maps and forest
         setupSpeciesMap();
+
         
         ViabilityCalculator calc = new ViabilityCalculator(terrain, abiotics);
         Random r = new Random();
@@ -304,15 +325,19 @@ public class TestGrid
         // Store the old plants temporarily
         List<Plant> oldPlants = new ArrayList<>();
         if (forest != null) {
-            oldPlants.addAll(forest.getAllPlants());
+            oldPlants.addAll(currentPlants);
         }
+        currentPlants.clear();
+                // logic here potentially wrong
+        mapBySpecies.values().forEach(SpeciesMap::clearMap);
         
         // Re-process each pink noise point with same species
-        for (PointSample s : pinkNoise) {
+        for (Plant s : oldPlants) {
             int xCell = clamp((int) (s.getX() / gridSpacing), 0, dim - 1);
             int yCell = clamp((int) (s.getY() / gridSpacing), 0, dim - 1);
             
             // Find if there was a plant at this location
+            /*
             Plant oldPlant = null;
             for (Plant p : oldPlants) {
                 if (Math.abs(p.getX() - s.getX()) < 0.01 && Math.abs(p.getY() - s.getY()) < 0.01) {
@@ -320,11 +345,12 @@ public class TestGrid
                     break;
                 }
             }
+        
             
             if (oldPlant == null) continue;
-            
-            Species species = oldPlant.getSpecies();
-            
+              */          
+
+            Species species = s.getSpecies();
             // Recalculate viability with new conditions
             float v = calc.viabililty(species, xCell, yCell);
             //if (v < r.nextFloat()) continue;
@@ -332,7 +358,7 @@ public class TestGrid
             // Recalculate age and growth parameters
             float cohortAge = age.getAge(xCell, yCell);
             float cap = Math.min(cohortAge, species.getLifeSpan());
-            float plantAge = Math.min(oldPlant.getAge(), cap * v); // Adjust age based on new viability
+            float plantAge = Math.min(s.getAge(), cap * v); // Adjust age based on new viability
             
             boolean isOpen = v > openOrClosedDensity;
             float height = new GrowthFunction().calculateSize(species, plantAge, isOpen);
@@ -358,22 +384,22 @@ public class TestGrid
     // be able to select species and stuff and turn on and off
 
     // run method 
-    public SimulationResult runChange(boolean pinkNoise, boolean updateSpecies)
+    public SimulationResult runChange(boolean pinkNoise) // , boolean updateSpecies
     {
         if (pinkNoise) {
             pinkNoise();
         }
-        if (updateSpecies) {
             placementLoop();
             assembleForest();
             makeSimResult();
-        }
-        else
+        /*
+        if(!updateSpecies)
         {
             recalculateWithSameSpecies();
             assembleForest();
             makeSimResult();
         }
+        */
         return simResult;
     }
 

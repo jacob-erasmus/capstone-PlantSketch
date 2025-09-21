@@ -27,7 +27,8 @@ public class TestView extends BorderPane {
     private final ConsolePane console = new ConsolePane();
     private final VBox parameterPanel = new VBox(10);
     private final Label statusLabel = new Label();
-    private final CheckBox regenerateSpeciesCheckBox = new CheckBox("Re-generate species at a point?");
+    private final CheckBox regeneratePinkNoise = new CheckBox("Re-generate pink noise?");
+    // private final CheckBox regenerateSpecies = new CheckBox("Re-generate species placement?");
     
     // Grid value editors
     private final Map<String, float[][]> currentGridValues = new HashMap<>();
@@ -101,7 +102,7 @@ public class TestView extends BorderPane {
         scrollPane.setFitToWidth(true);
         scrollPane.setPrefHeight(700);
         
-        // Create grid editors for each parameter
+        // This creates the empty grids without the values inside
         gridEditors.put("Temperature", new GridEditor("Temperature (°C)", 
             testGrid.getMinTemp(), testGrid.getMaxTemp()));
         gridEditors.put("Age", new GridEditor("Age (years)", 
@@ -120,6 +121,7 @@ public class TestView extends BorderPane {
         gridPane.setVgap(10);  // space between rows
         gridPane.setPadding(new Insets(10));
 
+        // making two columns next to eachother of grid editors
        int col = 0, row = 0;
         for (GridEditor editor : gridEditors.values()) {
             gridPane.add(editor, col, row);
@@ -133,7 +135,7 @@ public class TestView extends BorderPane {
 
         Button simulateBtn = new Button("Simulate with new parameters");
         simulateBtn.setPrefWidth(250);
-        simulateBtn.setOnAction(e -> resimulate());
+        simulateBtn.setOnAction(e -> executeSimulation(0, true));
 
         VBox panelContent = new VBox(10);
         panelContent.getChildren().addAll
@@ -142,7 +144,8 @@ public class TestView extends BorderPane {
             new Separator(),
             gridPane,
             new Separator(),
-            regenerateSpeciesCheckBox,
+            regeneratePinkNoise,
+            // regenerateSpecies,
             simulateBtn);
         
 
@@ -164,111 +167,121 @@ public class TestView extends BorderPane {
         return statusBar;
     }
     
+    // This is just for the second screen with the options 
     public void initializeWithMode(String mode) {
         console.clear();
         console.log("Initializing Test Mode: " + mode);
         
         switch (mode) {
             case "random":
-                runRandomTest();
+                executeSimulation(0, false);
                 break;
             case "preset1":
-                runPreset1Test();
+                executeSimulation(1, false);
                 break;
             case "preset2":
-                runPreset2Test();
+                executeSimulation(2, false);
                 break;
         }
     }
-    
-    private void runRandomTest() {
-        executeSimulation(0);
-    }
-    
-    private void runPreset1Test() {
-        executeSimulation(1);
-    }
-    
-    private void runPreset2Test() {
-        executeSimulation(2);
-    }
+
 
 // here is execute simulation for the first time
-    private void executeSimulation(int choice) {
+    private void executeSimulation(int choice, boolean isResimulation) {
         tabs.getTabs().clear();
         
+
         try {
+            if(isResimulation)
+            {
+                console.log("Re-simulating with new parameters...");
+            
+                // Update TestGrid with new values
+                testGrid.setTemperatureGrid(gridEditors.get("Temperature").getValues());
+                testGrid.setAgeGrid(gridEditors.get("Age").getValues());
+                testGrid.setMoistureGrid(gridEditors.get("Moisture").getValues());
+                testGrid.setSunlightGrid(gridEditors.get("Sunlight").getValues());
+                testGrid.setElevationGrid(gridEditors.get("Elevation").getValues());
+                testGrid.setSlopeGrid(gridEditors.get("Slope").getValues());
+
+                currentResult = testGrid.runChange(regeneratePinkNoise.isSelected() 
+                // ,regenerateSpecies.isSelected()
+                );
+            }
+            else
+            {
             currentResult = testGrid.run(choice);
             
+            }
+
             // Update grid editors with current values
             updateGridEditors();
             
-            // Create visualization tabs
-            tabs.getTabs().add(makeTab("Pink Noise",
-                new ScrollPane(new PinkNoiseView(currentResult.samples(), 
-                    currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
-            
-            tabs.getTabs().add(makeTab("Forest",
-                new ScrollPane(new ForestView(currentResult.forest(), 
-                    currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
-            
-            tabs.getTabs().add(makeTab("Forest + Elevation",
-                new ScrollPane(new ForestOnTerrainView(currentResult.forest(), 
-                    currentResult.elevationGrid(), currentResult.gridSpacing()))));
+            createTabs(currentResult);
             
             updateStatusDisplay();
-            console.log("✓ Test simulation complete. Plants placed: " + 
-                currentResult.forest().getAllPlants().size());
+            console.log("✓ Test simulation complete. Plants placed: " + currentResult.forest().getAllPlants().size());
+
+            int numSpecies = 0;
+            for (SpeciesMap sm : currentResult.forest().getOverallSpeciesMap()) 
+            {
+                console.log(" - " + sm.getPlants().size() + "  " + sm.getSpecies().getName() );
+                if (sm.getPlants().size() > 0) numSpecies++;
             
-        } catch (Exception ex) {
+                // this is for testing and confirming purposes
+                for (Plant p : sm.getPlants()) 
+                {
+                    console.log("Plant " + p.getId() + " Species: " + p.getSpecies().getName() + " Vigour " + p.getVigour() + " Height: " + p.getHeight());
+                    
+                }
+            }
+            for (int row = 0; row < 2; row++) 
+            {
+                for (int col = 0; col < 2; col++) 
+                {
+                    console.log("Temperature gridEditor: " + gridEditors.get("Temperature").getValues()[row][col]);
+                    console.log("Temperature testGrid: " + testGrid.getTemperatureGrid()[row][col]);
+                }
+            }
+            
+            console.log("Number of species: " + numSpecies);
+            updateVisualization();
+
+        } catch (Exception ex) 
+        {
             ex.printStackTrace();
             console.log("✗ Test simulation failed: " + ex.getMessage());
         }
     }
     
-// and obvs here is the resimulation of the ting
-    private void resimulate() {
-        console.log("Re-simulating with new parameters...");
-        
-        // Update TestGrid with new values
-        testGrid.setTemperatureGrid(gridEditors.get("Temperature").getValues());
-        testGrid.setAgeGrid(gridEditors.get("Age").getValues());
-        testGrid.setMoistureGrid(gridEditors.get("Moisture").getValues());
-        testGrid.setSunlightGrid(gridEditors.get("Sunlight").getValues());
-        testGrid.setElevationGrid(gridEditors.get("Elevation").getValues());
-        testGrid.setSlopeGrid(gridEditors.get("Slope").getValues());
-        
-        if (regenerateSpeciesCheckBox.isSelected()) {
-            // Full re-run with new species placement
-            executeSimulation(0);
-        } else {
-            // Recalculate with same species positions
-            testGrid.recalculateWithSameSpecies();
-            currentResult = testGrid.makeSimResult();
-            updateVisualization();
-        }
+    public void createTabs(SimulationResult currentResult)
+    {
+// Create visualization tabs
+
+            tabs.getTabs().add(makeTab("Forest + Elevation", new ScrollPane(new ForestOnTerrainView(currentResult.forest(), currentResult.elevationGrid(), currentResult.gridSpacing()))));
+
+            tabs.getTabs().add(makeTab("Pink Noise", new ScrollPane(new PinkNoiseView(currentResult.samples(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
+            
+            tabs.getTabs().add(makeTab("Forest", new ScrollPane(new ForestView(currentResult.forest(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
+            
+
     }
-    
+
+    // this updates the three tabs on the top and makes the grids
     private void updateVisualization() {
         tabs.getTabs().clear();
         
-        tabs.getTabs().add(makeTab("Pink Noise",
-            new ScrollPane(new PinkNoiseView(currentResult.samples(), 
-                currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
+        tabs.getTabs().add(makeTab("Forest + Elevation", new ScrollPane(new ForestOnTerrainView(currentResult.forest(), currentResult.elevationGrid(), currentResult.gridSpacing()))));
+
+        tabs.getTabs().add(makeTab("Pink Noise", new ScrollPane(new PinkNoiseView(currentResult.samples(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
         
-        tabs.getTabs().add(makeTab("Forest",
-            new ScrollPane(new ForestView(currentResult.forest(), 
-                currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
-        
-        tabs.getTabs().add(makeTab("Forest + Elevation",
-            new ScrollPane(new ForestOnTerrainView(currentResult.forest(), 
-                currentResult.elevationGrid(), currentResult.gridSpacing()))));
-        
+        tabs.getTabs().add(makeTab("Forest", new ScrollPane(new ForestView(currentResult.forest(),  currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
+    
         updateStatusDisplay();
-        console.log("✓ Re-simulation complete. Plants: " + 
-            currentResult.forest().getAllPlants().size());
+        console.log("Plants: " + currentResult.forest().getAllPlants().size());
     }
     
+
     private void updateGridEditors() {
         gridEditors.get("Temperature").setValues(testGrid.getTemperatureGrid());
         gridEditors.get("Age").setValues(testGrid.getAgeGrid());
@@ -278,6 +291,7 @@ public class TestView extends BorderPane {
         gridEditors.get("Slope").setValues(testGrid.getSlopeGrid());
     }
     
+    // This is the bottom status bar
     private void updateStatusDisplay() {
         StringBuilder status = new StringBuilder();
         status.append("Grid Status | ");
@@ -295,10 +309,10 @@ public class TestView extends BorderPane {
         statusLabel.setText(status.toString());
     }
     
+    // formats the grid values for display in the bottom status bar
     private String formatGrid(float[][] grid) {
         if (grid == null || grid.length < 2) return "N/A";
-        return String.format("[%.1f,%.1f;%.1f,%.1f]", 
-            grid[0][0], grid[0][1], grid[1][0], grid[1][1]);
+        return String.format("[%.1f,%.1f;%.1f,%.1f]", grid[0][0], grid[0][1], grid[1][0], grid[1][1]);
     }
     
     private Tab makeTab(String name, Node content) {
@@ -307,66 +321,4 @@ public class TestView extends BorderPane {
         return t;
     }
     
-    // Inner class for grid editing
-    private class GridEditor extends VBox {
-        private final String paramName;
-        private final float min;
-        private final float max;
-        private final TextField[][] fields = new TextField[2][2];
-        
-        public GridEditor(String paramName, float min, float max) {
-            this.paramName = paramName;
-            this.min = min;
-            this.max = max;
-            
-            setSpacing(5);
-            
-            Label label = new Label(paramName);
-            label.setFont(Font.font("System", FontWeight.BOLD, 12));
-            getChildren().add(label);
-            
-            GridPane grid = new GridPane();
-            grid.setHgap(5);
-            grid.setVgap(5);
-            
-            for (int i = 0; i < 2; i++) {
-                for (int j = 0; j < 2; j++) {
-                    fields[i][j] = new TextField();
-                    fields[i][j].setPrefWidth(80);
-                    fields[i][j].setPromptText(String.format("[%d,%d]", i+1, j+1));
-                    grid.add(fields[i][j], j, i);
-                }
-            }
-            
-            Label rangeLabel = new Label(String.format("Range: %.1f - %.1f", min, max));
-            rangeLabel.setStyle("-fx-font-size: 10px; -fx-text-fill: #666;");
-            
-            getChildren().addAll(grid, rangeLabel);
-        }
-        
-        public void setValues(float[][] values) {
-            if (values != null && values.length >= 2) {
-                for (int i = 0; i < 2; i++) {
-                    for (int j = 0; j < 2; j++) {
-                        fields[i][j].setText(String.format("%.2f", values[i][j]));
-                    }
-                }
-            }
-        }
-        
-        public float[][] getValues() {
-            float[][] values = new float[2][2];
-            for (int i = 0; i < 2; i++) {
-                for (int j = 0; j < 2; j++) {
-                    try {
-                        float val = Float.parseFloat(fields[i][j].getText());
-                        values[i][j] = Math.max(min, Math.min(max, val));
-                    } catch (NumberFormatException e) {
-                        values[i][j] = (min + max) / 2;
-                    }
-                }
-            }
-            return values;
-        }
-    }
 }
