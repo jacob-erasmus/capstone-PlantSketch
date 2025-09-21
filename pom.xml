@@ -18,8 +18,8 @@
     <javafx.version>21.0.4</javafx.version>
 
     <!-- Your JavaFX entry point -->
-    <main.class>plantsketch.opengl.Launcher</main.class>
-<!-- <main.class>plantsketch.ui.MainApp</main.class> -->
+    <main.class>plantsketch.ui.MainApp</main.class>
+<!-- ui.MainApp or opengl.Launcher -->
 
     <!-- LWJGL for OpenGL for 3d rendering-->
     <lwjgl.version>3.3.3</lwjgl.version>
@@ -124,13 +124,13 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-          <mainClass>plantsketch.opengl.Launcher</mainClass>
-<!-- <main.class>plantsketch.ui.MainApp</main.class> -->
+          <mainClass>plantsketch.ui.MainApp</mainClass>
+<!-- ui.MainApp or opengl.Launcher-->
           <!-- list the modules you actually use -->
           <launcher>app</launcher>
           <jlinkZip>false</jlinkZip>
           <options>
-            <option>-XstartOnFirstThread</option>
+            <!-- <option>-XstartOnFirstThread</option> -->
           </options>
         </configuration>
       </plugin>
