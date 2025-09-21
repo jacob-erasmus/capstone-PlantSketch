@@ -47,9 +47,11 @@ public class ForestOnTerrainView extends Region {
                 double t = (elevation[x][y] - min) / Math.max(1e-9, (max - min));
                 int gray = (int) Math.round(t * 255);
                 g.setFill(Color.rgb(gray, gray, gray));
+                
                 double px = vt.cellXtoPx(x);
                 double py = vt.cellYtoPx(y);
-                g.fillRect(px, py, cs, cs);
+                g.fillRect(py, px, cs, cs);
+                // was g.fillRect(px, px, cs, cs); was mirroring it wrong. idk why
             }
         }
 
