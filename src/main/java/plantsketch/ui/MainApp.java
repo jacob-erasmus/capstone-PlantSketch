@@ -82,7 +82,7 @@ public class MainApp extends Application {
         preset1Button.setPrefHeight(40);
         preset1Button.setOnAction(e -> launchTestView(stage, "preset1"));
         
-        Button preset2Button = new Button("Preset 2: Complex");
+        Button preset2Button = new Button("Preset 2: Harsh Cond.");
         preset2Button.setPrefWidth(150);
         preset2Button.setPrefHeight(40);
         preset2Button.setOnAction(e -> launchTestView(stage, "preset2"));

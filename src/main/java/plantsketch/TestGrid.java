@@ -9,12 +9,14 @@ import java.util.function.Consumer;
 public class TestGrid 
 {
 
+    boolean isTestGrid = true;
     private final Consumer<String> logger;
 
     // set values
     int sampleCount = 100;
     float gridSpacing = 25f; // in metres
-    int dim = 2; // dimensions of the grid (square)
+    int dimX = 2;
+    int dimY = 2; // dimensions of the grid 
     float openOrClosedDensity = 0.8f; // threshold for open or closed growth form
 
 
@@ -57,16 +59,16 @@ public class TestGrid
     AbioticFactors abiotics;
 
 
-    // constructor
+    // constructor for the 2x2 test grid
     public TestGrid(Consumer<String> logger)
     {
         this.logger = (logger == null) ? (s -> {}) : logger;
-        temp = new TemperatureMap(dim, dim, gridSpacing, null);
-        age = new AgeMap(dim, dim, gridSpacing, null);
-        moist = new MoistureMap(dim, dim, gridSpacing ,null);
-        sun = new SunlightMap(dim, dim, gridSpacing, null);
+        temp = new TemperatureMap(dimX, dimY, gridSpacing, null);
+        age = new AgeMap(dimX, dimY, gridSpacing, null);
+        moist = new MoistureMap(dimX, dimY, gridSpacing ,null);
+        sun = new SunlightMap(dimX, dimY, gridSpacing, null);
         abiotics = new AbioticFactors(moist, temp, sun);
-        terrain = new Terrain(dim, dim, gridSpacing, abiotics, makeRandomGrid(minElev, maxElev));
+        terrain = new Terrain(dimX, dimY, gridSpacing, abiotics, makeRandomGrid(minElev, maxElev));
 
         SpeciesDictionary dict = new SpeciesDictionary();
         speciesList = List.of(
@@ -80,16 +82,41 @@ public class TestGrid
     }
 
 
+    public TestGrid(Consumer<String> logger, int dimX, int dimY, float gridSpacing)
+    {
+        this.dimX = dimX;
+        this.dimY = dimY;
+        this.gridSpacing = gridSpacing;
+        isTestGrid = false;
+        this.logger = (logger == null) ? (s -> {}) : logger;
+        temp = new TemperatureMap(dimX, dimY, gridSpacing, null);
+        age = new AgeMap(dimX, dimY, gridSpacing, null);
+        moist = new MoistureMap(dimX, dimY, gridSpacing ,null);
+        sun = new SunlightMap(dimX, dimY, gridSpacing, null);
+        abiotics = new AbioticFactors(moist, temp, sun);
+        terrain = new Terrain(dimX, dimY, gridSpacing, abiotics, makeRandomGrid(minElev, maxElev));
+
+        SpeciesDictionary dict = new SpeciesDictionary();
+        speciesList = List.of(
+                dict.loadBoxwood(),
+                dict.loadSnowyMespilus(),
+                dict.loadMountainPine(),
+                dict.loadSilverFir(),
+                dict.loadSilverBirch(),
+                dict.loadSissileOak(),
+                dict.loadEuropeanBeech());
+    }
+
 // --------------------------
 // simulation methods:
 
     // random grid maker
     public float[][] makeRandomGrid(float min, float max)
     {
-        float[][] grid = new float[dim][dim];
+        float[][] grid = new float[dimX][dimY];
         Random r = new Random();
-        for (int i = 0; i < dim; i++) {
-            for (int j = 0; j < dim; j++) {
+        for (int i = 0; i < dimX; i++) {
+            for (int j = 0; j < dimY; j++) {
                 grid[i][j] = min + r.nextFloat() * (max - min);
             }
         }
@@ -142,8 +169,8 @@ public class TestGrid
     public void loadPreset2() {
 
         temp.setGrid(new float[][] {
-            {20f, 22.5f},
-            {19.0f, 21f}
+            {0f, 0f},
+            {1.0f, 2f}
         });
 
         age.setGrid(new float[][] {
@@ -152,14 +179,13 @@ public class TestGrid
         });
 
         moist.setGrid(new float[][] {
-            {25.0f, 25.0f},
-            {25.0f, 25.0f}
+            {12.0f, 8.0f},
+            {10.0f, 9.0f}
         });
 
-
         sun.setGrid(new float[][] {
-            {7f, 7.5f},
-            {5.0f, 6f}
+            {9f, 10f},
+            {10.5f, 11f}
         });
 
         terrain.setElevationGrid(new float[][] {
@@ -167,7 +193,7 @@ public class TestGrid
             {65.0f, 75.0f}
         });
 
-        logger.accept("Loaded Preset 2:");
+        logger.accept("Loaded Preset 2: harsh conditions");
     }
 
 
@@ -175,8 +201,9 @@ public class TestGrid
     // generate pink noise
     public List<PointSample> pinkNoise()
     {
-        float meters = dim * gridSpacing;
-        PinkNoiseSampler sampler = new PinkNoiseSampler(meters, meters, 2.0f, 0); // figure out what seed means and does
+        float metersX = dimX * gridSpacing;
+        float metersY = dimY * gridSpacing;
+        PinkNoiseSampler sampler = new PinkNoiseSampler(metersX, metersY, 2.0f, 0); // figure out what seed means and does
         List<PointSample> samples = sampler.generateSamples(sampleCount);
         this.pinkNoise = samples;
         return samples;
@@ -207,8 +234,8 @@ public class TestGrid
 // changed the wheel to an arraylist so that it is easier to size and also sumv was not being used
 
         for (PointSample s : pinkNoise) {
-            int xCell = clamp((int) (s.getX() / gridSpacing), 0, dim - 1);
-            int yCell = clamp((int) (s.getY() / gridSpacing), 0, dim - 1);
+            int xCell = clamp((int) (s.getX() / gridSpacing), 0, dimX - 1);
+            int yCell = clamp((int) (s.getY() / gridSpacing), 0, dimY - 1);
 
             float density = 0f;
             float sumV = 0f;
@@ -262,7 +289,7 @@ public class TestGrid
     // assemble forest
     public Forest assembleForest()
     {
-        forest = new Forest(dim, dim);
+        forest = new Forest(dimX, dimY);
         mapBySpecies.values().forEach(forest::addSpeciesMap);
         numPlants = forest.getAllPlants().size();
         return forest;
@@ -271,7 +298,7 @@ public class TestGrid
     // make simulation result object
     public SimulationResult makeSimResult()
     {
-        simResult = new SimulationResult(forest, pinkNoise, dim, dim, gridSpacing, terrain.getElevationGrid());
+        simResult = new SimulationResult(forest, pinkNoise, dimX, dimY, gridSpacing, terrain.getElevationGrid());
         new EcoVizOutput(simResult).createFile("testingGrid.pdb"); // and then make the file
         return simResult;
 // could potentially use my list of plants for this instead of the species maps
@@ -298,8 +325,8 @@ public class TestGrid
         
         // Re-process each pink noise point with same species
         for (Plant s : oldPlants) {
-            int xCell = clamp((int) (s.getX() / gridSpacing), 0, dim - 1);
-            int yCell = clamp((int) (s.getY() / gridSpacing), 0, dim - 1);  
+            int xCell = clamp((int) (s.getX() / gridSpacing), 0, dimX - 1);
+            int yCell = clamp((int) (s.getY() / gridSpacing), 0, dimY - 1);  
 
             Species species = s.getSpecies();
             // Recalculate viability with new conditions
@@ -356,20 +383,44 @@ public class TestGrid
 
     public SimulationResult run(int choice) 
     {
-        if (choice == 1) {
-            loadPreset1();
-        } else if (choice == 2) {
-            loadPreset2();
-        } else {
-            randomiseGridValues();
+        if (isTestGrid)
+        {
+            if (choice == 1) {
+                loadPreset1();
+            } else if (choice == 2) {
+                loadPreset2();
+            } else {
+                randomiseGridValues();
+            }
+
+            pinkNoise();
+            placementLoop();
+            assembleForest();
+            makeSimResult();
+
+            return simResult;
         }
+        /*
+        else
+        {
+            if (choice == 1) {
+                loadD1-256();
+            } else if (choice == 2) {
+                loadD2-512();
+            } else if (choice == 3) {
+                loadD3-1024();
+            } else if (choice == 4) {
+                loadD4-1024();
 
-        pinkNoise();
-        placementLoop();
-        assembleForest();
-        makeSimResult();
+            pinkNoise();
+            placementLoop();
+            assembleForest();
+            makeSimResult();
 
-        return simResult;
+            return simResult;
+        }
+        */
+        return null;
     }
 
 
