@@ -108,25 +108,29 @@ public class TestGrid
     // Preset 1
     public void loadPreset1() {
         currentTempGrid = new float[][] {
-            {8.0f, 12.0f},
-            {9.0f, 11.0f}
+            {8.0f, 7.0f},
+            {8.0f, 7.0f}
         };
         temp.setGrid(currentTempGrid);
+
         currentAgeGrid = new float[][] {
-            {50.0f, 75.0f},
-            {60.0f, 80.0f}
+            {300f, 300f},
+            {300.0f, 300.0f}
         };
         age.setGrid(currentAgeGrid);
+
         currentMoistGrid = new float[][] {
-            {35.0f, 40.0f},
-            {38.0f, 42.0f}
+            {25.0f, 25.0f},
+            {25.0f, 25.0f}
         };
         moist.setGrid(currentMoistGrid);
+
         currentSunGrid = new float[][] {
-            {8.0f, 9.0f},
-            {7.5f, 8.5f}
+            {6.0f, 7.0f},
+            {5.5f, 6.0f}
         };
         sun.setGrid(currentSunGrid);
+
         currentElevGrid = new float[][] {
             {20.0f, 25.0f},
             {22.0f, 28.0f}
@@ -136,7 +140,7 @@ public class TestGrid
         // idk if this one works or if I should do this later as idrk when the slopes are made
         currentSlopeGrid = terrain.getSlopeGrid();
         
-        logger.accept("Loaded Preset 1: ");
+        logger.accept("Loaded Preset 1: perfect conditions for most species");
     }
     
     // Preset 2
@@ -255,7 +259,7 @@ public class TestGrid
             if (candidates.isEmpty()) continue;
 
             // thinning by density
-            if (density < r.nextFloat()) continue;
+            if (density > r.nextFloat()) continue;
 // changed > to < because if the float is greater than the density the plant can't exist
 
             // roulette wheel on cumulative viability
@@ -306,6 +310,7 @@ public class TestGrid
 // TO DO: FINISH THIS METHOD
 // this method is for when the values are changed for the grid!!
     // Recalculate with same species positions
+    // ignoring all of this hard work i reckon
     public void recalculateWithSameSpecies() {
     
         
@@ -379,23 +384,22 @@ public class TestGrid
     // be able to select species and stuff and turn on and off
 
     // run method 
-    public SimulationResult runChange(boolean pinkNoise, boolean updateSpecies)
+    public SimulationResult runChange(boolean pinkNoise) // , boolean updateSpecies
     {
         if (pinkNoise) {
             pinkNoise();
         }
-        if (updateSpecies) {
-
             placementLoop();
             assembleForest();
             makeSimResult();
-        }
-        else
+        /*
+        if(!updateSpecies)
         {
             recalculateWithSameSpecies();
             assembleForest();
             makeSimResult();
         }
+        */
         return simResult;
     }
 

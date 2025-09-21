@@ -10,9 +10,10 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Window;
-import plantsketch.SimulationResult;
 
 
 /**
@@ -31,6 +32,7 @@ public class MainView extends BorderPane {
     private final Spinner<Integer> plantCount = new Spinner<>(1, 50_000, 2_000, 100);
     private final Button browseBtn = new Button("Browse…");
     private final Button runBtn = new Button("Run");
+    private final Runnable onBack;
 
     /* ---------- Center ---------- */
     private final TabPane tabs = new TabPane();
@@ -41,13 +43,14 @@ public class MainView extends BorderPane {
     private final Runnable onRenderAnotherEnvironment;
 
     /* ---------- Constructors ---------- */
-    public MainView() { this(true, null); }
+    public MainView() { this(true, null, null); }
 
-    public MainView(boolean showToolbar) { this(showToolbar, null); }
+    public MainView(boolean showToolbar) { this(showToolbar, null, null); }
 
-    public MainView(boolean showToolbar, Runnable onRenderAnotherEnvironment) {
+    public MainView(boolean showToolbar, Runnable onRenderAnotherEnvironment, Runnable onBack) {
         this.showToolbar = showToolbar;
         this.onRenderAnotherEnvironment = onRenderAnotherEnvironment;
+        this.onBack = onBack;
 
         setPadding(new Insets(8));
 
@@ -119,6 +122,7 @@ public class MainView extends BorderPane {
         );
     }
 
+
     private HBox buildLogHeader() {
         var header = new HBox();
         header.setSpacing(8);
@@ -147,6 +151,9 @@ public class MainView extends BorderPane {
             folderField.setText(f.getAbsolutePath());
         }
     }
+
+    // 
+
 
     /* ---------- Execution pipeline (UI shell) ---------- */
 
