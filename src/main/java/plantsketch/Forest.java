@@ -2,10 +2,12 @@ package plantsketch;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 public class Forest {
     private final ArrayList<SpeciesMap> OverallSpeciesMap;
+    public HashMap<String, SpeciesMap> removedSpecies = new HashMap<>();
 
     public Forest() {
         this.OverallSpeciesMap = new ArrayList<>();
@@ -17,6 +19,11 @@ public class Forest {
 
     public void addSpeciesMap(SpeciesMap speciesMap) {
         this.OverallSpeciesMap.add(speciesMap);
+    }
+
+    public void addSpeciesMapByName(String speciesName) {
+        this.OverallSpeciesMap.add(removedSpecies.get(speciesName));
+        removedSpecies.remove(speciesName);
     }
 
     // for local changes
@@ -42,14 +49,15 @@ public List<Plant> getAllPlants() {
 }
 
     // global change
-    public void removeSpecies(Species species) {
-        OverallSpeciesMap.remove(getSpeciesMap(species));
+    public void removeSpecies(String speciesName) {
+        removedSpecies.put(speciesName, getSpeciesMap(speciesName));
+        OverallSpeciesMap.remove(getSpeciesMap(speciesName));
     }
 
-    public SpeciesMap getSpeciesMap(Species species) {
+    public SpeciesMap getSpeciesMap(String speciesName) {
         // Method stub
         for (int i = 0; i < 7; i++) {
-            if (OverallSpeciesMap.get(i).getSpecies() == species) {
+            if (OverallSpeciesMap.get(i).getSpecies().getName() == speciesName) {
                 return OverallSpeciesMap.get(i);
             }
         }
