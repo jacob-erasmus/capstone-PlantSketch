@@ -70,7 +70,6 @@ public class SidePanel extends Region{
         for (CheckBox boxes : speciesCheck.values()) {
             boxes.setSelected(true);
             gridPane.add(boxes, col, row);
-
             col++;
             if (col > 1) { // wrap after 2 columns
                 col = 0;
@@ -90,7 +89,7 @@ public class SidePanel extends Region{
         brushSizeSlider.showTickLabelsProperty();
         
 
-        Button simulateBtn = new Button("Regenerate according to Parameters");
+        Button simulateBtn = new Button("Remove species");
         simulateBtn.setPrefWidth(250);
 
         VBox panelContent = new VBox(10);
@@ -120,5 +119,14 @@ public class SidePanel extends Region{
         VBox container = new VBox(scrollPane);
         return container;
 
+    }
+
+    public SimulationResult removeSpecies(SimulationResult result){
+        for (CheckBox boxes : speciesCheck.values()) {
+            if(boxes.isSelected()!=true){
+                result.forest().removeSpecies(boxes.getText());
+            }
+        }
+        return result;
     }
 }
