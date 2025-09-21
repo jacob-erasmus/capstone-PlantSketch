@@ -7,10 +7,10 @@ import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 
 public class ForestOnTerrainView extends Region {
-    private final Forest forest;
-    private final float[][] elevation; // [dimX][dimY]
-    private final ViewTransform vt;
-    private final Canvas canvas = new Canvas();
+    private Forest forest;
+    private float[][] elevation; // [dimX][dimY]
+    private ViewTransform vt;
+    private Canvas canvas = new Canvas();
 
     public ForestOnTerrainView(Forest forest, float[][] elevation, float gridSpacing) {
         this.forest = forest;
