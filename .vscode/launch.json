@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launcher",
+            "request": "launch",
+            "mainClass": "plantsketch.opengl.Launcher",
+            "projectName": "plantsketch"
+        },
+        {
+            "type": "java",
+            "name": "ThreeDeeRender",
+            "request": "launch",
+            "mainClass": "plantsketch.ui.ThreeDeeRender",
+            "projectName": "plantsketch"
+        },
+        {
+            "type": "java",
             "name": "MainApp",
             "request": "launch",
             "mainClass": "plantsketch.ui.MainApp",

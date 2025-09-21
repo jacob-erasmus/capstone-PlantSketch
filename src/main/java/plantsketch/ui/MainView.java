@@ -32,7 +32,6 @@ public class MainView extends BorderPane {
     private final Spinner<Integer> plantCount = new Spinner<>(1, 50_000, 2_000, 100);
     private final Button browseBtn = new Button("Browse…");
     private final Button runBtn = new Button("Run");
-    private final Runnable onBack;
 
     /* ---------- Center ---------- */
     private final TabPane tabs = new TabPane();
@@ -43,14 +42,14 @@ public class MainView extends BorderPane {
     private final Runnable onRenderAnotherEnvironment;
 
     /* ---------- Constructors ---------- */
-    public MainView() { this(true, null, null); }
+    public MainView() { this(true, null); }
 
-    public MainView(boolean showToolbar) { this(showToolbar, null, null); }
+    public MainView(boolean showToolbar) { this(showToolbar, null); }
 
-    public MainView(boolean showToolbar, Runnable onRenderAnotherEnvironment, Runnable onBack) {
+    public MainView(boolean showToolbar, Runnable onRenderAnotherEnvironment) {
         this.showToolbar = showToolbar;
         this.onRenderAnotherEnvironment = onRenderAnotherEnvironment;
-        this.onBack = onBack;
+
 
         setPadding(new Insets(8));
 
