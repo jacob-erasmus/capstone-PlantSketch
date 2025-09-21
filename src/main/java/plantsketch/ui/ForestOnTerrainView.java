@@ -51,7 +51,7 @@ public class ForestOnTerrainView extends Region {
                 double px = vt.cellXtoPx(x);
                 double py = vt.cellYtoPx(y);
                 g.fillRect(py, px, cs, cs);
-                // was g.fillRect(px, px, cs, cs); was mirroring it wrong. idk why
+                // was g.fillRect(px, py, cs, cs); was mirroring it wrong. idk why
             }
         }
 
