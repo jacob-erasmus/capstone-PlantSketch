@@ -42,14 +42,14 @@ public List<Plant> getAllPlants() {
 }
 
     // global change
-    public void removeSpecies(Species species) {
-        OverallSpeciesMap.remove(getSpeciesMap(species));
+    public void removeSpecies(String speciesName) {
+        OverallSpeciesMap.remove(getSpeciesMap(speciesName));
     }
 
-    public SpeciesMap getSpeciesMap(Species species) {
+    public SpeciesMap getSpeciesMap(String speciesName) {
         // Method stub
         for (int i = 0; i < 7; i++) {
-            if (OverallSpeciesMap.get(i).getSpecies() == species) {
+            if (OverallSpeciesMap.get(i).getSpecies().getName() == speciesName) {
                 return OverallSpeciesMap.get(i);
             }
         }

@@ -17,6 +17,7 @@ import javafx.scene.text.FontWeight;
 public class SidePanel extends Region{
     private final VBox parameterPanel = new VBox(10);
     private final Map<String, CheckBox> speciesCheck = new HashMap<>();
+
     public VBox buildParameterPanel(){
         parameterPanel.setPadding(new Insets(10));
         parameterPanel.setPrefWidth(500);
@@ -48,7 +49,7 @@ public class SidePanel extends Region{
         
         Label enivroAge = new Label("Enivornment Age");
         Slider ageSlider = new Slider(1, 600, 1);
-        tempSlider.setShowTickLabels(true);
+        ageSlider.setShowTickLabels(true);
         ageSlider.setShowTickMarks(true);
         ageSlider.setBlockIncrement(1);
         ageSlider.setPrefWidth(250);
@@ -57,13 +58,17 @@ public class SidePanel extends Region{
         Slider sunSlider = new Slider(3, 7, 3);
         sunSlider.setShowTickLabels(true);
         sunSlider.setShowTickMarks(true);
+        sunSlider.setMajorTickUnit(0.25);
         sunSlider.setBlockIncrement(0.25);
+        sunSlider.setSnapToTicks(true);
+        sunSlider.setMinorTickCount(0);
+        sunSlider.showTickLabelsProperty();
         sunSlider.setPrefWidth(250);
 
         GridPane gridPane = new GridPane();
         int col = 0, row = 0;
         for (CheckBox boxes : speciesCheck.values()) {
-            
+            boxes.setSelected(true);
             gridPane.add(boxes, col, row);
 
             col++;
@@ -73,7 +78,19 @@ public class SidePanel extends Region{
             }
         }
 
-        Button simulateBtn = new Button("Simulate with new parameters");
+        Label brushSize = new Label("Brush Size");
+        Slider brushSizeSlider = new Slider(1, 5, 1);
+        brushSizeSlider.setShowTickLabels(true);
+        brushSizeSlider.setShowTickMarks(true);
+        brushSizeSlider.setMajorTickUnit(1);
+        brushSizeSlider.setBlockIncrement(1);
+        brushSizeSlider.setPrefWidth(250);
+        brushSizeSlider.setSnapToTicks(true);
+        brushSizeSlider.setMinorTickCount(0);
+        brushSizeSlider.showTickLabelsProperty();
+        
+
+        Button simulateBtn = new Button("Regenerate according to Parameters");
         simulateBtn.setPrefWidth(250);
 
         VBox panelContent = new VBox(10);
@@ -92,6 +109,9 @@ public class SidePanel extends Region{
             new Separator(),
             gridPane,
             new Separator(),
+            brushSize,
+            brushSizeSlider,
+            new Separator(),
             simulateBtn);
         
 
@@ -99,6 +119,6 @@ public class SidePanel extends Region{
         
         VBox container = new VBox(scrollPane);
         return container;
-    }
 
+    }
 }

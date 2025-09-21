@@ -76,6 +76,7 @@ public class MainView extends BorderPane {
         setPadding(new Insets(8));
         // stream stdout/stderr into the console pane
         console.hookSystemStreams();
+        
     }
 
     /* ---------- Public API used by MainApp (wizard handoff) ---------- */
@@ -206,4 +207,5 @@ public class MainView extends BorderPane {
     private void alert(String msg) {
         new Alert(Alert.AlertType.INFORMATION, msg).showAndWait();
     }
+
 }
