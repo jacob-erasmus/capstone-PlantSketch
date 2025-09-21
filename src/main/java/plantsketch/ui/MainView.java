@@ -3,6 +3,7 @@ package plantsketch.ui;
 import plantsketch.*; // domain types
 import java.nio.file.Path;
 import java.io.File;
+import java.lang.reflect.Parameter;
 import java.util.Objects;
 
 import javafx.geometry.Insets;
@@ -12,7 +13,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Window;
-import plantsketch.SimulationResult;
 
 
 /**
@@ -34,6 +34,9 @@ public class MainView extends BorderPane {
 
     /* ---------- Center ---------- */
     private final TabPane tabs = new TabPane();
+
+    /* ---------- Right ---------- */
+    private final SidePanel parameterPanel = new SidePanel();
 
     /* ---------- Bottom (console + actions) ---------- */
     private final ConsolePane console = new ConsolePane();
@@ -64,8 +67,13 @@ public class MainView extends BorderPane {
         split.setOrientation(Orientation.VERTICAL);
         split.getItems().addAll(tabs, logBox);
         split.setDividerPositions(0.78);
-        setCenter(split);
 
+         // Main content - tabs on left, parameter panel on right
+        HBox mainContent = new HBox(10);
+        mainContent.getChildren().addAll(split, parameterPanel.buildParameterPanel());
+        HBox.setHgrow(split, Priority.ALWAYS);
+        setCenter(mainContent);
+        setPadding(new Insets(8));
         // stream stdout/stderr into the console pane
         console.hookSystemStreams();
     }
