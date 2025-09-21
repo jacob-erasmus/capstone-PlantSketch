@@ -10,9 +10,10 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Window;
-import plantsketch.SimulationResult;
 
 
 /**
@@ -48,6 +49,7 @@ public class MainView extends BorderPane {
     public MainView(boolean showToolbar, Runnable onRenderAnotherEnvironment) {
         this.showToolbar = showToolbar;
         this.onRenderAnotherEnvironment = onRenderAnotherEnvironment;
+
 
         setPadding(new Insets(8));
 
@@ -119,6 +121,7 @@ public class MainView extends BorderPane {
         );
     }
 
+
     private HBox buildLogHeader() {
         var header = new HBox();
         header.setSpacing(8);
@@ -147,6 +150,9 @@ public class MainView extends BorderPane {
             folderField.setText(f.getAbsolutePath());
         }
     }
+
+    // 
+
 
     /* ---------- Execution pipeline (UI shell) ---------- */
 

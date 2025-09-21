@@ -18,7 +18,11 @@
     <javafx.version>21.0.4</javafx.version>
 
     <!-- Your JavaFX entry point -->
-    <main.class>plantsketch.ui.MainApp</main.class>
+    <main.class>plantsketch.opengl.Launcher</main.class>
+<!-- <main.class>plantsketch.ui.MainApp</main.class> -->
+
+    <!-- LWJGL for OpenGL for 3d rendering-->
+    <lwjgl.version>3.3.3</lwjgl.version>
   </properties>
 
   <dependencies>
@@ -38,6 +42,7 @@
       <artifactId>javafx-controls</artifactId>
       <version>21.0.4</version>
     </dependency>
+
     <!-- Add if you use FXML -->
     <dependency>
       <groupId>org.openjfx</groupId>
@@ -51,6 +56,53 @@
       <artifactId>junit-jupiter</artifactId>
       <version>5.10.2</version>
       <scope>test</scope>
+    </dependency>
+
+  <!-- LWJGL STUFF:-->
+    <!-- LWJGL Core -->
+    <dependency>
+        <groupId>org.lwjgl</groupId>
+        <artifactId>lwjgl</artifactId>
+        <version>${lwjgl.version}</version>
+    </dependency>
+
+    <!-- LWJGL OpenGL bindings -->
+    <dependency>
+        <groupId>org.lwjgl</groupId>
+        <artifactId>lwjgl-opengl</artifactId>
+        <version>${lwjgl.version}</version>
+    </dependency>
+
+    <!-- GLFW (for window/input) -->
+    <dependency>
+        <groupId>org.lwjgl</groupId>
+        <artifactId>lwjgl-glfw</artifactId>
+        <version>${lwjgl.version}</version>
+    </dependency>
+
+    <!-- Natives (needed for your OS) -->
+    <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl</artifactId>
+      <version>${lwjgl.version}</version>
+      <classifier>natives-macos-arm64</classifier> <!-- Changed from natives-macos -->
+  </dependency>
+  <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-opengl</artifactId>
+      <version>${lwjgl.version}</version>
+      <classifier>natives-macos-arm64</classifier> <!-- Changed from natives-macos -->
+  </dependency>
+  <dependency>
+      <groupId>org.lwjgl</groupId>
+      <artifactId>lwjgl-glfw</artifactId>
+      <version>${lwjgl.version}</version>
+      <classifier>natives-macos-arm64</classifier> <!-- Changed from natives-macos -->
+  </dependency>
+    <dependency>
+      <groupId>org.joml</groupId>
+      <artifactId>joml</artifactId>
+      <version>1.10.5</version>
     </dependency>
   </dependencies>
 
@@ -72,12 +124,13 @@
         <artifactId>javafx-maven-plugin</artifactId>
         <version>0.0.8</version>
         <configuration>
-          <mainClass>plantsketch.ui.MainApp</mainClass>
+          <mainClass>plantsketch.opengl.Launcher</mainClass>
+<!-- <main.class>plantsketch.ui.MainApp</main.class> -->
           <!-- list the modules you actually use -->
           <launcher>app</launcher>
           <jlinkZip>false</jlinkZip>
           <options>
-            <!-- usually none needed -->
+            <option>-XstartOnFirstThread</option>
           </options>
         </configuration>
       </plugin>
