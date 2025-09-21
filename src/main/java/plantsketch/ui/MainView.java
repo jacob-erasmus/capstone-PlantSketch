@@ -40,10 +40,6 @@ public class MainView extends BorderPane {
     /* ---------- Center ---------- */
     private final TabPane tabs = new TabPane();
 
-    /* ---------- Right ---------- */
-    //private final SidePanel parameterPanel = new SidePanel();
-    //private final Button renderToParameters = new Button("Render according to Parameters");
-    
 
     /* ---------- Bottom (console + actions) ---------- */
     private final ConsolePane console = new ConsolePane();
