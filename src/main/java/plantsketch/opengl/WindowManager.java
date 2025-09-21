@@ -1,5 +1,6 @@
 package plantsketch.opengl;
 
+/*
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWVidMode;
@@ -198,4 +199,5 @@ public class WindowManager {
         float aspectRatio = (float) width / height;
         return matrix.setPerspective(FOV, aspectRatio, Z_NEAR, Z_FAR); 
     }
-}
+}        */
+
