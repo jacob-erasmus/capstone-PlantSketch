@@ -270,8 +270,6 @@ public class MainView extends BorderPane {
         }
     }
 
-    // 
-
 
     /* ---------- Execution pipeline (UI shell) ---------- */
     private void executeSimulation() {
@@ -292,15 +290,7 @@ public class MainView extends BorderPane {
             runner = new SimulationRunner(console::log); // pass a logger
             result = runner.run(path, n);
 
-            // Tabs: Pink Noise, Forest, Forest + Elevation
-            tabs.getTabs().add(makeTab("Pink Noise",
-                    new ScrollPane(new PinkNoiseView(result.samples(), result.dimX(), result.dimY(), result.gridSpacing()))));
-
-            tabs.getTabs().add(makeTab("Forest",
-                    new ScrollPane(new ForestView(result.forest(), result.dimX(), result.dimY(), result.gridSpacing()))));
-
-            tabs.getTabs().add(makeTab("Forest + Elevation",
-                    new ScrollPane(new ForestOnTerrainView(result.forest(), result.elevationGrid(), result.gridSpacing()))));
+            tabsVisualise();
 
             console.log("\u2714 Run complete. Plants placed: " + result.forest().getAllPlants().size());
 
@@ -340,14 +330,16 @@ public class MainView extends BorderPane {
     private void tabsVisualise(){
         tabs.getTabs().clear();
         // Tabs: Pink Noise, Forest, Forest + Elevation
-            tabs.getTabs().add(makeTab("Pink Noise",
-                    new ScrollPane(new PinkNoiseView(result.samples(), result.dimX(), result.dimY(), result.gridSpacing()))));
+        tabs.getTabs().add(makeTab("Forest + Elevation",
+                new ScrollPane(new ForestOnTerrainView(result.forest(), result.elevationGrid(), result.gridSpacing()))));
 
-            tabs.getTabs().add(makeTab("Forest",
-                    new ScrollPane(new ForestView(result.forest(), result.dimX(), result.dimY(), result.gridSpacing()))));
+        tabs.getTabs().add(makeTab("Pink Noise",
+                new ScrollPane(new PinkNoiseView(result.samples(), result.dimX(), result.dimY(), result.gridSpacing()))));
 
-            tabs.getTabs().add(makeTab("Forest + Elevation",
-                    new ScrollPane(new ForestOnTerrainView(result.forest(), result.elevationGrid(), result.gridSpacing()))));
+        tabs.getTabs().add(makeTab("Forest",
+                new ScrollPane(new ForestView(result.forest(), result.dimX(), result.dimY(), result.gridSpacing()))));
+
+
     }
 
 }
