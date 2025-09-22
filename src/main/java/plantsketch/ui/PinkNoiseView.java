@@ -11,6 +11,7 @@ public class PinkNoiseView extends Region {
     private final List<PointSample> samples;
     private final ViewTransform vt;
     private final Canvas canvas = new Canvas();
+    float pointDiameter = 0.2f; // percentage of cell
 
     public PinkNoiseView(List<PointSample> samples, int dimX, int dimY, float gridSpacing) {
         this.samples = samples;
@@ -35,14 +36,15 @@ public class PinkNoiseView extends Region {
 
         // draw points (meters → pixels)
         g.setFill(Color.PINK);
-        double r = Math.max(1, vt.cellPx * 0.40); // point diameter ~40% of a cell
+        double r = Math.max(1, vt.cellPx * pointDiameter); // point diameter ~40% of a cell
         for (PointSample s : samples) {
             double xPx = vt.meterXtoPx(s.getX());
             double yPx = vt.meterYtoPx(s.getY());
             // clamp for safety
             xPx = Math.max(0, Math.min(vt.widthPx - 1, xPx));
             yPx = Math.max(0, Math.min(vt.heightPx - 1, yPx));
-            g.fillOval(xPx - r / 2, yPx - r / 2, r, r);
+            g.fillOval(yPx - r / 2, xPx - r / 2, r, r);
+            // swapping:    g.fillOval(xPx - r / 2, yPx - r / 2, r, r);
         }
     }
 

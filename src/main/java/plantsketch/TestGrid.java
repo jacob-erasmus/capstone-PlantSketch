@@ -169,9 +169,17 @@ public class TestGrid
     public void loadPreset2() {
 
         temp.setGrid(new float[][] {
-            {0f, 0f},
-            {1.0f, 2f}
+            {2f, 0f},
+            {3.0f, 2f}
         });
+        for(int x = 0 ; x < 2; x++)
+        {
+            for(int y = 0 ; y < 2; y++)
+            {
+                System.out.println(temp.getValue(x, y));     
+            }
+        }
+
 
         age.setGrid(new float[][] {
             {400.0f, 450.0f},
@@ -179,13 +187,13 @@ public class TestGrid
         });
 
         moist.setGrid(new float[][] {
-            {12.0f, 8.0f},
-            {10.0f, 9.0f}
+            {22.0f, 8.0f},
+            {16.0f, 9.0f}
         });
 
         sun.setGrid(new float[][] {
-            {9f, 10f},
-            {10.5f, 11f}
+            {8f, 10f},
+            {6f, 11f}
         });
 
         terrain.setElevationGrid(new float[][] {

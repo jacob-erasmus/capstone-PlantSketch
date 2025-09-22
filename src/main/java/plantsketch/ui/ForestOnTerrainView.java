@@ -51,7 +51,7 @@ public class ForestOnTerrainView extends Region {
                 double px = vt.cellXtoPx(x);
                 double py = vt.cellYtoPx(y);
                 g.fillRect(py, px, cs, cs);
-                // was g.fillRect(px, py, cs, cs); was mirroring it wrong. idk why
+                // swapping them to fix mirror image thing:   g.fillRect(px, py, cs, cs);
             }
         }
 
@@ -63,7 +63,8 @@ public class ForestOnTerrainView extends Region {
                 double xPx = vt.meterXtoPx(p.getX());
                 double yPx = vt.meterYtoPx(p.getY());
                 double rPx = Math.max(2.0, vt.metersToPx(p.getCanopyRadius()));
-                g.fillOval(xPx - rPx, yPx - rPx, rPx * 2, rPx * 2);
+                g.fillOval(yPx - rPx, xPx - rPx, rPx * 2, rPx * 2);
+                // swappiing them to plaster fix mirror image thing:    g.fillOval(xPx - rPx, yPx - rPx, rPx * 2, rPx * 2);
             }
         }
 

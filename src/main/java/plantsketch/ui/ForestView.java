@@ -42,7 +42,8 @@ public class ForestView extends Region {
                 double xPx = vt.meterXtoPx(p.getX());
                 double yPx = vt.meterYtoPx(p.getY());
                 double rPx = Math.max(minCirclePx, vt.metersToPx(p.getCanopyRadius()));
-                g.fillOval(xPx - rPx, yPx - rPx, rPx * 2, rPx * 2);
+                g.fillOval(yPx - rPx, xPx - rPx, rPx * 2, rPx * 2);
+                // swapping them to fix y=-x thing: g.fillOval(xPx - rPx, yPx - rPx, rPx * 2, rPx * 2);
             }
         }
 
