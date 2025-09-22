@@ -169,7 +169,7 @@ public class MainApp extends Application {
                 sampleCount = 10000;
             }
 
-            TestAndRunView testView = new TestAndRunView(() -> showModeSelection(stage), mode, isTestGrid, sampleCount);
+            TestView testView = new TestView(() -> showModeSelection(stage), mode, isTestGrid, sampleCount);
             Scene scene = new Scene(testView, 1400, 900);
             stage.setScene(scene);
             stage.show();

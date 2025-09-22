@@ -16,7 +16,7 @@ import javafx.scene.text.FontWeight;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TestAndRunView extends BorderPane {
+public class TestView extends BorderPane {
     
 
 //*********** NOTES AND TO DO ****************\\
@@ -54,7 +54,7 @@ public class TestAndRunView extends BorderPane {
     private final Map<String, GridEditor> gridEditors = new HashMap<>();
     
 //*********** CONSTRUCTOR ****************\\
-    public TestAndRunView(Runnable onBack, String mode, boolean isTestGrid, int sampleCount) {
+    public TestView(Runnable onBack, String mode, boolean isTestGrid, int sampleCount) {
         this.onBack = onBack;
         this.testGrid = new TestGrid(console::log, isTestGrid, sampleCount);
         this.isTestGrid = isTestGrid;
