@@ -23,11 +23,11 @@ public final class ViewTransform {
     }
 
     // Alternative constructor that takes target canvas size directly
-    public ViewTransform(int dimX, int dimY, float gridSpcaing, double targetWidth, double targetHeight, boolean fillSpace) {
+    public ViewTransform(int dimX, int dimY, float gridSpcaing, double targetWidth, double targetHeight, boolean dynamic) {
         this.dimX = dimX;
         this.dimY = dimY;
         
-        if (fillSpace) {
+        if (dynamic) {
             // Calculate cell size to fill the target space
             double cellWidth = targetWidth / dimX;
             double cellHeight = targetHeight / dimY;
