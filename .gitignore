@@ -3,6 +3,8 @@
 /bin/
 /out/
 
+*.pdb
+
 # === IntelliJ / Eclipse / VSCode project files ===
 .idea/
 *.iml
