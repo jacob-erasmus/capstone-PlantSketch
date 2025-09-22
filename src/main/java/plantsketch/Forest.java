@@ -50,13 +50,17 @@ public List<Plant> getAllPlants() {
 
     // global change
     public void removeSpecies(String speciesName) {
-        removedSpecies.put(speciesName, getSpeciesMap(speciesName));
-        OverallSpeciesMap.remove(getSpeciesMap(speciesName));
+        SpeciesMap temp = getSpeciesMap(speciesName);
+        if (temp != null){
+            removedSpecies.put(speciesName, getSpeciesMap(speciesName));
+            OverallSpeciesMap.remove(getSpeciesMap(speciesName));
+        }
+        //else do nothing
     }
 
     public SpeciesMap getSpeciesMap(String speciesName) {
         // Method stub
-        for (int i = 0; i < 7; i++) {
+        for (int i = 0; i < OverallSpeciesMap.size(); i++) {
             if (OverallSpeciesMap.get(i).getSpecies().getName() == speciesName) {
                 return OverallSpeciesMap.get(i);
             }
