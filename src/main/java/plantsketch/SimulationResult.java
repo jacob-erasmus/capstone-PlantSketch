@@ -2,7 +2,7 @@ package plantsketch;
 
 import java.util.List;
 
-/** Immutable DTO returned by SimulationRunner for the UI to render. */
+/** Immutable Data Transfer Object returned by SimulationRunner for the UI to render. */
 public record SimulationResult(
         Forest forest,
         List<PointSample> samples,
