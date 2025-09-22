@@ -1,6 +1,5 @@
 package plantsketch.ui;
 
-import javafx.scene.control.Label;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -11,6 +10,7 @@ public class GridEditor extends VBox {
         private float min;
         private float max;
         private TextField[][] fields = new TextField[2][2];
+        private float[][] originalValues;
         
         public GridEditor(String paramName, float min, float max) {
             this.paramName = paramName;
@@ -41,15 +41,30 @@ public class GridEditor extends VBox {
             
             getChildren().addAll(grid, rangeLabel);
         }
-        
+
         public void setValues(float[][] values) {
             if (values != null && values.length >= 2) {
+                originalValues = new float[2][2];
                 for (int i = 0; i < 2; i++) {
                     for (int j = 0; j < 2; j++) {
                         fields[i][j].setText(String.format("%.2f", values[i][j]));
+                        originalValues[i][j] = values[i][j];
                     }
                 }
             }
+        }
+
+        public boolean isEdited() {
+            if (originalValues == null) return false;
+            float[][] current = getValues();
+            for (int i = 0; i < 2; i++) {
+                for (int j = 0; j < 2; j++) {
+                    if (Math.abs(current[i][j] - originalValues[i][j]) > 1e-6) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         
         public float[][] getValues() {

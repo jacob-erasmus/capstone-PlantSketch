@@ -17,7 +17,6 @@ public class MainApp extends Application {
     private void centerStage(Stage stage) {
         // Get the screen dimensions
         javafx.geometry.Rectangle2D screenBounds = javafx.stage.Screen.getPrimary().getVisualBounds();
-        int sampleCount;
         
         // Calculate the center position
         stage.setX((screenBounds.getWidth() - stage.getWidth()) / 2);
