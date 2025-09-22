@@ -46,13 +46,13 @@ public class MainApp extends Application {
         testButton.setPrefWidth(200);
         testButton.setPrefHeight(50);
         testButton.setStyle("-fx-font-size: 16px;");
-        testButton.setOnAction(e -> showTestMode(stage, true));
+        testButton.setOnAction(e -> showTestMode(stage));
         
         Button runButton = new Button("Run Mode");
         runButton.setPrefWidth(200);
         runButton.setPrefHeight(50);
         runButton.setStyle("-fx-font-size: 16px;");
-        runButton.setOnAction(e -> showTestMode(stage, false));
+        runButton.setOnAction(e -> showWizard(stage));
         
         root.getChildren().addAll(title, subtitle, testButton, runButton);
         
@@ -62,8 +62,8 @@ public class MainApp extends Application {
         centerStage(stage);
     }
 
-    // this shows the first and second screens for both test mode and run mode
-    private void showTestMode(Stage stage, boolean isTestGrid) {
+    /** Show test mode selection */
+    private void showTestMode(Stage stage) {
         VBox root = new VBox(20);
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(40));
@@ -96,16 +96,24 @@ public class MainApp extends Application {
 
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
         
+        Label subtitle = new Label("Select Test Configuration");
         subtitle.setStyle("-fx-font-size: 16px;");
 
         sampleLabel = new Label("Sample Count (1-10000):");
         sampleField.setPrefWidth(150);
         sampleField.setPrefHeight(40);
         
+        Button randomButton = new Button("Random");
+        randomButton.setPrefWidth(150);
+        randomButton.setPrefHeight(40);
+        randomButton.setOnAction(e -> launchTestView(stage, "random"));
+        
+        Button preset1Button = new Button("Preset 1: Good Cond.");
         preset1Button.setPrefWidth(150);
         preset1Button.setPrefHeight(40);
         preset1Button.setOnAction(e -> launchTestView(stage, "preset1", isTestGrid, sampleField));
         
+        Button preset2Button = new Button("Preset 2: Harsh Cond.");
         preset2Button.setPrefWidth(150);
         preset2Button.setPrefHeight(40);
         preset2Button.setOnAction(e -> launchTestView(stage, "preset2", isTestGrid, sampleField));
@@ -186,7 +194,7 @@ public class MainApp extends Application {
     }
 
     /** Show the original wizard for run mode */
-    private void showWizard(Stage stage, String mode, boolean isTestGrid) {
+    private void showWizard(Stage stage) {
         StartupWizard wizard = new StartupWizard(stage, (dataRoot, envFolder, sampleCount) -> {
             AppConfig.dataRoot = dataRoot;
             AppConfig.environment = envFolder;

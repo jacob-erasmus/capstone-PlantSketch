@@ -187,7 +187,7 @@ public class MainViewOld extends BorderPane {
         tempSlider.setBlockIncrement(0.5);
         tempSlider.setPrefWidth(250);
         
-        Label enivroAge = new Label("Environnment Age");
+        Label enivroAge = new Label("Enivornment Age");
         Slider ageSlider = new Slider(1, 600, 1);
         ageSlider.setShowTickLabels(true);
         ageSlider.setShowTickMarks(true);

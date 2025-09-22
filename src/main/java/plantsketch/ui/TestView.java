@@ -39,7 +39,6 @@ public class TestView extends BorderPane {
     private final Runnable onBack;
     private TestGrid testGrid;
     private SimulationResult currentResult;
-    private boolean isTestGrid;
     
     // UI Components
     private final TabPane tabs = new TabPane();
@@ -439,7 +438,7 @@ public class TestView extends BorderPane {
 
         Button simulateBtn = new Button("Simulate with new parameters");
         simulateBtn.setPrefWidth(250);
-        simulateBtn.setOnAction(e -> executeSimulation(0, true));   
+        simulateBtn.setOnAction(e -> executeSimulation(0, true));
 
         VBox panelContent = new VBox(10);
         panelContent.getChildren().addAll

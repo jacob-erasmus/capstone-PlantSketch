@@ -355,9 +355,9 @@ public class TestGrid
     // be able to select species and stuff and turn on and off
 
     // run method 
-    public SimulationResult runChange(boolean updatePinkNoise) // , boolean updateSpecies
+    public SimulationResult runChange(boolean pinkNoise) // , boolean updateSpecies
     {
-        if (updatePinkNoise) {
+        if (pinkNoise) {
             pinkNoise();
         }
             placementLoop();
