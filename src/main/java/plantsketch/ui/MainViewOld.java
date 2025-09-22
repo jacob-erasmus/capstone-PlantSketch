@@ -26,7 +26,7 @@ import javafx.stage.Window;
  * - Renders ONLY: Pink Noise, Forest, Forest + Elevation (faster).
  * - Provides a "Render another environment" button that navigates back via a callback.
  */
-public class MainView extends BorderPane {
+public class MainViewOld extends BorderPane {
     private SimulationRunner runner;
     private SimulationResult result;
 
@@ -47,11 +47,11 @@ public class MainView extends BorderPane {
     private final Runnable onRenderAnotherEnvironment;
 
     /* ---------- Constructors ---------- */
-    public MainView() { this(true, null); }
+    public MainViewOld() { this(true, null); }
 
-    public MainView(boolean showToolbar) { this(showToolbar, null); }
+    public MainViewOld(boolean showToolbar) { this(showToolbar, null); }
 
-    public MainView(boolean showToolbar, Runnable onRenderAnotherEnvironment) {
+    public MainViewOld(boolean showToolbar, Runnable onRenderAnotherEnvironment) {
         this.showToolbar = showToolbar;
         this.onRenderAnotherEnvironment = onRenderAnotherEnvironment;
 
@@ -92,6 +92,7 @@ public class MainView extends BorderPane {
      * Sets internal fields (even when toolbar is hidden) and kicks the pipeline.
      */
     public void runSimulation(Path dataRoot, String envFolder, int sampleCount) {
+
         Objects.requireNonNull(dataRoot, "dataRoot");
         Objects.requireNonNull(envFolder, "envFolder");
         if (sampleCount <= 0) {

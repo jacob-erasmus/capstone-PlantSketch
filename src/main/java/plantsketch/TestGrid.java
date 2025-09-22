@@ -6,14 +6,17 @@ package plantsketch;
 import java.util.*;
 import java.util.function.Consumer;
 
+import javafx.scene.control.Spinner;
+
 public class TestGrid 
 {
 
+    private final Spinner<Integer> plantCount = new Spinner<>(1, 50_000, 2_000, 100);
     boolean isTestGrid = true;
     private final Consumer<String> logger;
 
     // set values
-    int sampleCount = 100;
+    int sampleCount = 30;
     float gridSpacing = 25f; // in metres
     int dimX = 2;
     int dimY = 2; // dimensions of the grid 
@@ -60,55 +63,37 @@ public class TestGrid
 
 
     // constructor for the 2x2 test grid
-    public TestGrid(Consumer<String> logger)
+    public TestGrid(Consumer<String> logger, boolean isTestGrid, int sampleCount)
     {
         this.logger = (logger == null) ? (s -> {}) : logger;
-        temp = new TemperatureMap(dimX, dimY, gridSpacing, null);
-        age = new AgeMap(dimX, dimY, gridSpacing, null);
-        moist = new MoistureMap(dimX, dimY, gridSpacing ,null);
-        sun = new SunlightMap(dimX, dimY, gridSpacing, null);
-        abiotics = new AbioticFactors(moist, temp, sun);
-        terrain = new Terrain(dimX, dimY, gridSpacing, abiotics, makeRandomGrid(minElev, maxElev));
-
-        SpeciesDictionary dict = new SpeciesDictionary();
-        speciesList = List.of(
-                dict.loadBoxwood(),
-                dict.loadSnowyMespilus(),
-                dict.loadMountainPine(),
-                dict.loadSilverFir(),
-                dict.loadSilverBirch(),
-                dict.loadSissileOak(),
-                dict.loadEuropeanBeech());
-    }
-
-
-    public TestGrid(Consumer<String> logger, int dimX, int dimY, float gridSpacing)
-    {
-        this.dimX = dimX;
-        this.dimY = dimY;
-        this.gridSpacing = gridSpacing;
-        isTestGrid = false;
-        this.logger = (logger == null) ? (s -> {}) : logger;
-        temp = new TemperatureMap(dimX, dimY, gridSpacing, null);
-        age = new AgeMap(dimX, dimY, gridSpacing, null);
-        moist = new MoistureMap(dimX, dimY, gridSpacing ,null);
-        sun = new SunlightMap(dimX, dimY, gridSpacing, null);
-        abiotics = new AbioticFactors(moist, temp, sun);
-        terrain = new Terrain(dimX, dimY, gridSpacing, abiotics, makeRandomGrid(minElev, maxElev));
-
-        SpeciesDictionary dict = new SpeciesDictionary();
-        speciesList = List.of(
-                dict.loadBoxwood(),
-                dict.loadSnowyMespilus(),
-                dict.loadMountainPine(),
-                dict.loadSilverFir(),
-                dict.loadSilverBirch(),
-                dict.loadSissileOak(),
-                dict.loadEuropeanBeech());
+        this.isTestGrid = isTestGrid;
+        this.sampleCount = sampleCount;
+        
     }
 
 // --------------------------
 // simulation methods:
+
+// used to be in constructor
+    public void initialiseTest()
+    {
+        temp = new TemperatureMap(dimX, dimY, gridSpacing, null);
+        age = new AgeMap(dimX, dimY, gridSpacing, null);
+        moist = new MoistureMap(dimX, dimY, gridSpacing ,null);
+        sun = new SunlightMap(dimX, dimY, gridSpacing, null);
+        abiotics = new AbioticFactors(moist, temp, sun);
+        terrain = new Terrain(dimX, dimY, gridSpacing, abiotics, makeRandomGrid(minElev, maxElev));
+
+        SpeciesDictionary dict = new SpeciesDictionary();
+        speciesList = List.of(
+                dict.loadBoxwood(),
+                dict.loadSnowyMespilus(),
+                dict.loadMountainPine(),
+                dict.loadSilverFir(),
+                dict.loadSilverBirch(),
+                dict.loadSissileOak(),
+                dict.loadEuropeanBeech());
+    }
 
     // random grid maker
     public float[][] makeRandomGrid(float min, float max)
@@ -158,8 +143,8 @@ public class TestGrid
         });
 
         terrain.setElevationGrid(new float[][] {
-            {20.0f, 25.0f},
-            {22.0f, 28.0f}
+            {60.0f, 65.0f},
+            {68.0f, 74.0f}
         });
         
         logger.accept("Loaded Preset 1: perfect conditions for most species");
@@ -197,8 +182,8 @@ public class TestGrid
         });
 
         terrain.setElevationGrid(new float[][] {
-            {60.0f, 70.0f},
-            {65.0f, 75.0f}
+            {60.0f, 87.0f},
+            {65.0f, 90.0f}
         });
 
         logger.accept("Loaded Preset 2: harsh conditions");
@@ -393,6 +378,8 @@ public class TestGrid
     {
         if (isTestGrid)
         {
+            initialiseTest();
+
             if (choice == 1) {
                 loadPreset1();
             } else if (choice == 2) {
@@ -408,17 +395,20 @@ public class TestGrid
 
             return simResult;
         }
-        /*
+        
         else
         {
             if (choice == 1) {
-                loadD1-256();
+                loadD("src/target/classes/D1-256");
             } else if (choice == 2) {
-                loadD2-512();
+                loadD("src/target/classes/D2-512");
             } else if (choice == 3) {
-                loadD3-1024();
+                loadD("src/target/classes/D3-1024");
             } else if (choice == 4) {
-                loadD4-1024();
+                loadD("src/target/classes/D4-1024");
+            } else if (choice == 5) {
+                //chooseFolder();
+            } else randomiseGridValues();
 
             pinkNoise();
             placementLoop();
@@ -427,8 +417,36 @@ public class TestGrid
 
             return simResult;
         }
-        */
-        return null;
+    }
+
+    public void loadD(String file)
+    {
+        FileManager fm = new FileManager();
+        fm.fileFinder(file);
+
+        dimX = fm.getDimX();
+        dimY = fm.getDimY();
+        gridSpacing = fm.getGridSpacing();
+
+        logger.accept("Dimensions: " + dimX + " × " + dimY + ", spacing " + gridSpacing + "m");
+
+        temp = new TemperatureMap(dimX, dimY, gridSpacing, fm.getTemperatureGrid());
+        age = new AgeMap(dimX, dimY, gridSpacing, fm.getAgeGrid());
+        moist = new MoistureMap(dimX, dimY, gridSpacing ,fm.getMoistureGrid());
+        sun = new SunlightMap(dimX, dimY, gridSpacing, fm.getSunlightGrid());
+        abiotics = new AbioticFactors(moist, temp, sun);
+        terrain = new Terrain(dimX, dimY, gridSpacing, abiotics, fm.getElevationGrid());
+
+        SpeciesDictionary dict = new SpeciesDictionary();
+        speciesList = List.of(
+                dict.loadBoxwood(),
+                dict.loadSnowyMespilus(),
+                dict.loadMountainPine(),
+                dict.loadSilverFir(),
+                dict.loadSilverBirch(),
+                dict.loadSissileOak(),
+                dict.loadEuropeanBeech());
+
     }
 
 
