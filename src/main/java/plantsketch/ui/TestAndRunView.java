@@ -29,6 +29,7 @@ public class TestAndRunView extends BorderPane {
 // must read in slider values and apply them to the maps
 // ADD FILE READING! I HAVENT ADDED FILE READING FUNCTIONALITY TO THIS YET. WHEN YOU SELECT THE CHOOSE A FILE
     // OPTION ON MAINAPP IT USES ELLAS STARTUP WIZARD STUFF SO THE DISPLAY IS TOTALLY DIFFERENT
+// hello
 
 
 
