@@ -95,25 +95,17 @@ public class MainApp extends Application {
         }
 
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
-        
-        subtitle = new Label("Select Test Configuration");
+    
         subtitle.setStyle("-fx-font-size: 16px;");
 
         sampleLabel = new Label("Sample Count (1-10000):");
         sampleField.setPrefWidth(150);
         sampleField.setPrefHeight(40);
         
-        randomButton = new Button("Random");
-        randomButton.setPrefWidth(150);
-        randomButton.setPrefHeight(40);
-        randomButton.setOnAction(e -> launchTestView(stage, "random", isTestGrid, sampleField));
-        
-        preset1Button = new Button("Preset 1: Good Cond.");
         preset1Button.setPrefWidth(150);
         preset1Button.setPrefHeight(40);
         preset1Button.setOnAction(e -> launchTestView(stage, "preset1", isTestGrid, sampleField));
         
-        preset2Button = new Button("Preset 2: Harsh Cond.");
         preset2Button.setPrefWidth(150);
         preset2Button.setPrefHeight(40);
         preset2Button.setOnAction(e -> launchTestView(stage, "preset2", isTestGrid, sampleField));
