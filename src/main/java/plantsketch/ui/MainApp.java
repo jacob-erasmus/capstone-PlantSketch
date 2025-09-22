@@ -44,13 +44,13 @@ public class MainApp extends Application {
         testButton.setPrefWidth(200);
         testButton.setPrefHeight(50);
         testButton.setStyle("-fx-font-size: 16px;");
-        testButton.setOnAction(e -> showTestMode(stage, true));
+        testButton.setOnAction(e -> showTestMode(stage));
         
         Button runButton = new Button("Run Mode");
         runButton.setPrefWidth(200);
         runButton.setPrefHeight(50);
         runButton.setStyle("-fx-font-size: 16px;");
-        runButton.setOnAction(e -> showTestMode(stage, false));
+        runButton.setOnAction(e -> showWizard(stage));
         
         root.getChildren().addAll(title, subtitle, testButton, runButton);
         
@@ -60,89 +60,46 @@ public class MainApp extends Application {
         centerStage(stage);
     }
 
-    // this shows the first and second screens for both test mode and run mode
-    private void showTestMode(Stage stage, boolean isTestGrid) {
+    /** Show test mode selection */
+    private void showTestMode(Stage stage) {
         VBox root = new VBox(20);
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(40));
         
-            Label title;
-            Label subtitle;
-            Button randomButton;
-            Button chooseFolderButton;
-            Button preset1Button;
-            Button preset2Button;
-            Button preset3Button;
-            Button preset4Button;
-
-        if (isTestGrid)
-        {
-            title = new Label("Test Mode");
-            subtitle = new Label("Select Test Configuration");
-             preset1Button = new Button("Preset 1: Good Cond.");
-             preset2Button = new Button("Preset 2: Harsh Cond.");
-        }
-        else 
-        {
-             title = new Label("Run Mode");
-             subtitle = new Label("Select Environments");
-             preset1Button = new Button("D1-256");
-             preset2Button = new Button("D2-512");
-        }
-
+        Label title = new Label("Test Mode");
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
         
+        Label subtitle = new Label("Select Test Configuration");
         subtitle.setStyle("-fx-font-size: 16px;");
         
+        Button randomButton = new Button("Random");
+        randomButton.setPrefWidth(150);
+        randomButton.setPrefHeight(40);
+        randomButton.setOnAction(e -> launchTestView(stage, "random"));
+        
+        Button preset1Button = new Button("Preset 1: Good Cond.");
         preset1Button.setPrefWidth(150);
         preset1Button.setPrefHeight(40);
-        preset1Button.setOnAction(e -> launchTestView(stage, "preset1", isTestGrid));
+        preset1Button.setOnAction(e -> launchTestView(stage, "preset1"));
         
+        Button preset2Button = new Button("Preset 2: Harsh Cond.");
         preset2Button.setPrefWidth(150);
         preset2Button.setPrefHeight(40);
-        preset2Button.setOnAction(e -> launchTestView(stage, "preset2", isTestGrid));
+        preset2Button.setOnAction(e -> launchTestView(stage, "preset2"));
         
         Button backButton = new Button("Back");
         backButton.setPrefWidth(100);
         backButton.setOnAction(e -> showModeSelection(stage));
-
-        if (!isTestGrid)
-        {
-            chooseFolderButton = new Button("Select a Folder");
-            preset3Button = new Button("D3-1024");
-            preset4Button = new Button("D4-1024");
-
-            chooseFolderButton.setPrefWidth(150);
-            chooseFolderButton.setPrefHeight(40);
-            chooseFolderButton.setOnAction(e -> showWizard(stage, "chooseFolder", isTestGrid));
-            
-            preset3Button.setPrefWidth(150);
-            preset3Button.setPrefHeight(40);
-            preset3Button.setOnAction(e -> launchTestView(stage, "preset3", isTestGrid));
-            
-            preset4Button.setPrefWidth(150);
-            preset4Button.setPrefHeight(40);
-            preset4Button.setOnAction(e -> launchTestView(stage, "preset4", isTestGrid));
-
-            root.getChildren().addAll(title, subtitle, chooseFolderButton, preset1Button, preset2Button, preset3Button, preset4Button, backButton);
-        }
-        else
-        {
-            randomButton = new Button("Random");
-            randomButton.setPrefWidth(150);
-            randomButton.setPrefHeight(40);
-            randomButton.setOnAction(e -> launchTestView(stage, "random", isTestGrid));
-
-            root.getChildren().addAll(title, subtitle, randomButton, preset1Button, preset2Button, backButton);
-        }
+        
+        root.getChildren().addAll(title, subtitle, randomButton, preset1Button, preset2Button, backButton);
         
         Scene scene = new Scene(root, 400, 350);
         stage.setScene(scene);
     }
 
     /** Launch the TestView with selected configuration */
-    private void launchTestView(Stage stage, String mode, boolean isTestGrid) {
-        TestView testView = new TestView(() -> showModeSelection(stage), mode, isTestGrid);
+    private void launchTestView(Stage stage, String mode) {
+        TestView testView = new TestView(() -> showModeSelection(stage), mode);
         Scene scene = new Scene(testView, 1400, 900);
         stage.setScene(scene);
         stage.show();
@@ -153,13 +110,13 @@ public class MainApp extends Application {
     }
 
     /** Show the original wizard for run mode */
-    private void showWizard(Stage stage, String mode, boolean isTestGrid) {
+    private void showWizard(Stage stage) {
         StartupWizard wizard = new StartupWizard(stage, (dataRoot, envFolder, sampleCount) -> {
             AppConfig.dataRoot = dataRoot;
             AppConfig.environment = envFolder;
             AppConfig.sampleCount = sampleCount;
 
-            MainView mainView = new MainView(false, () -> showWizard(stage, mode, isTestGrid));
+            MainView mainView = new MainView(false, () -> showWizard(stage));
             Scene scene = new Scene(mainView, 1280, 800);
             stage.setScene(scene);
             stage.show();
