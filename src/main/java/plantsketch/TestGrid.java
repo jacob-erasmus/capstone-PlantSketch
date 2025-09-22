@@ -67,7 +67,8 @@ public class TestGrid
     {
         this.logger = (logger == null) ? (s -> {}) : logger;
         this.isTestGrid = isTestGrid;
-        this.sampleCount = sampleCount;
+        // gonna leave the testing grids at the preset sample count of 30
+        if (!isTestGrid) this.sampleCount = sampleCount;
         
     }
 
