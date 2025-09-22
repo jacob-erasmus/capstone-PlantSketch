@@ -1,0 +1,36 @@
+- user edit abiotics:
+    - you have map. retain initial values so that you can reset.
+    - brush (circular mouse tracker). increment and decrement each value (addition)
+    - ALSO: editing the viability of the species! and all the other values as well.
+    - adjustable randius
+
+- speed of changing:
+    - must be real-time :(
+        - i.e. as you lift your brush stroke it updates the values on the map then and there. no button pressed
+    - faster = better
+
+- Spacial acceleration data structure?!?!
+- Parallelisation too
+- file upload does not matter and initial rendering
+- but the REGENERATIION IS VERY IMPORTANT TO BE FAST
+
+- must be able to go back to previous states and save and stuff
+
+- DONT NAVE N^2 DATA STRUCTURE (EACH ONE CHECKS EVERY OTHER POITNT)
+    - RATHER HAVE IT CHECK SURROUNDING BLOCKS AND THEN update
+
+- Painted zone will regenerate but unpainted zone must stay the same. (ella was right)
+
+- don't update pink noise
+
+- EcoViz:
+    - other people are having issues too.
+    - nobody successfully ran it
+    - will work on windows
+    - he'll send another link
+
+- he also wants graphs for performance speedup and stuff. diagrams, anaysis.
+- a full-on report dude
+
+- idea: put scale onto grid
+- make each species a thread

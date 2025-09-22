@@ -30,7 +30,8 @@ public class EcoVizOutput {
         {
             // header
             writer.println("3.0");
-            writer.println(dimx + " " + dimy);
+           // writer.println(dimx + " " + dimy); // he said he wanted 0 0
+           writer.println("0 0");
             writer.println("0");
             writer.println(numTrees);
 
@@ -39,13 +40,9 @@ public class EcoVizOutput {
             {
                 for (Plant p: speciesMap.getPlants())
                 {
-                    writer.printf("%d %-4s %.2f %.2f %.2f %.2f 0 0", p.getId(), p.getMnemonic(), p.getX(), p.getY(), p.getHeight(), p.getCanopyRadius());
+                    writer.printf("%d %-4s %.2f %.2f %.2f %.2f 0 0 /n", p.getId(), p.getMnemonic(), p.getX(), p.getY(), p.getHeight(), p.getCanopyRadius());
                 }
             }
-
-
-
-
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -56,7 +53,7 @@ public class EcoVizOutput {
 /*
  
     3.0
-    dimx dimy
+    0 0
     0
     numTrees
     TreeID(int) speciesName(4xchar) posx posy height canopyRadius 0 0
