@@ -7,6 +7,7 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -16,6 +17,7 @@ public class MainApp extends Application {
     private void centerStage(Stage stage) {
         // Get the screen dimensions
         javafx.geometry.Rectangle2D screenBounds = javafx.stage.Screen.getPrimary().getVisualBounds();
+        int sampleCount;
         
         // Calculate the center position
         stage.setX((screenBounds.getWidth() - stage.getWidth()) / 2);
@@ -66,6 +68,8 @@ public class MainApp extends Application {
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(40));
         
+            Label sampleLabel;
+            TextField sampleField = new TextField("100"); // default value
             Label title;
             Label subtitle;
             Button randomButton;
@@ -93,14 +97,18 @@ public class MainApp extends Application {
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
         
         subtitle.setStyle("-fx-font-size: 16px;");
+
+        sampleLabel = new Label("Sample Count (1-10000):");
+        sampleField.setPrefWidth(150);
+        sampleField.setPrefHeight(40);
         
         preset1Button.setPrefWidth(150);
         preset1Button.setPrefHeight(40);
-        preset1Button.setOnAction(e -> launchTestView(stage, "preset1", isTestGrid));
+        preset1Button.setOnAction(e -> launchTestView(stage, "preset1", isTestGrid, sampleField));
         
         preset2Button.setPrefWidth(150);
         preset2Button.setPrefHeight(40);
-        preset2Button.setOnAction(e -> launchTestView(stage, "preset2", isTestGrid));
+        preset2Button.setOnAction(e -> launchTestView(stage, "preset2", isTestGrid, sampleField));
         
         Button backButton = new Button("Back");
         backButton.setPrefWidth(100);
@@ -108,6 +116,8 @@ public class MainApp extends Application {
 
         if (!isTestGrid)
         {
+
+
             chooseFolderButton = new Button("Select a Folder");
             preset3Button = new Button("D3-1024");
             preset4Button = new Button("D4-1024");
@@ -118,20 +128,20 @@ public class MainApp extends Application {
             
             preset3Button.setPrefWidth(150);
             preset3Button.setPrefHeight(40);
-            preset3Button.setOnAction(e -> launchTestView(stage, "preset3", isTestGrid));
+            preset3Button.setOnAction(e -> launchTestView(stage, "preset3", isTestGrid, sampleField));
             
             preset4Button.setPrefWidth(150);
             preset4Button.setPrefHeight(40);
-            preset4Button.setOnAction(e -> launchTestView(stage, "preset4", isTestGrid));
+            preset4Button.setOnAction(e -> launchTestView(stage, "preset4", isTestGrid, sampleField));
 
-            root.getChildren().addAll(title, subtitle, chooseFolderButton, preset1Button, preset2Button, preset3Button, preset4Button, backButton);
+            root.getChildren().addAll(title, subtitle, sampleLabel, sampleField, chooseFolderButton, preset1Button, preset2Button, preset3Button, preset4Button, backButton);
         }
         else
         {
             randomButton = new Button("Random");
             randomButton.setPrefWidth(150);
             randomButton.setPrefHeight(40);
-            randomButton.setOnAction(e -> launchTestView(stage, "random", isTestGrid));
+            randomButton.setOnAction(e -> launchTestView(stage, "random", isTestGrid, sampleField));
 
             root.getChildren().addAll(title, subtitle, randomButton, preset1Button, preset2Button, backButton);
         }
@@ -141,15 +151,38 @@ public class MainApp extends Application {
     }
 
     /** Launch the TestView with selected configuration */
-    private void launchTestView(Stage stage, String mode, boolean isTestGrid) {
-        TestView testView = new TestView(() -> showModeSelection(stage), mode, isTestGrid);
-        Scene scene = new Scene(testView, 1400, 900);
-        stage.setScene(scene);
-        stage.show();
-        centerStage(stage);
+    private void launchTestView(Stage stage, String mode, boolean isTestGrid, TextField sampleField) {
+
         
-        // Run simulation after scene is shown
-        Platform.runLater(() -> testView.initializeWithMode(mode));
+
+
+        // for test grid
+        if (!mode.equals("chooseFolder"))
+        {
+            // getting sample count
+            int sampleCount = Integer.parseInt(sampleField.getText().trim());
+            if (sampleCount <= 0) {
+                sampleCount = 1;
+            }
+            if (sampleCount >= 10000)
+            {
+                sampleCount = 10000;
+            }
+
+            TestAndRunView testView = new TestAndRunView(() -> showModeSelection(stage), mode, isTestGrid, sampleCount);
+            Scene scene = new Scene(testView, 1400, 900);
+            stage.setScene(scene);
+            stage.show();
+            centerStage(stage);
+            
+            // Run simulation after scene is shown
+            Platform.runLater(() -> testView.initializeWithMode(mode));
+        }
+
+        else
+        {
+            // put in special stuff here for when the user has to choose their own folder.
+        }
     }
 
     /** Show the original wizard for run mode */
@@ -159,7 +192,7 @@ public class MainApp extends Application {
             AppConfig.environment = envFolder;
             AppConfig.sampleCount = sampleCount;
 
-            MainView mainView = new MainView(false, () -> showWizard(stage, mode, isTestGrid));
+            MainViewOld mainView = new MainViewOld(false, () -> showWizard(stage, mode, isTestGrid));
             Scene scene = new Scene(mainView, 1280, 800);
             stage.setScene(scene);
             stage.show();
