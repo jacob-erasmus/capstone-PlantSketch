@@ -106,7 +106,7 @@ public class MainApp extends Application {
         randomButton = new Button("Random");
         randomButton.setPrefWidth(150);
         randomButton.setPrefHeight(40);
-        randomButton.setOnAction(e -> launchTestView(stage, "random"));
+        randomButton.setOnAction(e -> launchTestView(stage, "random", isTestGrid, sampleField));
         
         preset1Button = new Button("Preset 1: Good Cond.");
         preset1Button.setPrefWidth(150);
