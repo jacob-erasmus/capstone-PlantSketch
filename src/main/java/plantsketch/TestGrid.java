@@ -6,12 +6,9 @@ package plantsketch;
 import java.util.*;
 import java.util.function.Consumer;
 
-import javafx.scene.control.Spinner;
-
 public class TestGrid 
 {
 
-    private final Spinner<Integer> plantCount = new Spinner<>(1, 50_000, 2_000, 100);
     boolean isTestGrid = true;
     private final Consumer<String> logger;
 

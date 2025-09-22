@@ -51,6 +51,7 @@ public class TestView extends BorderPane {
     // Grid value editors
     private final Map<String, float[][]> currentGridValues = new HashMap<>();
     private final Map<String, GridEditor> gridEditors = new HashMap<>();
+    private final Map<String, Slider> sliders = new HashMap<>();
     
 //*********** CONSTRUCTOR ****************\
     public TestView(Runnable onBack, String mode, boolean isTestGrid, int sampleCount) {
@@ -78,6 +79,7 @@ public class TestView extends BorderPane {
         
         var split = new SplitPane();
         split.setOrientation(Orientation.VERTICAL);
+        // the forest and stuff
         split.getItems().addAll(tabs, logBox);
         split.setDividerPositions(0.65);
         
@@ -203,20 +205,10 @@ public class TestView extends BorderPane {
             {
                 console.log("Re-simulating with new parameters...");
             
+                boolean wasChange = readGridEditors();
                 // Update TestGrid with new values
-                float[][] newTemp = gridEditors.get("Temperature").getValues();
-                float[][] newAge = gridEditors.get("Age").getValues();
-                float[][] newMoist = gridEditors.get("Moisture").getValues();
-                float[][] newSun = gridEditors.get("Sunlight").getValues();
-                float[][] newElev = gridEditors.get("Elevation").getValues();
 
-                testGrid.setTemperatureGrid(newTemp);
-                testGrid.setAgeGrid(newAge);
-                testGrid.setMoistureGrid(newMoist);
-                testGrid.setSunlightGrid(newSun);
-                testGrid.setElevationGrid(newElev);
-
-                currentResult = testGrid.runChange(regeneratePinkNoise.isSelected() 
+                if (wasChange) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected() 
                 // ,regenerateSpecies.isSelected()
                 );
             }
@@ -290,30 +282,50 @@ public class TestView extends BorderPane {
         speciesCheck.put("sissileOak", new CheckBox("Sissile Oak"));
         speciesCheck.put("europeanBeech", new CheckBox("European Beech"));
 
-        Label temp = new Label("Temperature");
-        Slider tempSlider = new Slider(-10, 40, -10);
+        Label temp = new Label("Temperature Slider: Min = "+ testGrid.getMinTemp() +"  ; Max = "+ testGrid.getMaxTemp());
+        Slider tempSlider = new Slider(-15, 15, 0);
         tempSlider.setShowTickLabels(true);
         tempSlider.setShowTickMarks(true);
         tempSlider.setBlockIncrement(0.5);
-        tempSlider.setPrefWidth(250);
+        tempSlider.setMajorTickUnit(0.5);
+        tempSlider.setSnapToTicks(true);
+        tempSlider.setPrefWidth(400);
         
-        Label enivroAge = new Label("Environnment Age");
-        Slider ageSlider = new Slider(1, 600, 1);
+        Label age = new Label("Age Slider: Min = "+ testGrid.getMinAge() +"  ; Max = "+ testGrid.getMaxAge());
+        Slider ageSlider = new Slider(-650, 650, 0);
         ageSlider.setShowTickLabels(true);
         ageSlider.setShowTickMarks(true);
-        ageSlider.setBlockIncrement(1);
+        ageSlider.setBlockIncrement(25);
+        ageSlider.setMajorTickUnit(25);
+        ageSlider.setSnapToTicks(true);
         ageSlider.setPrefWidth(250);
 
-        Label sun = new Label("Sun");
-        Slider sunSlider = new Slider(3, 7, 3);
+        Label sun = new Label("Sunlight Slider: Min = "+ testGrid.getMinSun() +"  ; Max = "+ testGrid.getMaxSun());
+        Slider sunSlider = new Slider(-13, 13, 0);
         sunSlider.setShowTickLabels(true);
         sunSlider.setShowTickMarks(true);
-        sunSlider.setMajorTickUnit(0.25);
-        sunSlider.setBlockIncrement(0.25);
+        sunSlider.setBlockIncrement(1);
+        sunSlider.setMajorTickUnit(0.5);
         sunSlider.setSnapToTicks(true);
-        sunSlider.setMinorTickCount(0);
-        sunSlider.showTickLabelsProperty();
         sunSlider.setPrefWidth(250);
+
+        Label moist = new Label("Moisture Slider: Min = "+ testGrid.getMinMoist() +"  ; Max = "+ testGrid.getMaxMoist());
+        Slider moistSlider = new Slider(-54, 54, 0);
+        moistSlider.setShowTickLabels(true);
+        moistSlider.setShowTickMarks(true);
+        moistSlider.setBlockIncrement(1);
+        moistSlider.setMajorTickUnit(1);
+        moistSlider.setSnapToTicks(true);
+        moistSlider.setPrefWidth(250);
+
+        Label elevation = new Label("Elevation Slider: Min = "+ testGrid.getMinElev() +"  ; Max = "+ testGrid.getMaxElev());
+        Slider elevationSlider = new Slider(-200, 200, 0);
+        elevationSlider.setShowTickLabels(true);
+        elevationSlider.setShowTickMarks(true);
+        elevationSlider.setBlockIncrement(10);
+        elevationSlider.setMajorTickUnit(10);
+        elevationSlider.setSnapToTicks(true);
+        elevationSlider.setPrefWidth(250);
 
         GridPane gridPane = new GridPane();
         int col = 0, row = 0;
@@ -349,14 +361,20 @@ public class TestView extends BorderPane {
         (
             title,
             new Separator(),
+            elevation,
+            elevationSlider,
+            new Separator(),
             temp,
             tempSlider,
             new Separator(),
-            enivroAge,
+            age,
             ageSlider,
             new Separator(),
             sun,
             sunSlider,
+            new Separator(),
+            moist,
+            moistSlider,
             new Separator(),
             gridPane,
             new Separator(),
@@ -384,6 +402,11 @@ public class TestView extends BorderPane {
             }
         }
         createTabs();
+    }
+
+    public float readSlider(Slider slider)
+    {
+        return (float) slider.getValue();
     }
     
 
@@ -459,7 +482,8 @@ public class TestView extends BorderPane {
     }
         
     // puts in the values for the right tab
-    private void updateGridEditors() {
+    private void updateGridEditors() 
+    {
         gridEditors.get("Temperature").setValues(testGrid.getTemperatureGrid());
         gridEditors.get("Age").setValues(testGrid.getAgeGrid());
         gridEditors.get("Moisture").setValues(testGrid.getMoistureGrid());
@@ -468,8 +492,49 @@ public class TestView extends BorderPane {
         gridEditors.get("Slope").setValues(testGrid.getSlopeGrid());
     }
 
+    // reads in values from the screen grids
+    private boolean readGridEditors()
+    {
+        boolean wasChange = false;
+
+        float[][] newTemp = gridEditors.get("Temperature").getValues();
+        float[][] newAge = gridEditors.get("Age").getValues();
+        float[][] newMoist = gridEditors.get("Moisture").getValues();
+        float[][] newSun = gridEditors.get("Sunlight").getValues();
+        float[][] newElev = gridEditors.get("Elevation").getValues();
+
+        if(gridEditors.get("Temperature").isEdited()) 
+        {
+            testGrid.setTemperatureGrid(newTemp);
+            wasChange = true;
+        }
+        if(gridEditors.get("Age").isEdited()) 
+        {
+            testGrid.setAgeGrid(newAge);
+            wasChange = true;
+        }        
+        if(gridEditors.get("Moisture").isEdited()) 
+        {
+            testGrid.setMoistureGrid(newMoist);
+            wasChange = true;
+        }        
+        if(gridEditors.get("Sunlight").isEdited()) 
+        {
+            testGrid.setSunlightGrid(newSun);
+            wasChange = true;
+        }        
+        if(gridEditors.get("Elevation").isEdited()) 
+        {
+            testGrid.setElevationGrid(newElev);
+            wasChange = true;
+        }
+
+        return wasChange;
+    }
+
     // This is the bottom status bar
-    private void updateStatusDisplay() {
+    private void updateStatusDisplay() 
+    {
         StringBuilder status = new StringBuilder();
         status.append("Grid Status | ");
         status.append("Samples: ").append(testGrid.getSampleCount()).append(" | ");
