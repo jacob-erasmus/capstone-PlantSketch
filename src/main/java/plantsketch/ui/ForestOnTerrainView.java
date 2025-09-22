@@ -57,15 +57,15 @@ public class ForestOnTerrainView extends Region {
 
         // 2) draw plants on top (meters)
         for (SpeciesMap sm : forest.getSpeciesMapList()) {
-            Color c = parseColour(sm.getSpecies().getColour()).deriveColor(0, 1, 1, 0.85);
-            g.setFill(c);
-            for (Plant p : sm.getPlants()) {
-                double xPx = vt.meterXtoPx(p.getX());
-                double yPx = vt.meterYtoPx(p.getY());
-                double rPx = Math.max(2.0, vt.metersToPx(p.getCanopyRadius()));
-                g.fillOval(yPx - rPx, xPx - rPx, rPx * 2, rPx * 2);
-                // swappiing them to plaster fix mirror image thing:    g.fillOval(xPx - rPx, yPx - rPx, rPx * 2, rPx * 2);
-            }
+                Color c = parseColour(sm.getSpecies().getColour()).deriveColor(0, 1, 1, 0.85);
+                g.setFill(c);
+                for (Plant p : sm.getPlants()) {
+                    double xPx = vt.meterXtoPx(p.getX());
+                    double yPx = vt.meterYtoPx(p.getY());
+                    double rPx = Math.max(2.0, vt.metersToPx(p.getCanopyRadius()));
+                    g.fillOval(yPx - rPx, xPx - rPx, rPx * 2, rPx * 2);
+                    // swappiing them to plaster fix mirror image thing:    g.fillOval(xPx - rPx, yPx - rPx, rPx * 2, rPx * 2);
+                }     
         }
 
         g.setStroke(Color.BLACK);
