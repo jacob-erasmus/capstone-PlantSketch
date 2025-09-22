@@ -22,6 +22,29 @@ public final class ViewTransform {
         this.heightPx = dimY * cellPx;
     }
 
+    // Alternative constructor that takes target canvas size directly
+    public ViewTransform(int dimX, int dimY, float gridSpcaing, double targetWidth, double targetHeight, boolean fillSpace) {
+        this.dimX = dimX;
+        this.dimY = dimY;
+        
+        if (fillSpace) {
+            // Calculate cell size to fill the target space
+            double cellWidth = targetWidth / dimX;
+            double cellHeight = targetHeight / dimY;
+            double cellPx = Math.min(cellWidth, cellHeight);
+            
+            // Ensure minimum size
+            this.cellPx = Math.max(cellPx, 1.0);
+        } else {
+            // Use the original maxPixels constraint
+            this.cellPx = Math.max(1.0, Math.floor((double) 350 / Math.max(dimX, dimY)));
+        }
+        
+        this.widthPx = dimX * cellPx;
+        this.heightPx = dimY * cellPx;
+        this.gridSpacing = gridSpcaing;
+    }
+
     // --- cells → pixels (top-left origin) ---
     public double cellXtoPx(double cellX) { return cellX * cellPx; }
     public double cellYtoPx(double cellY) { return cellY * cellPx; }

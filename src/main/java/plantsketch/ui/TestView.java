@@ -133,13 +133,86 @@ public class TestView extends BorderPane {
     public void createTabs()
     {
         tabs.getTabs().clear();
+        // Create Forest + Elevation tab with zoom controls
+    VBox forestElevationContainer = new VBox(5);
+    HBox zoomControls = new HBox(10);
+    zoomControls.setAlignment(Pos.CENTER_LEFT);
+    zoomControls.setPadding(new Insets(5));
+    
+    Button zoomInBtn = new Button("+");
+    Button zoomOutBtn = new Button("-");
+    Button defaultBtn = new Button("Default");
+    Button fitToSizeBtn = new Button("Fit");
+    Label zoomLabel = new Label("100%");
+    
+    zoomInBtn.setPrefSize(30, 30);
+    zoomOutBtn.setPrefSize(30, 30);
+    defaultBtn.setPrefSize(100, 30);
+    //fitToSizeBtn.setPrefSize(50, 30);
+    
+    zoomControls.getChildren().addAll(zoomOutBtn, zoomInBtn, defaultBtn, zoomLabel);
+    
+    // Create the view
+    ForestOnTerrainView forestView = new ForestOnTerrainView(currentResult.forest(), currentResult.elevationGrid(), currentResult.gridSpacing());
+    
+    ScrollPane forestElevationPane = new ScrollPane(forestView);
+    forestElevationPane.setFitToHeight(false);
+    forestElevationPane.setFitToWidth(false);
+    forestElevationPane.setPannable(true);
+    forestElevationPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+    forestElevationPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+    // Zoom functionality - apply scaling to the view inside the ScrollPane, not the ScrollPane itself
+    final double[] zoomLevel = {1.0};
+    
+    zoomInBtn.setOnAction(e -> {
+        zoomLevel[0] = Math.min(zoomLevel[0] * 1.2, 5.0); // Max 500% zoom
+        forestView.setScaleX(zoomLevel[0]);
+        forestView.setScaleY(zoomLevel[0]);
+        zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100));
+        // Disable fit-to-size when manually zooming
+        forestElevationPane.setFitToHeight(false);
+        forestElevationPane.setFitToWidth(false);
+    });
+    
+    zoomOutBtn.setOnAction(e -> {
+        zoomLevel[0] = Math.max(zoomLevel[0] / 1.2, 1); // Min 100% zoom
+        forestView.setScaleX(zoomLevel[0]);
+        forestView.setScaleY(zoomLevel[0]);
+        zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100));
+        // Disable fit-to-size when manually zooming
+        forestElevationPane.setFitToHeight(false);
+        forestElevationPane.setFitToWidth(false);
+    });
+    /* 
+    fitToSizeBtn.setOnAction(e -> {
+        zoomLevel[0] = 1.0;
+        forestView.setScaleX(1.0);
+        forestView.setScaleY(1.0);
+        // Enable fit-to-size
+        forestElevationPane.setFitToHeight(true);
+        forestElevationPane.setFitToWidth(true);
+        zoomLabel.setText("Fit");
+    });
+    */
+    defaultBtn.setOnAction(e -> {
+        zoomLevel[0] = 1.0;
+        forestView.setScaleX(1.0);
+        forestView.setScaleY(1.0);
+        // Disable fit-to-size
+        forestElevationPane.setFitToHeight(false);
+        forestElevationPane.setFitToWidth(false);
+        zoomLabel.setText("Default");
+    });
+    
+    forestElevationContainer.getChildren().addAll(zoomControls, forestElevationPane);
+    VBox.setVgrow(forestElevationPane, Priority.ALWAYS);
+    
+    tabs.getTabs().add(makeTab("Forest + Elevation", forestElevationContainer));
 
-        tabs.getTabs().add(makeTab("Forest + Elevation", new ScrollPane(new ForestOnTerrainView(currentResult.forest(), currentResult.elevationGrid(), currentResult.gridSpacing()))));
 
         tabs.getTabs().add(makeTab("Pink Noise", new ScrollPane(new PinkNoiseView(currentResult.samples(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
         
         tabs.getTabs().add(makeTab("Forest", new ScrollPane(new ForestView(currentResult.forest(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()))));
-            
 
     }
 
