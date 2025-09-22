@@ -60,10 +60,9 @@ public class TestGrid
 
 
     // constructor for the 2x2 test grid
-    public TestGrid(Consumer<String> logger, boolean isTestGrid)
+    public TestGrid(Consumer<String> logger)
     {
         this.logger = (logger == null) ? (s -> {}) : logger;
-        this.isTestGrid = isTestGrid;
         temp = new TemperatureMap(dimX, dimY, gridSpacing, null);
         age = new AgeMap(dimX, dimY, gridSpacing, null);
         moist = new MoistureMap(dimX, dimY, gridSpacing ,null);
@@ -82,7 +81,7 @@ public class TestGrid
                 dict.loadEuropeanBeech());
     }
 
-    // constructor for when you run programme
+
     public TestGrid(Consumer<String> logger, int dimX, int dimY, float gridSpacing)
     {
         this.dimX = dimX;
@@ -371,9 +370,9 @@ public class TestGrid
     // be able to select species and stuff and turn on and off
 
     // run method 
-    public SimulationResult runChange(boolean updatePinkNoise) // , boolean updateSpecies
+    public SimulationResult runChange(boolean pinkNoise) // , boolean updateSpecies
     {
-        if (updatePinkNoise) {
+        if (pinkNoise) {
             pinkNoise();
         }
             placementLoop();
