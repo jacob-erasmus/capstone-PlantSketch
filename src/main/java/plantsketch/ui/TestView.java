@@ -21,6 +21,7 @@ public class TestView extends BorderPane {
     private final Runnable onBack;
     private TestGrid testGrid;
     private SimulationResult currentResult;
+    private boolean isTestGrid;
     
     // UI Components
     private final TabPane tabs = new TabPane();
@@ -34,9 +35,10 @@ public class TestView extends BorderPane {
     private final Map<String, float[][]> currentGridValues = new HashMap<>();
     private final Map<String, GridEditor> gridEditors = new HashMap<>();
     
-    public TestView(Runnable onBack, String mode) {
+    public TestView(Runnable onBack, String mode, boolean isTestGrid) {
         this.onBack = onBack;
-        this.testGrid = new TestGrid(console::log);
+        this.testGrid = new TestGrid(console::log, isTestGrid);
+        this.isTestGrid = isTestGrid;
         
         setupUI(mode);
         console.hookSystemStreams();
@@ -135,7 +137,7 @@ public class TestView extends BorderPane {
 
         Button simulateBtn = new Button("Simulate with new parameters");
         simulateBtn.setPrefWidth(250);
-        simulateBtn.setOnAction(e -> executeSimulation(0, true));
+        simulateBtn.setOnAction(e -> executeSimulation(0, true));   
 
         VBox panelContent = new VBox(10);
         panelContent.getChildren().addAll
@@ -182,6 +184,12 @@ public class TestView extends BorderPane {
             case "preset2":
                 executeSimulation(2, false);
                 break;
+            case "preset3":
+                executeSimulation(3, false);
+            case "preset4":
+                executeSimulation(4, false);
+            case "chooseFolder":
+                executeSimulation(5, false);
         }
     }
 
