@@ -21,8 +21,6 @@ public class TestView extends BorderPane {
 
 //*********** NOTES AND TO DO ****************\\
 
-// Error in remove species. null pointer exception because accessing species map in forest that dont exist (i think)
-// in test grid: only update forest if abiotic values change
 // must be able to change plant variables (ie max sunlight etc)
 // BRUSH TOOL
 // must save previous values
@@ -207,10 +205,8 @@ public class TestView extends BorderPane {
             
                 boolean wasChange = readGridEditors();
                 // Update TestGrid with new values
-
-                if (wasChange) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected() 
-                // ,regenerateSpecies.isSelected()
-                );
+                if (regeneratePinkNoise.isSelected()) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected());
+                else if (wasChange) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected());
             }
             else
             {
