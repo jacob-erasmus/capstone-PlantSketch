@@ -161,8 +161,6 @@ public class MainApp extends Application {
     /** Launch the TestView with selected configuration */
     private void launchTestView(Stage stage, String mode, boolean isTestGrid, TextField sampleField) {
 
-        
-
 
         // for test grid
         if (!mode.equals("chooseFolder"))
