@@ -39,7 +39,7 @@ public class TestView extends BorderPane {
     private final Runnable onBack;
     private TestGrid testGrid;
     private SimulationResult currentResult;
-    
+    private boolean isTestGrid;
     // UI Components
     private final TabPane tabs = new TabPane();
     private final ConsolePane console = new ConsolePane();
@@ -52,7 +52,7 @@ public class TestView extends BorderPane {
     private final Map<String, float[][]> currentGridValues = new HashMap<>();
     private final Map<String, GridEditor> gridEditors = new HashMap<>();
     
-//*********** CONSTRUCTOR ****************\\
+//*********** CONSTRUCTOR ****************\
     public TestView(Runnable onBack, String mode, boolean isTestGrid, int sampleCount) {
         this.onBack = onBack;
         this.testGrid = new TestGrid(console::log, isTestGrid, sampleCount);
