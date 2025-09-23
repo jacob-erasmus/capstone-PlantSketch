@@ -8,18 +8,63 @@ import javafx.scene.paint.Color;
 
 public class ForestView extends Region {
     private final Forest forest;
-    private final ViewTransform vt;
+    private ViewTransform vt;
     private final Canvas canvas = new Canvas();
     private final double minCirclePx = 2.0; // keep plants visible
+    boolean useDefaultCellSize;
+    int dimX;
+    int dimY;
+    float gridSpacing;
+
 
     public ForestView(Forest forest, int dimX, int dimY, float gridSpacing) {
         this.forest = forest;
-        this.vt = new ViewTransform(dimX, dimY, gridSpacing);
+        this.dimX = dimX;
+        this.dimY = dimY;
+        this.gridSpacing = gridSpacing;
+        useDefaultCellSize = true;
+        if (dimX < 256){
+            useDefaultCellSize = false;
+        }
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, dimX, dimY, useDefaultCellSize);
+        //renderzoom
+        updateRegionSize();
+        canvas.setLayoutX(0);
+        canvas.setLayoutY(0);
         getChildren().add(canvas);
         draw();
-        setPrefSize(canvas.getWidth(), canvas.getHeight());
     }
 
+    private void updateRegionSize(){
+        setPrefSize(vt.widthPx, vt.heightPx);
+        setMinSize(vt.widthPx, vt.heightPx);
+        setMaxSize(vt.widthPx, vt.heightPx);
+        canvas.setWidth(vt.widthPx);
+        canvas.setHeight(vt.heightPx);
+        requestLayout();
+    }
+    public void zoomIn(){
+        //increase render by 20% (capped at 3000px)
+        double currentSize = Math.max(vt.widthPx, vt.heightPx);
+        double newSize = Math.min(currentSize * 1.2, 3000);
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, newSize, newSize, useDefaultCellSize);
+        updateRegionSize();
+        draw();
+    }
+    public void zoomOut(){
+        //decrease render by 20% (capped at 80% of original)
+        double currentSize = Math.max(vt.widthPx, vt.heightPx);
+        double newSize = Math.max(currentSize / 1.2, 256);
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, newSize, newSize, useDefaultCellSize);
+        updateRegionSize();
+        draw();
+    }
+    public void resetToDefault(){
+        //reset
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, dimX, dimY, useDefaultCellSize);
+        updateRegionSize();
+        draw();
+    }
     private static Color parseColour(String hexOrName) {
         try { return Color.web(hexOrName); } catch (Exception e) { return Color.LIMEGREEN; }
     }

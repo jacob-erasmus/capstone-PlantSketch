@@ -14,26 +14,63 @@ public class ForestOnTerrainView extends Region {
     private ViewTransform vt;
     private Canvas canvas = new Canvas();
     private float gridSpacing;
+    private boolean useDefaultCellSize;
 
     public ForestOnTerrainView(Forest forest, float[][] elevation, float gridSpacing) {
         this.forest = forest;
         this.elevation = elevation;
         int dimX = elevation.length;
         int dimY = elevation[0].length;
-        boolean useDefaultCellSize = true;
+        useDefaultCellSize = true;
         if (dimX < 256){
             useDefaultCellSize = false;
         }
         this.gridSpacing = gridSpacing;
         this.vt = new ViewTransform(dimX, dimY, gridSpacing, dimX, dimY, useDefaultCellSize);
+        //renderzoom
+        updateRegionSize();
+        canvas.setLayoutX(0);
+        canvas.setLayoutY(0);
         getChildren().add(canvas);
-        setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-        //listen for size changes
-        widthProperty().addListener((obs, oldVal, newVal) -> { if (newVal.doubleValue() > 0) { updateSize(); draw();}});
-        heightProperty().addListener((obs, oldVal, newVal) -> { if (newVal.doubleValue() > 0) { updateSize(); draw();}});
         draw();
     }
 
+    private void updateRegionSize(){
+        setPrefSize(vt.widthPx, vt.heightPx);
+        setMinSize(vt.widthPx, vt.heightPx);
+        setMaxSize(vt.widthPx, vt.heightPx);
+        canvas.setWidth(vt.widthPx);
+        canvas.setHeight(vt.heightPx);
+        requestLayout();
+    }
+    public void zoomIn(){
+        int dimX = elevation.length;
+        int dimY = elevation[0].length;
+        //increase render by 20% (capped at 3000px)
+        double currentSize = Math.max(vt.widthPx, vt.heightPx);
+        double newSize = Math.min(currentSize * 1.2, 3000);
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, newSize, newSize, useDefaultCellSize);
+        updateRegionSize();
+        draw();
+    }
+    public void zoomOut(){
+        int dimX = elevation.length;
+        int dimY = elevation[0].length;
+        //decrease render by 20% (capped at 80% of original)
+        double currentSize = Math.max(vt.widthPx, vt.heightPx);
+        double newSize = Math.max(currentSize / 1.2, 256);
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, newSize, newSize, useDefaultCellSize);
+        updateRegionSize();
+        draw();
+    }
+    public void resetToDefault(){
+        int dimX = elevation.length;
+        int dimY = elevation[0].length;
+        //reset
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, dimX, dimY, useDefaultCellSize);
+        updateRegionSize();
+        draw();
+    }
     private void updateSize(){
         double width = getWidth();
         double height = getHeight();
@@ -41,7 +78,7 @@ public class ForestOnTerrainView extends Region {
             //scale to fit viewtransform
             int dimX = elevation.length;
             int dimY = elevation[0].length;
-            this.vt = new ViewTransform(dimX, dimY, gridSpacing, width, height, true);
+            this.vt = new ViewTransform(dimX, dimY, gridSpacing, width, height, useDefaultCellSize);
             // Update canvas size
             canvas.setWidth(vt.widthPx);
             canvas.setHeight(vt.heightPx);
