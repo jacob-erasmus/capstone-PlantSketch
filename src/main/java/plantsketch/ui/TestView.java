@@ -602,11 +602,15 @@ public class TestView extends BorderPane {
     }
 
     private void updateBrushCursor(ForestOnTerrainView forestElevationView, double brushSize){
+//image as cursor - some glitches so commented out for now.
+//Will fix/improve.
         //Image brushImage = new Image(getClass().getResource("/101064.png").toExternalForm());
         //double scale = brushSize;
         //Image scaledImg = new Image(brushImage.getUrl(), brushImage.getWidth() * scale, brushImage.getHeight() * scale, true, true);
         //forestElevationView.setCursor(new ImageCursor(scaledImg, scaledImg.getWidth()/2, scaledImg.getHeight()/2));
+//basic crosshair cursor but no visual resize shown but functionally yes. 
         forestElevationView.setCursor(Cursor.CROSSHAIR);
+
         
     }
     private void removeSpecies(SimulationResult result, Map<String, CheckBox> speciesCheck){
