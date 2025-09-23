@@ -37,7 +37,7 @@ public final class ViewTransform {
             this.cellPx = Math.max(cellPx, 1.0);
         } else {
             // Use the original maxPixels constraint
-            this.cellPx = Math.max(1.0, Math.floor((double) 350 / Math.max(dimX, dimY)));
+            this.cellPx = Math.max(1.0, Math.floor((double) maxPixels / Math.max(dimX, dimY)));
         }
         
         this.widthPx = dimX * cellPx;

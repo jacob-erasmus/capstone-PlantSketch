@@ -20,8 +20,12 @@ public class ForestOnTerrainView extends Region {
         this.elevation = elevation;
         int dimX = elevation.length;
         int dimY = elevation[0].length;
+        boolean useDefaultCellSize = true;
+        if (dimX < 256){
+            useDefaultCellSize = false;
+        }
         this.gridSpacing = gridSpacing;
-        this.vt = new ViewTransform(dimX, dimY, gridSpacing, dimX, dimY, true);
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, dimX, dimY, useDefaultCellSize);
         getChildren().add(canvas);
         setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
         //listen for size changes
