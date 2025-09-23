@@ -592,8 +592,10 @@ public class TestView extends BorderPane {
     private void brush(ForestOnTerrainView forestElevationView, Slider brushSizeSlider){
         brushMode = !brushMode; // toggle on/off
         if (brushMode){
+            forestElevationView.enableBrushMode(() -> brushSizeSlider.getValue());
             updateBrushCursor(forestElevationView, brushSizeSlider.getValue());
         }else{
+            forestElevationView.disableBrushMode();
             forestElevationView.setCursor(Cursor.DEFAULT);  
         }
         

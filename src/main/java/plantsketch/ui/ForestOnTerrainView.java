@@ -1,6 +1,9 @@
 package plantsketch.ui;
 
 import plantsketch.*;
+
+import java.util.function.Supplier;
+
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ScrollPane;
@@ -137,6 +140,24 @@ public class ForestOnTerrainView extends Region {
         g.setStroke(Color.BLACK);
         g.strokeRect(0.5, 0.5, vt.widthPx - 1, vt.heightPx - 1);
     }
+    
+    public void enableBrushMode(Supplier<Double> brushSizeSupplier){
+        canvas.setOnMousePressed(e -> applyBrush(e.getX(), e.getY(), brushSizeSupplier.get()));
+        canvas.setOnMouseDragged(e -> applyBrush(e.getX(), e.getY(), brushSizeSupplier.get()));
+        canvas.setOnMouseReleased(e -> {});
+    }
 
+    public void disableBrushMode(){
+        canvas.setOnMousePressed(null);
+        canvas.setOnMouseDragged(null);
+        canvas.setOnMouseReleased(null);
+    }
+
+    private void applyBrush(double x, double y, double brushSize){
+        double px = vt.cellXtoPx(x);
+        double py = vt.cellYtoPx(y);
+        
+
+    }
     @Override protected void layoutChildren() { canvas.relocate(0, 0); }
 }
