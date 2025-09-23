@@ -2,6 +2,8 @@ package plantsketch.ui;
 
 import plantsketch.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 import javafx.scene.canvas.Canvas;
@@ -16,6 +18,7 @@ public class ForestOnTerrainView extends Region {
     private float[][] elevation; // [dimX][dimY]
     private ViewTransform vt;
     private Canvas canvas = new Canvas();
+    //private Canvas overlay = new Canvas();
     private float gridSpacing;
     private boolean useDefaultCellSize;
 
@@ -34,6 +37,9 @@ public class ForestOnTerrainView extends Region {
         updateRegionSize();
         canvas.setLayoutX(0);
         canvas.setLayoutY(0);
+        //overlay.setLayoutX(0);
+        //overlay.setLayoutY(0);
+        //getChildren().addAll(canvas, overlay);
         getChildren().add(canvas);
         draw();
     }
@@ -44,6 +50,8 @@ public class ForestOnTerrainView extends Region {
         setMaxSize(vt.widthPx, vt.heightPx);
         canvas.setWidth(vt.widthPx);
         canvas.setHeight(vt.heightPx);
+        //overlay.setWidth(vt.widthPx);
+        //overlay.setHeight(vt.heightPx);
         requestLayout();
     }
     public void zoomIn(){
@@ -74,24 +82,7 @@ public class ForestOnTerrainView extends Region {
         updateRegionSize();
         draw();
     }
-    private void updateSize(){
-        double width = getWidth();
-        double height = getHeight();
-        if(width > 0 && height > 0){
-            //scale to fit viewtransform
-            int dimX = elevation.length;
-            int dimY = elevation[0].length;
-            this.vt = new ViewTransform(dimX, dimY, gridSpacing, width, height, useDefaultCellSize);
-            // Update canvas size
-            canvas.setWidth(vt.widthPx);
-            canvas.setHeight(vt.heightPx);
-            canvas.setLayoutX(0);
-            canvas.setLayoutY(0);
-            setPrefSize(vt.widthPx, vt.heightPx);
-            // Redraw with new dimensions
-            draw();
-        }
-    }
+
     private static Color parseColour(String hexOrName) {
         try { return Color.web(hexOrName); } catch (Exception e) { return Color.LIMEGREEN; }
     }
@@ -144,20 +135,76 @@ public class ForestOnTerrainView extends Region {
     public void enableBrushMode(Supplier<Double> brushSizeSupplier){
         canvas.setOnMousePressed(e -> applyBrush(e.getX(), e.getY(), brushSizeSupplier.get()));
         canvas.setOnMouseDragged(e -> applyBrush(e.getX(), e.getY(), brushSizeSupplier.get()));
-        canvas.setOnMouseReleased(e -> {});
+        /* 
+        overlay.setOnMouseMoved(e -> drawBrushOutline(e.getX(), e.getY(), brushSizeSupplier.get()));
+        overlay.setOnMouseExited(e -> clearBrushOutline());
+        */
     }
 
     public void disableBrushMode(){
         canvas.setOnMousePressed(null);
         canvas.setOnMouseDragged(null);
         canvas.setOnMouseReleased(null);
-    }
-
-    private void applyBrush(double x, double y, double brushSize){
-        double px = vt.cellXtoPx(x);
-        double py = vt.cellYtoPx(y);
+        /* 
+        overlay.setOnMouseMoved(null);
+        overlay.setOnMouseExited(null);
+        clearBrushOutline();
+        */
         
-
     }
+
+    private void applyBrush(double brushX, double brushY, double brushSize){
+        System.out.print("brush");
+        //double px = vt.cellXtoPx(x);
+        //double py = vt.cellYtoPx(y);
+        double brushRadiusPx = brushSizeToPixels(brushSize);
+
+        List<Plant> toRemove = new ArrayList<>();
+        for(Plant p : forest.getAllPlants()){
+            //System.out.println("x:" + x + "p: " + vt.meterXtoPx(p.getX()));
+            double xPx = vt.meterXtoPx(p.getX());
+            double yPx = vt.meterYtoPx(p.getY());
+            double rPx = Math.max(2.0, vt.metersToPx(p.getCanopyRadius()));
+            //swapped so same as draw method
+            double dx = brushX - yPx;
+            double dy = brushY - xPx;
+            double dist = Math.hypot(dx,dy);
+
+            //if plant canopy contacts brush radius
+            if(dist <= (brushRadiusPx + rPx)){
+                toRemove.add(p);
+            }
+        }
+        if (!toRemove.isEmpty()){
+            for(Plant p : toRemove){
+                forest.removePlant(p);
+                //System.out.print("plant removed" + p);
+            }
+            System.out.print("removed " + toRemove.size() + " plants");
+            draw();
+        } else {
+            System.out.println("none");
+        }
+    }
+
+    private double brushSizeToPixels(double size){
+        return size * vt.cellPx;
+    }
+    /* 
+    private void drawBrushOutline(double x, double y, double brushSize){
+        GraphicsContext g = overlay.getGraphicsContext2D();
+        clearBrushOutline();
+        g.setStroke(Color.RED);
+        g.setLineWidth(2);
+        double brushSizePx = brushSizeToPixels(brushSize);
+        g.strokeOval(x-brushSizePx, y-brushSizePx, brushSizePx*2, brushSizePx*2);
+    }
+
+
+
+    private void clearBrushOutline(){
+        overlay.getGraphicsContext2D().clearRect(0, 0, overlay.getWidth(), overlay.getHeight());
+    }
+    */
     @Override protected void layoutChildren() { canvas.relocate(0, 0); }
 }
