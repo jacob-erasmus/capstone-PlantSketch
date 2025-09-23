@@ -132,16 +132,16 @@ public class ForestOnTerrainView extends Region {
         g.strokeRect(0.5, 0.5, vt.widthPx - 1, vt.heightPx - 1);
     }
     
-    public void enableBrushMode(Supplier<Double> brushSizeSupplier){
-        canvas.setOnMousePressed(e -> applyBrush(e.getX(), e.getY(), brushSizeSupplier.get()));
-        canvas.setOnMouseDragged(e -> applyBrush(e.getX(), e.getY(), brushSizeSupplier.get()));
+    public void enableBrushRemovalMode(Supplier<Double> brushSizeSupplier){
+        canvas.setOnMousePressed(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()));
+        canvas.setOnMouseDragged(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()));
         /* 
         overlay.setOnMouseMoved(e -> drawBrushOutline(e.getX(), e.getY(), brushSizeSupplier.get()));
         overlay.setOnMouseExited(e -> clearBrushOutline());
         */
     }
 
-    public void disableBrushMode(){
+    public void disableBrushRemovalMode(){
         canvas.setOnMousePressed(null);
         canvas.setOnMouseDragged(null);
         canvas.setOnMouseReleased(null);
@@ -153,7 +153,7 @@ public class ForestOnTerrainView extends Region {
         
     }
 
-    private void applyBrush(double brushX, double brushY, double brushSize){
+    private void applyBrushRemoval(double brushX, double brushY, double brushSize){
         System.out.print("brush");
         //double px = vt.cellXtoPx(x);
         //double py = vt.cellYtoPx(y);

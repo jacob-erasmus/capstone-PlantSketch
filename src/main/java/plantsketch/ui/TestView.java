@@ -44,7 +44,7 @@ public class TestView extends BorderPane {
     private SimulationResult currentResult;
     private boolean isTestGrid;
     private int sampleCount;
-    private boolean brushMode = false;
+    private boolean brushRemovalMode = false;
     private ForestOnTerrainView forestElevationView;
     // UI Components
     private final TabPane tabs = new TabPane();
@@ -541,13 +541,13 @@ public class TestView extends BorderPane {
         
         //listen for changes
         brushSizeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
-            if (brushMode){
+            if (brushRemovalMode){
                 updateBrushCursor(forestElevationView, newVal.doubleValue());
             }
         });
-        Button enableBrushBtn = new Button("Toggle Brush Mode");
-        enableBrushBtn.setOnAction(e -> brush(forestElevationView, brushSizeSlider));
-        enableBrushBtn.setPrefWidth(250);
+        Button enableBrushRemovalBtn = new Button("Toggle Brush Removal Mode");
+        enableBrushRemovalBtn.setOnAction(e -> brushRemoval(forestElevationView, brushSizeSlider));
+        enableBrushRemovalBtn.setPrefWidth(250);
 
         Button simulateBtn = new Button("Selected Species Only");
         simulateBtn.setOnAction(e -> removeSpecies(currentResult, speciesCheck));
@@ -577,7 +577,7 @@ public class TestView extends BorderPane {
             new Separator(),
             brushSize,
             brushSizeSlider,
-            enableBrushBtn,
+            enableBrushRemovalBtn,
             new Separator(),
             simulateBtn);
         
@@ -589,23 +589,25 @@ public class TestView extends BorderPane {
 
     }
 
-    private void brush(ForestOnTerrainView forestElevationView, Slider brushSizeSlider){
-        brushMode = !brushMode; // toggle on/off
-        if (brushMode){
-            forestElevationView.enableBrushMode(() -> brushSizeSlider.getValue());
+    private void brushRemoval(ForestOnTerrainView forestElevationView, Slider brushSizeSlider){
+        brushRemovalMode = !brushRemovalMode; // toggle on/off
+        if (brushRemovalMode){
+            forestElevationView.enableBrushRemovalMode(() -> brushSizeSlider.getValue());
             updateBrushCursor(forestElevationView, brushSizeSlider.getValue());
         }else{
-            forestElevationView.disableBrushMode();
+            forestElevationView.disableBrushRemovalMode();
             forestElevationView.setCursor(Cursor.DEFAULT);  
         }
         
     }
 
     private void updateBrushCursor(ForestOnTerrainView forestElevationView, double brushSize){
-        Image brushImage = new Image(getClass().getResource("/101064.png").toExternalForm());
-        double scale = brushSize;
-        Image scaledImg = new Image(brushImage.getUrl(), brushImage.getWidth() * scale, brushImage.getHeight() * scale, true, true);
-        forestElevationView.setCursor(new ImageCursor(scaledImg, scaledImg.getWidth()/2, scaledImg.getHeight()/2));
+        //Image brushImage = new Image(getClass().getResource("/101064.png").toExternalForm());
+        //double scale = brushSize;
+        //Image scaledImg = new Image(brushImage.getUrl(), brushImage.getWidth() * scale, brushImage.getHeight() * scale, true, true);
+        //forestElevationView.setCursor(new ImageCursor(scaledImg, scaledImg.getWidth()/2, scaledImg.getHeight()/2));
+        forestElevationView.setCursor(Cursor.CROSSHAIR);
+        
     }
     private void removeSpecies(SimulationResult result, Map<String, CheckBox> speciesCheck){
         for (CheckBox boxes : speciesCheck.values()) {
