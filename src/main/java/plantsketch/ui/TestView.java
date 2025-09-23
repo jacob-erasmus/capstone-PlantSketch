@@ -14,6 +14,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ public class TestView extends BorderPane {
     private TestGrid testGrid;
     private SimulationResult currentResult;
     private boolean isTestGrid;
+    private int sampleCount;
     // UI Components
     private final TabPane tabs = new TabPane();
     private final ConsolePane console = new ConsolePane();
@@ -55,6 +57,7 @@ public class TestView extends BorderPane {
 //*********** CONSTRUCTOR ****************\
     public TestView(Runnable onBack, String mode, boolean isTestGrid, int sampleCount) {
         this.onBack = onBack;
+        this.sampleCount = sampleCount;
         this.testGrid = new TestGrid(console::log, isTestGrid, sampleCount);
         this.isTestGrid = isTestGrid;
         
@@ -236,13 +239,13 @@ public class TestView extends BorderPane {
         {
             switch (mode) {
                 case "random":
-                    executeSimulation(0, false);
+                    executeSimulation(0, false, null);
                     break;
                 case "preset1":
-                    executeSimulation(1, false);
+                    executeSimulation(1, false, null);
                     break;
                 case "preset2":
-                    executeSimulation(2, false);
+                    executeSimulation(2, false, null);
                     break;
             }
         }
@@ -251,23 +254,25 @@ public class TestView extends BorderPane {
 
             switch (mode){
                 case "preset1":
-                    executeSimulation(1, false);
+                    executeSimulation(1, false, null);
                     break;
                 case "preset2":
-                    executeSimulation(2, false);
+                    executeSimulation(2, false, null);
                     break;
                 case "preset3":
-                    executeSimulation(3, false);
+                    executeSimulation(3, false, null);
                 case "preset4":
-                    executeSimulation(4, false);
+                    executeSimulation(4, false, null);
                 case "chooseFolder":
-                    executeSimulation(5, false);
+                    testGrid = new TestGrid(console::log, isTestGrid, sampleCount);
+                    console.log("Custom folder mode - waiting for folder data...");
+                    executeSimulation(5, false, null);
             }
         }
     }
 
     // here is execute simulation for the first time
-    private void executeSimulation(int choice, boolean isResimulation) {
+    private void executeSimulation(int choice, boolean isResimulation, String fullPath) {
         tabs.getTabs().clear();
         
 
@@ -283,7 +288,7 @@ public class TestView extends BorderPane {
             }
             else
             {
-                currentResult = testGrid.run(choice);
+                currentResult = testGrid.run(choice, fullPath);
             
             }
 
@@ -293,8 +298,6 @@ public class TestView extends BorderPane {
             
             createTabs();
             
-
-
             if (isTestGrid) updateStatusDisplay();
             console.log("✓ Test simulation complete. Plants placed: " + currentResult.forest().getAllPlants().size());
 
@@ -325,7 +328,18 @@ public class TestView extends BorderPane {
 
 //*********** RUN VIEW METHODS ****************\\
     
+    public void initializeWithCustomFolder(Path dataRoot, String envFolder) {
+        try {
+            String fullPath = dataRoot.resolve(envFolder).toString();
+            console.log("Initializing with custom folder: " + fullPath);
 
+            executeSimulation(5, false, fullPath);
+            
+        } catch (Exception e) {
+            console.log("Failed to load custom folder: " + e.getMessage());
+            e.printStackTrace();
+        }
+}
 
     private VBox buildParameterPanelRun(){
 
@@ -530,7 +544,7 @@ public class TestView extends BorderPane {
 
         Button simulateBtn = new Button("Simulate with new parameters");
         simulateBtn.setPrefWidth(250);
-        simulateBtn.setOnAction(e -> executeSimulation(0, true));
+        simulateBtn.setOnAction(e -> executeSimulation(0, true, null));
 
         VBox panelContent = new VBox(10);
         panelContent.getChildren().addAll
