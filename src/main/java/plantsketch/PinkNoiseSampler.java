@@ -8,54 +8,92 @@ public class PinkNoiseSampler {
 
     private final float width;
     private final float height;
-    private final float minDistance; // min spacing between points (e.g. 2m)
+    private final float minDistance;
     private final Random rng;
 
     public PinkNoiseSampler(float width, float height, float minDistance, long seed) {
+        if (width <= 0 || height <= 0 || minDistance <= 0) {
+            throw new IllegalArgumentException("width/height/minDistance must be > 0");
+        }
         this.width = width;
         this.height = height;
         this.minDistance = minDistance;
-        this.rng = new Random();
-// I (WILLIAM) MADE THE SEED RANDOM WAS : new Random(seed);
+        this.rng = new Random(seed);
     }
 
-    /**
-     * Generate N point samples using dart throwing.
-     *
-     * @param n number of points to generate
-     * @return list of PointSample
-     */
     public List<PointSample> generateSamples(int n) {
-        List<PointSample> samples = new ArrayList<>();
+        if (n <= 0) return new ArrayList<>();
 
-        int attempts = 0;
-        while (samples.size() < n && attempts < n * 1000) {
-            float x = rng.nextFloat() * width;
-            float y = rng.nextFloat() * height;
-
-            // can add in the checks for plants here and add the plant as you create the
-            // point
-
-            PointSample candidate = new PointSample(x, y);
-
-            if (isFarEnough(candidate, samples)) {
-                samples.add(candidate);
-            }
-            attempts++;
+        // 1) candidates
+        float[] xs = new float[n];
+        float[] ys = new float[n];
+        for (int i = 0; i < n; i++) {
+            xs[i] = rng.nextFloat() * width;
+            ys[i] = rng.nextFloat() * height;
         }
 
-        return samples;
+        // 2) prune via sparse grid
+        final float cellSize = (float) (minDistance / Math.sqrt(2.0));
+        final float invCell  = 1.0f / cellSize;
+
+        var grid = new java.util.HashMap<Long, java.util.ArrayList<Integer>>(n * 2);
+        final float minDist2 = minDistance * minDistance;
+        ArrayList<PointSample> kept = new ArrayList<>(n);
+
+        int[] order = shuffledIndices(n, rng);
+        for (int oi = 0; oi < n; oi++) {
+            int i = order[oi];
+            float x = xs[i], y = ys[i];
+
+            int gx = (int) (x * invCell);
+            int gy = (int) (y * invCell);
+
+            boolean tooClose = false;
+
+            for (int by = gy - 1; by <= gy + 1 && !tooClose; by++) {
+                for (int bx = gx - 1; bx <= gx + 1; bx++) {
+                    var bucket = grid.get(pack(bx, by));
+                    if (bucket == null) continue;
+                    for (int idx : bucket) {
+                        float dx = xs[idx] - x;
+                        float dy = ys[idx] - y;
+                        if (dx * dx + dy * dy < minDist2) {
+                            tooClose = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!tooClose) {
+                kept.add(new PointSample(x, y));
+                long key = pack(gx, gy);
+                var list = grid.get(key);
+                if (list == null) {
+                    list = new ArrayList<>(4);
+                    grid.put(key, list);
+                }
+                list.add(i);
+
+                // early exit if we already have N
+                if (kept.size() >= n) break;
+            }
+        }
+
+        return kept;
     }
 
-    private boolean isFarEnough(PointSample candidate, List<PointSample> samples) {
-        for (PointSample s : samples) {
-            float dx = candidate.getX() - s.getX();
-            float dy = candidate.getY() - s.getY();
-            float distSq = dx * dx + dy * dy;
-            if (distSq < minDistance * minDistance) {
-                return false; // too close
-            }
+    private static long pack(int x, int y) {
+        return (((long) x) << 32) | (y & 0xffffffffL); // OR avoids collisions
+    }
+
+    private static int[] shuffledIndices(int n, Random rng) {
+        int[] a = new int[n];
+        for (int i = 0; i < n; i++) a[i] = i;
+        for (int i = n - 1; i > 0; i--) {
+            int j = rng.nextInt(i + 1);
+            int tmp = a[i]; a[i] = a[j]; a[j] = tmp;
         }
-        return true;
+        return a;
     }
 }
