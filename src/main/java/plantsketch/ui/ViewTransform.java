@@ -33,15 +33,26 @@ public final class ViewTransform {
             double cellHeight = targetHeight / dimY;
             double cellPx = Math.min(cellWidth, cellHeight);
             
-            // Ensure minimum size
-            this.cellPx = Math.max(cellPx, 1.0);
+            // Ensure minimum limit
+            
+            this.widthPx = Math.max(dimX*cellPx, 256);
+            this.heightPx = Math.max(dimY*cellPx, 256);
+            if(this.widthPx == 256){
+                this.cellPx = (double) 256/dimX;
+            }else{
+                this.cellPx = cellPx;
+            }
+            //this.cellPx = Math.max(cellPx, 0.8);
+            //this.cellPx = Math.max(cellPx, 1);
+
         } else {
             // Use the original maxPixels constraint
             this.cellPx = Math.max(1.0, Math.floor((double) maxPixels / Math.max(dimX, dimY)));
+            this.widthPx = dimX * cellPx;
+            this.heightPx = dimY * cellPx;
         }
         
-        this.widthPx = dimX * cellPx;
-        this.heightPx = dimY * cellPx;
+        
         this.gridSpacing = gridSpcaing;
     }
 

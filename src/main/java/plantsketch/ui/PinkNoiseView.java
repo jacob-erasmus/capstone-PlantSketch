@@ -9,18 +9,61 @@ import java.util.List;
 
 public class PinkNoiseView extends Region {
     private final List<PointSample> samples;
-    private final ViewTransform vt;
+    private ViewTransform vt;
     private final Canvas canvas = new Canvas();
     float pointDiameter = 0.2f; // percentage of cell
+    boolean useDefaultCellSize;
+    int dimX;
+    int dimY;
+    float gridSpacing;
 
     public PinkNoiseView(List<PointSample> samples, int dimX, int dimY, float gridSpacing) {
         this.samples = samples;
-        this.vt = new ViewTransform(dimX, dimY, gridSpacing); // choose a max size you like
+        this.dimX = dimX;
+        this.dimY = dimY;
+        this.gridSpacing = gridSpacing;
+        useDefaultCellSize = true;
+        if (dimX < 256){
+            useDefaultCellSize = false;
+        }
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, dimX, dimY, useDefaultCellSize);
+        //renderzoom
+        updateRegionSize();
+        canvas.setLayoutX(0);
+        canvas.setLayoutY(0);
         getChildren().add(canvas);
         draw();
-        setPrefSize(canvas.getWidth(), canvas.getHeight());
     }
-
+    private void updateRegionSize(){
+        setPrefSize(vt.widthPx, vt.heightPx);
+        setMinSize(vt.widthPx, vt.heightPx);
+        setMaxSize(vt.widthPx, vt.heightPx);
+        canvas.setWidth(vt.widthPx);
+        canvas.setHeight(vt.heightPx);
+        requestLayout();
+    }
+    public void zoomIn(){
+        //increase render by 20% (capped at 3000px)
+        double currentSize = Math.max(vt.widthPx, vt.heightPx);
+        double newSize = Math.min(currentSize * 1.2, 3000);
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, newSize, newSize, useDefaultCellSize);
+        updateRegionSize();
+        draw();
+    }
+    public void zoomOut(){
+        //decrease render by 20% (capped at 80% of original)
+        double currentSize = Math.max(vt.widthPx, vt.heightPx);
+        double newSize = Math.max(currentSize / 1.2, 256);
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, newSize, newSize, useDefaultCellSize);
+        updateRegionSize();
+        draw();
+    }
+    public void resetToDefault(){
+        //reset
+        this.vt = new ViewTransform(dimX, dimY, gridSpacing, dimX, dimY, useDefaultCellSize);
+        updateRegionSize();
+        draw();
+    }
     private void draw() {
         if (samples == null) return;
 
