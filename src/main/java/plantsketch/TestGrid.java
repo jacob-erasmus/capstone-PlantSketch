@@ -372,7 +372,7 @@ public class TestGrid
         return simResult;
     }
 
-    public SimulationResult run(int choice) 
+    public SimulationResult run(int choice, String fullPath) 
     {
         if (isTestGrid)
         {
@@ -404,9 +404,9 @@ public class TestGrid
                 loadD("src/target/classes/D3-1024");
             } else if (choice == 4) {
                 loadD("src/target/classes/D4-1024");
-            } else if (choice == 5) {
-                //chooseFolder();
-            } else randomiseGridValues();
+            } else if (choice == 5){
+                loadD(fullPath);
+            }
 
             pinkNoise();
             placementLoop();

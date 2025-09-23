@@ -72,7 +72,7 @@ public List<Plant> getAllPlants() {
         return OverallSpeciesMap;
     }
 
-    public void applyBrushChange(Brush brush) {
+    public void applyBrushChange() {
         // Method stub
     }
 

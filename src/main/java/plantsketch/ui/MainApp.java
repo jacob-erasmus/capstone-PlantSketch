@@ -68,7 +68,7 @@ public class MainApp extends Application {
         root.setPadding(new Insets(40));
         
             Label sampleLabel;
-            TextField sampleField = new TextField("100"); // default value
+            TextField sampleField = new TextField("1000"); // default value
             Label title;
             Label subtitle;
             Button randomButton;
@@ -94,7 +94,6 @@ public class MainApp extends Application {
         }
 
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
-    
         subtitle.setStyle("-fx-font-size: 16px;");
 
         sampleLabel = new Label("Sample Count (1-10000):");
@@ -123,7 +122,7 @@ public class MainApp extends Application {
 
             chooseFolderButton.setPrefWidth(150);
             chooseFolderButton.setPrefHeight(40);
-            chooseFolderButton.setOnAction(e -> showWizard(stage, "chooseFolder", isTestGrid));
+            chooseFolderButton.setOnAction(e -> showWizard(stage, isTestGrid, sampleField));
             
             preset3Button.setPrefWidth(150);
             preset3Button.setPrefHeight(40);
@@ -152,57 +151,44 @@ public class MainApp extends Application {
     /** Launch the TestView with selected configuration */
     private void launchTestView(Stage stage, String mode, boolean isTestGrid, TextField sampleField) {
 
-        
-
-
-        // for test grid
-        if (!mode.equals("chooseFolder"))
+    
+//          getting sample count
+        int sampleCount = Integer.parseInt(sampleField.getText().trim());
+        if (sampleCount <= 0) {
+            sampleCount = 1;
+        }
+        if (sampleCount >= 10000)
         {
-            // getting sample count
-            int sampleCount = Integer.parseInt(sampleField.getText().trim());
-            if (sampleCount <= 0) {
-                sampleCount = 1;
-            }
-            if (sampleCount >= 10000)
-            {
-                sampleCount = 10000;
-            }
+            sampleCount = 10000;
+        }
 
-            TestView testView = new TestView(() -> showModeSelection(stage), mode, isTestGrid, sampleCount);
+        TestView testView = new TestView(() -> showModeSelection(stage), mode, isTestGrid, sampleCount);
+        Scene scene = new Scene(testView, 1400, 900);
+        stage.setScene(scene);
+        stage.show();
+        centerStage(stage);
+        
+        // Run simulation after scene is shown
+        Platform.runLater(() -> testView.initializeWithMode(mode));
+    }
+
+    /** Show the wizard for custom folder selection */
+    private void showWizard(Stage stage, boolean isTestGrid, TextField sampleField) {
+        StartupWizard wizard = new StartupWizard(stage, (dataRoot, envFolder, sampleCount) -> {
+            // Create TestView with custom folder configuration
+            TestView testView = new TestView(() -> showModeSelection(stage), "customFolder", isTestGrid, sampleCount);
             Scene scene = new Scene(testView, 1400, 900);
             stage.setScene(scene);
             stage.show();
             centerStage(stage);
-            
-            // Run simulation after scene is shown
-            Platform.runLater(() -> testView.initializeWithMode(mode));
-        }
 
-        else
-        {
-            // put in special stuff here for when the user has to choose their own folder.
-        }
-    }
-
-    /** Show the original wizard for run mode */
-    private void showWizard(Stage stage, String mode, boolean isTestGrid) {
-        StartupWizard wizard = new StartupWizard(stage, (dataRoot, envFolder, sampleCount) -> {
-            AppConfig.dataRoot = dataRoot;
-            AppConfig.environment = envFolder;
-            AppConfig.sampleCount = sampleCount;
-
-            MainViewOld mainView = new MainViewOld(false, () -> showWizard(stage, mode, isTestGrid));
-            Scene scene = new Scene(mainView, 1280, 800);
-            stage.setScene(scene);
-            stage.show();
-            centerStage(stage);
-
-            Platform.runLater(() ->
-                mainView.runSimulation(AppConfig.dataRoot, AppConfig.environment, AppConfig.sampleCount)
-            );
+            // Initialize with the custom folder data
+            Platform.runLater(() -> testView.initializeWithCustomFolder(dataRoot, envFolder));
         });
-
-        stage.setScene(new Scene(wizard, 820, 540));
+        
+        // Display the wizard
+        Scene wizardScene = new Scene(wizard, 600, 400);
+        stage.setScene(wizardScene);
         stage.show();
         centerStage(stage);
     }
