@@ -283,8 +283,8 @@ public class TestView extends BorderPane {
             
                 boolean wasChange = readGridEditors();
                 // Update TestGrid with new values
-                if (regeneratePinkNoise.isSelected()) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected());
-                else if (wasChange) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected());
+                if (regeneratePinkNoise.isSelected()) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected()); // if need to regenerate pink noise
+                else if (wasChange) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected()); // if there was actually a change to anything
             }
             else
             {

@@ -36,7 +36,7 @@ public class PinkNoiseView extends Region {
 
         // draw points (meters → pixels)
         g.setFill(Color.PINK);
-        double r = Math.max(1, vt.cellPx * pointDiameter); // point diameter ~40% of a cell
+        double r = Math.max(1, vt.cellPx * pointDiameter);
         for (PointSample s : samples) {
             double xPx = vt.meterXtoPx(s.getX());
             double yPx = vt.meterYtoPx(s.getY());
