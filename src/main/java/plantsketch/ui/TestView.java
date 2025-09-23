@@ -78,12 +78,12 @@ public class TestView extends BorderPane {
 
         // this is the lhs thing with all of the windows, visual panes and terminal
         var logBox = new VBox(logHeader, console.getNode());
-        
+ 
         var split = new SplitPane();
         split.setOrientation(Orientation.VERTICAL);
         // the forest and stuff
         split.getItems().addAll(tabs, logBox);
-        split.setDividerPositions(0.65);
+        split.setDividerPositions(0.80);
         
         // Main content - tabs on left, parameter panel on right
         HBox mainContent = new HBox(10);
