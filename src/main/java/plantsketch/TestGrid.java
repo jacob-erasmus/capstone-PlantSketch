@@ -374,7 +374,7 @@ public class TestGrid
         return simResult;
     }
 
-    public void undo(SimulationResult simResult)
+    public void loadSaveState(SimulationResult simResult)
     {
         this.forest = simResult.forest();
         this.pinkNoise = simResult.samples();
