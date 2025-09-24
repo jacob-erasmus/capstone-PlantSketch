@@ -4,15 +4,12 @@
 package plantsketch.ui;
 
 import plantsketch.*;
-import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
-import javafx.scene.ImageCursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -21,7 +18,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TestView extends BorderPane {
+public class Interface extends BorderPane {
     
 
 //*********** NOTES AND TO DO ****************\\
@@ -60,7 +57,7 @@ public class TestView extends BorderPane {
     private final Map<String, Slider> sliders = new HashMap<>();
     
 //*********** CONSTRUCTOR ****************\
-    public TestView(Runnable onBack, String mode, boolean isTestGrid, int sampleCount) {
+    public Interface(Runnable onBack, String mode, boolean isTestGrid, int sampleCount) {
         this.onBack = onBack;
         this.sampleCount = sampleCount;
         this.testGrid = new TestGrid(console::log, isTestGrid, sampleCount);

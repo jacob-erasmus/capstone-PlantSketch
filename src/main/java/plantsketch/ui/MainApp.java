@@ -162,28 +162,28 @@ public class MainApp extends Application {
             sampleCount = 10000;
         }
 
-        TestView testView = new TestView(() -> showModeSelection(stage), mode, isTestGrid, sampleCount);
-        Scene scene = new Scene(testView, 1400, 900);
+        Interface theInterface = new Interface(() -> showModeSelection(stage), mode, isTestGrid, sampleCount);
+        Scene scene = new Scene(theInterface, 1400, 900);
         stage.setScene(scene);
         stage.show();
         centerStage(stage);
         
         // Run simulation after scene is shown
-        Platform.runLater(() -> testView.initializeWithMode(mode));
+        Platform.runLater(() -> theInterface.initializeWithMode(mode));
     }
 
     /** Show the wizard for custom folder selection */
     private void showWizard(Stage stage, boolean isTestGrid, TextField sampleField) {
         StartupWizard wizard = new StartupWizard(stage, (dataRoot, envFolder, sampleCount) -> {
             // Create TestView with custom folder configuration
-            TestView testView = new TestView(() -> showModeSelection(stage), "customFolder", isTestGrid, sampleCount);
-            Scene scene = new Scene(testView, 1400, 900);
+            Interface theInterface = new Interface(() -> showModeSelection(stage), "customFolder", isTestGrid, sampleCount);
+            Scene scene = new Scene(theInterface, 1400, 900);
             stage.setScene(scene);
             stage.show();
             centerStage(stage);
 
             // Initialize with the custom folder data
-            Platform.runLater(() -> testView.initializeWithCustomFolder(dataRoot, envFolder));
+            Platform.runLater(() -> theInterface.initializeWithCustomFolder(dataRoot, envFolder));
         });
         
         // Display the wizard
