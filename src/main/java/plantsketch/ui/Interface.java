@@ -63,7 +63,9 @@ public class Interface extends BorderPane {
     private final Map<String, GridEditor> gridEditors = new HashMap<>();
     private final Map<String, Slider> sliders = new HashMap<>();
     
-//*********** CONSTRUCTOR ****************\
+//*********** CONSTRUCTOR ****************\\
+
+
     public Interface(Runnable onBack, String mode, boolean isTestGrid, int sampleCount) {
         this.onBack = onBack;
         this.sampleCount = sampleCount;
@@ -74,6 +76,8 @@ public class Interface extends BorderPane {
         
         setupUI(mode);
         console.hookSystemStreams();
+
+        
     }
     
 
@@ -94,10 +98,12 @@ public class Interface extends BorderPane {
         split.setOrientation(Orientation.VERTICAL);
         // the forest and stuff
         split.getItems().addAll(tabs, logBox);
-        split.setDividerPositions(0.80);
+        split.setDividerPositions(0.666);
         
         // Main content - tabs on left, parameter panel on right
         HBox mainContent = new HBox(10);
+
+
     // buildParameterPanel is different between both
         if (isTestGrid) mainContent.getChildren().addAll(split, buildParameterPanelTest());
         else mainContent.getChildren().addAll(split, buildParameterPanelRun());
@@ -344,7 +350,7 @@ public class Interface extends BorderPane {
     // This is just for the second screen with the options 
     public void initializeWithMode(String mode) {
         console.clear();
-        console.log("Initializing Test Mode: " + mode);
+        // console.log("Initializing Test Mode: " + mode);
         
         if (isTestGrid)
         {
@@ -438,7 +444,7 @@ public class Interface extends BorderPane {
             createTabs();
             
             if (isTestGrid) updateStatusDisplay();
-            console.log("✓ Simulation complete. Plants placed: " + currentResult.forest().getAllPlants().size());
+            // console.log("✓ Simulation complete. Plants placed: " + currentResult.forest().getAllPlants().size());
 
             int numSpecies = 0;
             for (SpeciesMap sm : currentResult.forest().getOverallSpeciesMap()) 
@@ -503,6 +509,7 @@ public class Interface extends BorderPane {
 
 //*********** RUN VIEW METHODS ****************\\
     
+
     public void initializeWithCustomFolder(Path dataRoot, String envFolder) {
         try {
             String fullPath = dataRoot.resolve(envFolder).toString();
@@ -553,7 +560,6 @@ public class Interface extends BorderPane {
 
         return statesPane;
     }
-
 
     private TitledPane createSpeciesPanel()
     {
@@ -626,7 +632,6 @@ public class Interface extends BorderPane {
 
         return speciesHeader;
     }
-
 
     private TitledPane createAbioticsPanel()
     {
@@ -759,6 +764,7 @@ public class Interface extends BorderPane {
 
         
     }
+    
     private void removeSpecies(SimulationResult result, Map<String, CheckBox> speciesCheck){
         for (CheckBox boxes : speciesCheck.values()) {
             if(boxes.isSelected()!=true && result.forest().removedSpecies.containsKey(boxes.getText()) != true){
@@ -810,8 +816,8 @@ public class Interface extends BorderPane {
         return stateButtons;
     }
 
-//*********** TEST VIEW METHODS****************\\
 
+//*********** TEST VIEW METHODS****************\\
     
 
     private VBox buildParameterPanelTest() {
@@ -898,25 +904,12 @@ public class Interface extends BorderPane {
     // puts in the values for the right tab
     private void updateGridEditors() 
     {
-
-        float[][] tempGrid = testGrid.getTemperatureGrid();
-        System.out.println("Updating temp grid: " + tempGrid[0][0] + ", " + tempGrid[0][1]); // Debug
-
-        gridEditors.get("Temperature").setValues(tempGrid);
+        gridEditors.get("Temperature").setValues(testGrid.getTemperatureGrid());
         gridEditors.get("Age").setValues(testGrid.getAgeGrid());
         gridEditors.get("Moisture").setValues(testGrid.getMoistureGrid());
         gridEditors.get("Sunlight").setValues(testGrid.getSunlightGrid());
         gridEditors.get("Elevation").setValues(testGrid.getElevationGrid());
         gridEditors.get("Slope").setValues(testGrid.getSlopeGrid());
-
-        /*
-        gridEditors.get("Temperature").setValues(currentResult.temp().getGrid());
-        gridEditors.get("Age").setValues(currentResult.age().getGrid());
-        gridEditors.get("Moisture").setValues(currentResult.moist().getGrid());
-        gridEditors.get("Sunlight").setValues(currentResult.sun().getGrid());
-        gridEditors.get("Elevation").setValues(currentResult.terrain().getElevationGrid());
-        gridEditors.get("Slope").setValues(currentResult.terrain().getSlopeGrid());
-         */
     }
 
     // reads in values from the screen grids

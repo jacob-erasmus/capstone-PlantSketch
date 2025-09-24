@@ -59,6 +59,15 @@ public class MainApp extends Application {
         stage.setScene(scene);
         stage.show();
         centerStage(stage);
+
+        // now when you press esc it closes
+        scene.setOnKeyPressed(e -> {
+            switch (e.getCode()) {
+                case ESCAPE -> Platform.exit();
+            
+        }});
+
+        
     }
 
     // this shows the first and second screens for both test mode and run mode
