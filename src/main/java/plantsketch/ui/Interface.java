@@ -42,6 +42,7 @@ public class Interface extends BorderPane {
     private ArrayList<SimulationResult> saveStatesArray = new ArrayList<>();
     private int saveState;
     private boolean isUndo;
+    private int maxSaveStates = 30;
 
     private final Runnable onBack;
     private TestGrid testGrid;
@@ -390,6 +391,17 @@ public class Interface extends BorderPane {
         try {
             if (!isUndo)
             {
+                // making a new 'branch' as the user has made an edit. can no longer redo
+                
+                if(saveStatesArray.size() -1 > saveState)
+                {
+                    for (int i = saveState; i < saveStatesArray.size(); i++)
+                    {
+                        saveStatesArray.remove(i);
+                    }
+                }
+                
+
                 if(isResimulation)
                 {
                     // index of which save state it is
@@ -408,7 +420,7 @@ public class Interface extends BorderPane {
                 }
                 // adds to the current save state
                 saveStatesArray.add(currentResult);
-                if (saveStatesArray.size() > 20) // maximum 20 save states
+                if (saveStatesArray.size() > maxSaveStates) // maximum 30 save states
                 {
                     saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
                     saveState--; // the index now caps out at 20
@@ -416,6 +428,7 @@ public class Interface extends BorderPane {
                 }
             }
 
+            
 
 
             // Update grid editors with current values
@@ -453,16 +466,38 @@ public class Interface extends BorderPane {
 
     private void undo()
     {
-        if(saveStatesArray.size() > 1)
+        if(saveStatesArray.size() > 1 && saveState > 0)
         {
             isUndo = true;
 
-            saveStatesArray.remove(saveState--); // removes last saveState then decrements by 1
+            // saveStatesArray.remove(saveState--); // removes last saveState then decrements by 1
+            saveState--;
             currentResult = saveStatesArray.get(saveState);
-            this.testGrid.undo(currentResult);
+            this.testGrid.loadSaveState(currentResult);
             executeSimulation(0, true, null); // choice doesnt matter because it
         }
 
+    }
+
+    /*
+        so the way undo and redo are going to work is this:
+            say you work for 6 save states
+            then undo 2
+            you can now redo those two undos and get back to 6 save states
+            BUT
+            as soon as you make a new change it will make a new 'branch' and you lose all the old save states that you undid and you cannot redo then 
+
+     */
+    private void redo()
+    {
+        if(saveStatesArray.size() > 1 && saveState +1 < saveStatesArray.size())
+        {
+            isUndo = true;
+
+            currentResult = saveStatesArray.get(++saveState);
+            this.testGrid.loadSaveState(currentResult);
+            executeSimulation(0, true, null); // choice doesnt matter because it
+        }
     }
 
 
@@ -493,31 +528,22 @@ public class Interface extends BorderPane {
     private ScrollPane createStatesPanel()
     {
 
-        Button undoButton = new Button("Undo previous change !!NO REDO!!");
-        undoButton.setOnAction(e -> undo());
-        undoButton.setPrefWidth(250);
-
         TextField fileNameField = new TextField();
-        fileNameField.setPromptText("Enter file name you want to give your file (do not includ file type): ");
+        fileNameField.setPromptText("Enter file name you want to give your file (do not include file type): ");
         fileNameField.setPrefWidth(250);
 
-        Button saveButton = new Button("Create .pdb file");
-        saveButton.setOnAction(e -> {
-            String name = fileNameField.getText().trim();
-            if (!name.isEmpty()) 
-            {
-                new EcoVizOutput(currentResult).createFile(name+".pdb");
-            }});
-
-        saveButton.setPrefWidth(250);
+        Button[] stateButtons = createStateButtons(fileNameField);
 
         // undo and save menu
         VBox stateContent = new VBox(10);
         stateContent.getChildren().addAll
         (
-            undoButton,
             new Separator(),
-            saveButton,
+            stateButtons[0],
+            new Separator(),
+            stateButtons[1],
+            new Separator(),
+            stateButtons[2],
             fileNameField);
 
         ScrollPane statesPane = new ScrollPane();
@@ -587,7 +613,8 @@ public class Interface extends BorderPane {
         (
             gridPane,
             new Separator(),
-            simulateBtn);
+            simulateBtn,
+            new Separator());
 
         ScrollPane speciesPane = new ScrollPane();
         speciesPane.setFitToWidth(true);
@@ -693,7 +720,8 @@ public class Interface extends BorderPane {
             new Separator(),
             brushSize,
             brushSizeSlider,
-            enableBrushRemovalBtn);
+            enableBrushRemovalBtn,
+            new Separator());
 
         ScrollPane slidersPane = new ScrollPane();
         slidersPane.setFitToWidth(true);
@@ -758,11 +786,33 @@ public class Interface extends BorderPane {
         return (float) slider.getValue();
     }
     
+    private Button[] createStateButtons(TextField fileNameField)
+    {
+        Button undoButton = new Button("Undo previous change");
+        undoButton.setOnAction(e -> undo());
+        undoButton.setPrefWidth(250);
 
+        Button redoButton = new Button("Redo previous undo");
+        redoButton.setOnAction(e -> redo());
+        redoButton.setPrefWidth(250);
+
+        Button saveButton = new Button("Create .pdb file");
+        saveButton.setOnAction(e -> {
+            String name = fileNameField.getText().trim();
+            if (!name.isEmpty()) 
+            {
+                new EcoVizOutput(currentResult).createFile(name+".pdb");
+            }});
+
+        saveButton.setPrefWidth(250);
+
+        Button[] stateButtons = {undoButton, redoButton, saveButton};;
+        return stateButtons;
+    }
 
 //*********** TEST VIEW METHODS****************\\
 
-
+    
 
     private VBox buildParameterPanelTest() {
 
@@ -814,10 +864,11 @@ public class Interface extends BorderPane {
         simulateBtn.setPrefWidth(250);
         simulateBtn.setOnAction(e -> executeSimulation(0, true, null));
 
-        // undo button
-        Button undoButton = new Button("Undo previous change !!NO REDO!!");
-        undoButton.setOnAction(e -> undo());
-        undoButton.setPrefWidth(250);
+        TextField fileNameField = new TextField();
+        fileNameField.setPromptText("Enter file name you want to give your file (do not include file type): ");
+        fileNameField.setPrefWidth(250);
+
+        Button[] stateButtons = createStateButtons(fileNameField);
 
         VBox panelContent = new VBox(10);
         panelContent.getChildren().addAll
@@ -830,7 +881,12 @@ public class Interface extends BorderPane {
             // regenerateSpecies,
             simulateBtn,
             new Separator(),
-            undoButton);
+            stateButtons[0],
+            new Separator(),
+            stateButtons[1],
+            new Separator(),
+            stateButtons[2],
+            fileNameField);
         
 
         scrollPane.setContent(panelContent);
