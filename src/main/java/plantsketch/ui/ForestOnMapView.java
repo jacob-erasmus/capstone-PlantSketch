@@ -18,9 +18,9 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 
-public class ForestOnTerrainView extends Region {
+public class ForestOnMapView extends Region {
     private Forest forest;
-    private float[][] elevation; // [dimX][dimY]
+    private float[][] map; // [dimX][dimY]
     private ViewTransform vt;
     private Canvas canvas = new Canvas();
     private float gridSpacing;
@@ -28,11 +28,11 @@ public class ForestOnTerrainView extends Region {
     private Set<String> selectedSpecies;
     private Supplier<Set<String>> selectedSpeciesSupplier;
 
-    public ForestOnTerrainView(Forest forest, float[][] elevation, float gridSpacing) {
+    public ForestOnMapView(Forest forest, float[][] map, float gridSpacing) {
         this.forest = forest;
-        this.elevation = elevation;
-        int dimX = elevation.length;
-        int dimY = elevation[0].length;
+        this.map = map;
+        int dimX = map.length;
+        int dimY = map[0].length;
         useDefaultCellSize = true;
         if (dimX < 256){
             useDefaultCellSize = false;
@@ -56,8 +56,8 @@ public class ForestOnTerrainView extends Region {
         requestLayout();
     }
     public void zoomIn(){
-        int dimX = elevation.length;
-        int dimY = elevation[0].length;
+        int dimX = map.length;
+        int dimY = map[0].length;
         //increase render by 20% (capped at 3000)
         double currentSize = Math.max(vt.widthPx, vt.heightPx);
         double newSize = Math.min(currentSize * 1.2, 3000);
@@ -66,8 +66,8 @@ public class ForestOnTerrainView extends Region {
         draw();
     }
     public void zoomOut(){
-        int dimX = elevation.length;
-        int dimY = elevation[0].length;
+        int dimX = map.length;
+        int dimY = map[0].length;
         //decrease render by 20% (capped at 256)
         double currentSize = Math.max(vt.widthPx, vt.heightPx);
         double newSize = Math.max(currentSize / 1.2, 256);
@@ -76,8 +76,8 @@ public class ForestOnTerrainView extends Region {
         draw();
     }
     public void resetToDefault(){
-        int dimX = elevation.length;
-        int dimY = elevation[0].length;
+        int dimX = map.length;
+        int dimY = map[0].length;
         //reset
         this.vt = new ViewTransform(dimX, dimY, gridSpacing, dimX, dimY, useDefaultCellSize);
         updateRegionSize();
@@ -97,7 +97,7 @@ public class ForestOnTerrainView extends Region {
         float min = Float.MAX_VALUE, max = -Float.MAX_VALUE;
         for (int x = 0; x < vt.dimX; x++) {
             for (int y = 0; y < vt.dimY; y++) {
-                float v = elevation[x][y];
+                float v = map[x][y];
                 if (v < min) min = v;
                 if (v > max) max = v;
             }
@@ -105,7 +105,7 @@ public class ForestOnTerrainView extends Region {
         double cs = vt.cellPx;
         for (int x = 0; x < vt.dimX; x++) {
             for (int y = 0; y < vt.dimY; y++) {
-                double t = (elevation[x][y] - min) / Math.max(1e-9, (max - min));
+                double t = (map[x][y] - min) / Math.max(1e-9, (max - min));
                 int gray = (int) Math.round(t * 255);
                 g.setFill(Color.rgb(gray, gray, gray));
                 

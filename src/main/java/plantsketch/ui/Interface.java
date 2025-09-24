@@ -54,7 +54,7 @@ public class Interface extends BorderPane {
     private boolean isTestGrid;
     private int sampleCount;
     private boolean brushRemovalMode = false;
-    private ForestOnTerrainView forestElevationView;
+    private ForestOnMapView forestElevationView;
     Supplier<Set<String>> getSelectedSpecies;
     // UI Components
     private final TabPane tabs = new TabPane();
@@ -68,7 +68,9 @@ public class Interface extends BorderPane {
     private final Map<String, GridEditor> gridEditors = new HashMap<>();
     private final Map<String, Slider> sliders = new HashMap<>();
     
-//*********** CONSTRUCTOR ****************\
+//*********** CONSTRUCTOR ****************\\
+
+
     public Interface(Runnable onBack, String mode, boolean isTestGrid, int sampleCount) {
         this.onBack = onBack;
         this.sampleCount = sampleCount;
@@ -79,6 +81,8 @@ public class Interface extends BorderPane {
         
         setupUI(mode);
         console.hookSystemStreams();
+
+        
     }
     
 
@@ -99,10 +103,12 @@ public class Interface extends BorderPane {
         split.setOrientation(Orientation.VERTICAL);
         // the forest and stuff
         split.getItems().addAll(tabs, logBox);
-        split.setDividerPositions(0.80);
+        split.setDividerPositions(0.666);
         
         // Main content - tabs on left, parameter panel on right
         HBox mainContent = new HBox(10);
+
+
     // buildParameterPanel is different between both
         if (isTestGrid) mainContent.getChildren().addAll(split, buildParameterPanelTest());
         else mainContent.getChildren().addAll(split, buildParameterPanelRun());
@@ -153,14 +159,17 @@ public class Interface extends BorderPane {
     public void createTabs()
     {
         tabs.getTabs().clear();
-        createForestElevationTab();
+        createForestOnMapTab(currentResult.terrain().getElevationGrid(), "Elevation");
+        createForestOnMapTab(currentResult.abiotics().getMoistureMap().getGrid(), "Moisture");
+        createForestOnMapTab(currentResult.abiotics().getSunlightMap().getGrid(), "Sunlight");
+        createForestOnMapTab(currentResult.abiotics().getTemperatureMap().getGrid(), "Temperature");
         createPinkNoiseTab();
         createForestTab();
 
     }
     
     // Create Forest + Elevation tab with zoom controls
-    private void createForestElevationTab(){
+    private void createForestOnMapTab(float[][] map, String mapType){
         VBox forestElevationContainer = new VBox(5);
         HBox zoomControls = new HBox(10);
         zoomControls.setAlignment(Pos.CENTER_LEFT);
@@ -178,7 +187,7 @@ public class Interface extends BorderPane {
         zoomControls.getChildren().addAll(zoomOutBtn, zoomInBtn, defaultBtn, zoomLabel);
         
         // Create the view
-        forestElevationView= new ForestOnTerrainView(currentResult.forest(), currentResult.terrain().getElevationGrid(), currentResult.gridSpacing()); 
+        forestElevationView= new ForestOnMapView(currentResult.forest(), map, currentResult.gridSpacing()); 
         ScrollPane forestElevationPane = new ScrollPane(forestElevationView);
         forestElevationPane.setFitToHeight(false);
         forestElevationPane.setFitToWidth(false);
@@ -215,7 +224,7 @@ public class Interface extends BorderPane {
         });
         forestElevationContainer.getChildren().addAll(zoomControls, forestElevationPane);
         VBox.setVgrow(forestElevationPane, Priority.ALWAYS);
-        tabs.getTabs().add(makeTab("Forest + Elevation", forestElevationContainer));
+        tabs.getTabs().add(makeTab(mapType, forestElevationContainer));
     }
 
     // Create Pink Noise tab with zoom controls
@@ -349,7 +358,7 @@ public class Interface extends BorderPane {
     // This is just for the second screen with the options 
     public void initializeWithMode(String mode) {
         console.clear();
-        console.log("Initializing Test Mode: " + mode);
+        // console.log("Initializing Test Mode: " + mode);
         
         if (isTestGrid)
         {
@@ -443,7 +452,7 @@ public class Interface extends BorderPane {
             createTabs();
             
             if (isTestGrid) updateStatusDisplay();
-            console.log("✓ Simulation complete. Plants placed: " + currentResult.forest().getAllPlants().size());
+            // console.log("✓ Simulation complete. Plants placed: " + currentResult.forest().getAllPlants().size());
 
             int numSpecies = 0;
             for (SpeciesMap sm : currentResult.forest().getOverallSpeciesMap()) 
@@ -508,6 +517,7 @@ public class Interface extends BorderPane {
 
 //*********** RUN VIEW METHODS ****************\\
     
+
     public void initializeWithCustomFolder(Path dataRoot, String envFolder) {
         try {
             String fullPath = dataRoot.resolve(envFolder).toString();
@@ -534,23 +544,13 @@ public class Interface extends BorderPane {
     private ScrollPane createStatesPanel()
     {
 
-        TextField fileNameField = new TextField();
-        fileNameField.setPromptText("Enter file name you want to give your file (do not include file type): ");
-        fileNameField.setPrefWidth(250);
-
-        Button[] stateButtons = createStateButtons(fileNameField);
+        HBox stateButtons = createStateButtons();
 
         // undo and save menu
         VBox stateContent = new VBox(10);
         stateContent.getChildren().addAll
         (
-            new Separator(),
-            stateButtons[0],
-            new Separator(),
-            stateButtons[1],
-            new Separator(),
-            stateButtons[2],
-            fileNameField);
+            stateButtons);
 
         ScrollPane statesPane = new ScrollPane();
         statesPane.setFitToWidth(true);
@@ -559,7 +559,6 @@ public class Interface extends BorderPane {
 
         return statesPane;
     }
-
 
     private TitledPane createSpeciesPanel()
     {
@@ -636,7 +635,6 @@ public class Interface extends BorderPane {
 
         return speciesHeader;
     }
-
 
     private TitledPane createAbioticsPanel()
     {
@@ -748,8 +746,7 @@ public class Interface extends BorderPane {
         return slidersHeader;
     }
 
-    private void brushRemoval(ForestOnTerrainView forestElevationView, Slider brushSizeSlider){
-        //System.out.println(forestElevationView.getSelectedSpecies());
+    private void brushRemoval(ForestOnMapView forestElevationView, Slider brushSizeSlider){
         brushRemovalMode = !brushRemovalMode; // toggle on/off
         if (brushRemovalMode){
             forestElevationView.enableBrushRemovalMode(() -> brushSizeSlider.getValue());
@@ -762,7 +759,7 @@ public class Interface extends BorderPane {
         
     }
 
-    private void updateBrushCursor(ForestOnTerrainView forestElevationView, double brushSize){
+    private void updateBrushCursor(ForestOnMapView forestElevationView, double brushSize){
 //image as cursor - some glitches so commented out for now.
 //Will fix/improve.
         //Image brushImage = new Image(getClass().getResource("/101064.png").toExternalForm());
@@ -774,6 +771,7 @@ public class Interface extends BorderPane {
 
         
     }
+    
     private void removeSpecies(SimulationResult result, Map<String, CheckBox> speciesCheck){
         for (CheckBox boxes : speciesCheck.values()) {
             if(boxes.isSelected()!=true && result.forest().removedSpecies.containsKey(boxes.getText()) != true){
@@ -801,15 +799,19 @@ public class Interface extends BorderPane {
         return (float) slider.getValue();
     }
     
-    private Button[] createStateButtons(TextField fileNameField)
+    private HBox createStateButtons()
     {
-        Button undoButton = new Button("Undo previous change");
+        Button undoButton = new Button("Undo");
         undoButton.setOnAction(e -> undo());
-        undoButton.setPrefWidth(250);
+        undoButton.setPrefWidth(60);
 
-        Button redoButton = new Button("Redo previous undo");
+        Button redoButton = new Button("Redo");
         redoButton.setOnAction(e -> redo());
-        redoButton.setPrefWidth(250);
+        redoButton.setPrefWidth(60);
+
+        TextField fileNameField = new TextField();
+        fileNameField.setPromptText("Enter file name:");
+        fileNameField.setPrefWidth(120);
 
         Button saveButton = new Button("Create .pdb file");
         saveButton.setOnAction(e -> {
@@ -819,14 +821,19 @@ public class Interface extends BorderPane {
                 new EcoVizOutput(currentResult).createFile(name+".pdb");
             }});
 
-        saveButton.setPrefWidth(250);
+        saveButton.setPrefWidth(100);
 
-        Button[] stateButtons = {undoButton, redoButton, saveButton};;
-        return stateButtons;
+        Button[] stateButtons = {undoButton, redoButton, saveButton};
+
+        HBox stateButtonRow = new HBox(5); // spacing of 5px between buttons
+        stateButtonRow.getChildren().addAll(stateButtons);
+        stateButtonRow.getChildren().add(fileNameField);
+
+        return stateButtonRow;
     }
 
-//*********** TEST VIEW METHODS****************\\
 
+//*********** TEST VIEW METHODS****************\\
     
 
     private VBox buildParameterPanelTest() {
@@ -879,11 +886,7 @@ public class Interface extends BorderPane {
         simulateBtn.setPrefWidth(250);
         simulateBtn.setOnAction(e -> executeSimulation(0, true, null));
 
-        TextField fileNameField = new TextField();
-        fileNameField.setPromptText("Enter file name you want to give your file (do not include file type): ");
-        fileNameField.setPrefWidth(250);
-
-        Button[] stateButtons = createStateButtons(fileNameField);
+        HBox stateButtons = createStateButtons();
 
         VBox panelContent = new VBox(10);
         panelContent.getChildren().addAll
@@ -895,13 +898,7 @@ public class Interface extends BorderPane {
             regeneratePinkNoise,
             // regenerateSpecies,
             simulateBtn,
-            new Separator(),
-            stateButtons[0],
-            new Separator(),
-            stateButtons[1],
-            new Separator(),
-            stateButtons[2],
-            fileNameField);
+            stateButtons);
         
 
         scrollPane.setContent(panelContent);
@@ -913,25 +910,12 @@ public class Interface extends BorderPane {
     // puts in the values for the right tab
     private void updateGridEditors() 
     {
-
-        float[][] tempGrid = testGrid.getTemperatureGrid();
-        System.out.println("Updating temp grid: " + tempGrid[0][0] + ", " + tempGrid[0][1]); // Debug
-
-        gridEditors.get("Temperature").setValues(tempGrid);
+        gridEditors.get("Temperature").setValues(testGrid.getTemperatureGrid());
         gridEditors.get("Age").setValues(testGrid.getAgeGrid());
         gridEditors.get("Moisture").setValues(testGrid.getMoistureGrid());
         gridEditors.get("Sunlight").setValues(testGrid.getSunlightGrid());
         gridEditors.get("Elevation").setValues(testGrid.getElevationGrid());
         gridEditors.get("Slope").setValues(testGrid.getSlopeGrid());
-
-        /*
-        gridEditors.get("Temperature").setValues(currentResult.temp().getGrid());
-        gridEditors.get("Age").setValues(currentResult.age().getGrid());
-        gridEditors.get("Moisture").setValues(currentResult.moist().getGrid());
-        gridEditors.get("Sunlight").setValues(currentResult.sun().getGrid());
-        gridEditors.get("Elevation").setValues(currentResult.terrain().getElevationGrid());
-        gridEditors.get("Slope").setValues(currentResult.terrain().getSlopeGrid());
-         */
     }
 
     // reads in values from the screen grids

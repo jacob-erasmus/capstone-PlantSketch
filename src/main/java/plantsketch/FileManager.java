@@ -36,7 +36,7 @@ public class FileManager {
     // used chatgpt for the general format and to understand reading in multiple
     // files
     public void fileFinder() {
-        System.out.println("Please enter the path for the directory containing your files");
+        // System.out.println("Please enter the path for the directory containing your files");
         scan = new Scanner(System.in);
         pwd = scan.nextLine();
         File directory = new File(pwd);
@@ -46,15 +46,15 @@ public class FileManager {
 
             if (files != null) {
                 for (File file : files) {
-                    System.out.println("Found file: " + file.getName());
+                   // System.out.println("Found file: " + file.getName());
                     // loading .elv file first for the grid spacing
                     if (file.isFile()) {
                         String name = file.getName();
 
                         if (name.endsWith(".elv")) {
-                            System.out.println("Loading Elevation file: " + name);
+                           // System.out.println("Loading Elevation file: " + name);
                             elevationGrid = loadElv(file);
-                            System.out.println(name + " Loaded :)");
+                           // System.out.println(name + " Loaded :)");
                         }
                     }
                 }
@@ -65,30 +65,30 @@ public class FileManager {
 
                         if (name.endsWith(".txt")) {
                             if (name.contains("sun")) {
-                                System.out.println("Loading Sunlight File: " + name);
+                               // System.out.println("Loading Sunlight File: " + name);
                                 sunlightGrid = loadTxt(file);
-                                System.out.println(name + " Loaded :)");
+                               // System.out.println(name + " Loaded :)");
                             }
 
                             if (name.contains("temp")) {
-                                System.out.println("Loading Temperature File: " + name);
+                               // System.out.println("Loading Temperature File: " + name);
                                 temperatureGrid = loadTxt(file);
                                 // now edit constructors to allow accepting grid[][]
-                                System.out.println(name + " Loaded :)");
+                               // System.out.println(name + " Loaded :)");
                             }
 
                             if (name.contains("wet") || name.contains("water")) {
-                                System.out.println("Loading Moisture File: " + name);
+                               // System.out.println("Loading Moisture File: " + name);
                                 moistureGrid = loadTxt(file);
                                 // now edit constructors to allow accepting grid[][]
-                                System.out.println(name + " Loaded :)");
+                               // System.out.println(name + " Loaded :)");
                             }
                         } else if (name.endsWith(".png") && (name.contains("age") || name.contains("Age"))) {
-                            System.out.println("Loading Age File: " + name);
+                           // System.out.println("Loading Age File: " + name);
                             this.ageGrid = loadPng(file);
-                            System.out.println(name + " Loaded :)");
+                           // System.out.println(name + " Loaded :)");
                         } else {
-                            System.out.println("Unknown file in directory. Ignoring it." + name);
+                           // System.out.println("Unknown file in directory. Ignoring it." + name);
                         }
                     }
                 }
@@ -296,9 +296,9 @@ public class FileManager {
                 continue;
             String name = file.getName();
             if (name.endsWith(".elv")) {
-                System.out.println("Loading Elevation file: " + name);
+               // System.out.println("Loading Elevation file: " + name);
                 elevationGrid = loadElv(file);
-                System.out.println(name + " Loaded :)");
+               // System.out.println(name + " Loaded :)");
             }
         }
         // 2nd pass: others
@@ -308,22 +308,22 @@ public class FileManager {
             String name = file.getName();
             if (name.endsWith(".txt")) {
                 if (name.contains("sun")) {
-                    System.out.println("Loading Sunlight File: " + name);
+                   // System.out.println("Loading Sunlight File: " + name);
                     sunlightGrid = loadTxt(file);
-                    System.out.println(name + " Loaded :)");
+                    // System.out.println(name + " Loaded :)");
                 } else if (name.contains("temp")) {
-                    System.out.println("Loading Temperature File: " + name);
+                  // System.out.println("Loading Temperature File: " + name);
                     temperatureGrid = loadTxt(file);
-                    System.out.println(name + " Loaded :)");
+                   // System.out.println(name + " Loaded :)");
                 } else if (name.contains("wet") || name.contains("water")) {
-                    System.out.println("Loading Moisture File: " + name);
+                   // System.out.println("Loading Moisture File: " + name);
                     moistureGrid = loadTxt(file);
-                    System.out.println(name + " Loaded :)");
+                   // System.out.println(name + " Loaded :)");
                 }
             } else if (name.endsWith(".png") && (name.toLowerCase().contains("age"))) {
-                System.out.println("Loading Age File: " + name);
+               // System.out.println("Loading Age File: " + name);
                 this.ageGrid = loadPng(file);
-                System.out.println(name + " Loaded :)");
+               // System.out.println(name + " Loaded :)");
             }
         }
     }

@@ -18,7 +18,8 @@ public class PinkNoiseSampler {
         this.width = width;
         this.height = height;
         this.minDistance = minDistance;
-        this.rng = new Random(seed);
+        // this.rng = new Random(seed);
+        this.rng = new Random(); // the seed doesn't actually make sense in this context. useful for when we do speedup graphs tho
     }
 
     public List<PointSample> generateSamples(int n) {
