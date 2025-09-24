@@ -4,6 +4,7 @@
 package plantsketch.ui;
 
 import plantsketch.*;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -18,6 +19,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class Interface extends BorderPane {
     
@@ -518,6 +522,7 @@ public class Interface extends BorderPane {
 
     private VBox buildParameterPanelRun(){
 
+
         // putting it all together
         VBox container = new VBox(createAbioticsPanel(), createSpeciesPanel(), createStatesPanel());
         return container;
@@ -562,31 +567,31 @@ public class Interface extends BorderPane {
 
         CheckBox boxwood = new CheckBox("Boxwood");
         boxwood.setStyle("-fx-text-fill: red;");
-        speciesCheck.put("boxwood", boxwood);
+        speciesCheck.put("Boxwood", boxwood);
 
         CheckBox snowyMespilus = new CheckBox("Snowy Mespilus");
         snowyMespilus.setStyle("-fx-text-fill: blue;");
-        speciesCheck.put("snowyMespilus", snowyMespilus);
+        speciesCheck.put("Snowy Mespilus", snowyMespilus);
 
         CheckBox mountainPine = new CheckBox("Mountain Pine");
         mountainPine.setStyle("-fx-text-fill: green;");
-        speciesCheck.put("mountainPine", mountainPine);
+        speciesCheck.put("Mountain Pine", mountainPine);
 
         CheckBox silverFir = new CheckBox("Silver Fir");
         silverFir.setStyle("-fx-text-fill: purple;");
-        speciesCheck.put("silverFir", silverFir);
+        speciesCheck.put("Silver Fir", silverFir);
 
         CheckBox silverBirch = new CheckBox("Silver Birch");
         silverBirch.setStyle("-fx-text-fill: pink;");
-        speciesCheck.put("silverBirch", silverBirch);
+        speciesCheck.put("Silver Birch", silverBirch);
 
         CheckBox sissileOak = new CheckBox("Sissile Oak");
         sissileOak.setStyle("-fx-text-fill: orange;");
-        speciesCheck.put("sissileOak", sissileOak);
+        speciesCheck.put("Sissile Oak", sissileOak);
 
         CheckBox europeanBeech = new CheckBox("European Beech");
         europeanBeech.setStyle("-fx-text-fill: brown;");
-        speciesCheck.put("europeanBeech", europeanBeech);
+        speciesCheck.put("European Beech", europeanBeech);
 
         Button simulateBtn = new Button("Selected Species Only");
         simulateBtn.setOnAction(e -> removeSpecies(currentResult, speciesCheck));
@@ -606,7 +611,11 @@ public class Interface extends BorderPane {
                 row++;
             }
         }
-
+        // define the supplier that always reflects current checkbox states
+        Supplier<Set<String>> getSelectedSpecies = () -> speciesCheck.entrySet().stream()
+            .filter(entry -> entry.getValue().isSelected())
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toSet());
         // species window
         VBox speciesContent = new VBox(10);
         speciesContent.getChildren().addAll
@@ -676,6 +685,7 @@ public class Interface extends BorderPane {
         elevationSlider.setSnapToTicks(true);
         elevationSlider.setPrefWidth(250);
 
+
         // brush stuff
         Label brushSize = new Label("Brush Size");
         Slider brushSizeSlider = new Slider(10, 90, 50);
@@ -695,7 +705,10 @@ public class Interface extends BorderPane {
             }
         });
         Button enableBrushRemovalBtn = new Button("Toggle Brush Removal Mode");
-        enableBrushRemovalBtn.setOnAction(e -> brushRemoval(forestElevationView, brushSizeSlider));
+        enableBrushRemovalBtn.setOnAction(e -> 
+            {
+            forestElevationView.setSelectedSpeciesSupplier(getSelectedSpecies);
+            brushRemoval(forestElevationView, brushSizeSlider);});
         enableBrushRemovalBtn.setPrefWidth(250);
 
 
@@ -735,6 +748,7 @@ public class Interface extends BorderPane {
     }
 
     private void brushRemoval(ForestOnTerrainView forestElevationView, Slider brushSizeSlider){
+        //System.out.println(forestElevationView.getSelectedSpecies());
         brushRemovalMode = !brushRemovalMode; // toggle on/off
         if (brushRemovalMode){
             forestElevationView.enableBrushRemovalMode(() -> brushSizeSlider.getValue());

@@ -3,7 +3,12 @@ package plantsketch.ui;
 import plantsketch.*;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 
 import javafx.scene.canvas.Canvas;
@@ -20,6 +25,8 @@ public class ForestOnTerrainView extends Region {
     private Canvas canvas = new Canvas();
     private float gridSpacing;
     private boolean useDefaultCellSize;
+    private Set<String> selectedSpecies;
+    private Supplier<Set<String>> selectedSpeciesSupplier;
 
     public ForestOnTerrainView(Forest forest, float[][] elevation, float gridSpacing) {
         this.forest = forest;
@@ -126,6 +133,13 @@ public class ForestOnTerrainView extends Region {
         g.strokeRect(0.5, 0.5, vt.widthPx - 1, vt.heightPx - 1);
     }
     
+    private void setSelectedSpecies(){
+        this.selectedSpecies = (selectedSpeciesSupplier != null) ? selectedSpeciesSupplier.get() : Collections.emptySet();
+    }
+
+    public void setSelectedSpeciesSupplier(Supplier<Set<String>> supplier){
+        this.selectedSpeciesSupplier = supplier;
+    }
     public void enableBrushRemovalMode(Supplier<Double> brushSizeSupplier){
         canvas.setOnMousePressed(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()));
         canvas.setOnMouseDragged(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()));
@@ -138,11 +152,15 @@ public class ForestOnTerrainView extends Region {
     }
 
     private void applyBrushRemoval(double brushX, double brushY, double brushSize){
-        //System.out.print("brush");
+        System.out.print("brush" + selectedSpecies);
         double brushRadiusPx = brushSizeToPixels(brushSize);
-
+        setSelectedSpecies();
         List<Plant> toRemove = new ArrayList<>();
         for(Plant p : forest.getAllPlants()){
+            if (!selectedSpecies.contains(p.getSpeciesName())){
+                continue;
+            }
+
             double xPx = vt.meterXtoPx(p.getX());
             double yPx = vt.meterYtoPx(p.getY());
             double rPx = Math.max(2.0, vt.metersToPx(p.getCanopyRadius()));
@@ -163,9 +181,6 @@ public class ForestOnTerrainView extends Region {
             System.out.print("removed " + toRemove.size() + " plants");
             draw();
         } 
-        //else {
-        //    System.out.println("none");
-        //}
     }
 
     private double brushSizeToPixels(double size){
