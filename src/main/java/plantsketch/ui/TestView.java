@@ -597,6 +597,7 @@ public class TestView extends BorderPane {
         }else{
             forestElevationView.disableBrushRemovalMode();
             forestElevationView.setCursor(Cursor.DEFAULT);  
+            console.log("\nNumber of Remaining Plants: " + currentResult.forest().getAllPlants().size());
         }
         
     }
