@@ -4,6 +4,7 @@
 package plantsketch.ui;
 
 import plantsketch.*;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -18,6 +19,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 public class Interface extends BorderPane {
     
@@ -498,13 +502,13 @@ public class Interface extends BorderPane {
         scrollPane.setPrefHeight(800);
         
         // Create species checkboxes
-        speciesCheck.put("boxwood", new CheckBox("Boxwood"));
-        speciesCheck.put("snowyMespilus", new CheckBox("Snowy Mespilus"));
-        speciesCheck.put("mountainPine", new CheckBox("Mountain Pine"));
-        speciesCheck.put("silverFir", new CheckBox("Silver Fir"));
-        speciesCheck.put("silverBirch", new CheckBox("Silver Birch"));
-        speciesCheck.put("sissileOak", new CheckBox("Sissile Oak"));
-        speciesCheck.put("europeanBeech", new CheckBox("European Beech"));
+        speciesCheck.put("Boxwood", new CheckBox("Boxwood"));
+        speciesCheck.put("Snowy Mespilus", new CheckBox("Snowy Mespilus"));
+        speciesCheck.put("Mountain Pine", new CheckBox("Mountain Pine"));
+        speciesCheck.put("Silver Fir", new CheckBox("Silver Fir"));
+        speciesCheck.put("Silver Birch", new CheckBox("Silver Birch"));
+        speciesCheck.put("Sissile Oak", new CheckBox("Sissile Oak"));
+        speciesCheck.put("European Beech", new CheckBox("European Beech"));
 
         Label temp = new Label("Temperature Slider: Min = "+ testGrid.getMinTemp() +"  ; Max = "+ testGrid.getMaxTemp());
         Slider tempSlider = new Slider(-15, 15, 0);
@@ -551,6 +555,7 @@ public class Interface extends BorderPane {
         elevationSlider.setSnapToTicks(true);
         elevationSlider.setPrefWidth(250);
 
+
         GridPane gridPane = new GridPane();
         int col = 0, row = 0;
         
@@ -563,6 +568,12 @@ public class Interface extends BorderPane {
                 row++;
             }
         }
+
+        // define the supplier that always reflects current checkbox states
+        Supplier<Set<String>> getSelectedSpecies = () -> speciesCheck.entrySet().stream()
+            .filter(entry -> entry.getValue().isSelected())
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toSet());
 
         Label brushSize = new Label("Brush Size");
         Slider brushSizeSlider = new Slider(10, 100, 50);
@@ -582,7 +593,10 @@ public class Interface extends BorderPane {
             }
         });
         Button enableBrushRemovalBtn = new Button("Toggle Brush Removal Mode");
-        enableBrushRemovalBtn.setOnAction(e -> brushRemoval(forestElevationView, brushSizeSlider));
+        enableBrushRemovalBtn.setOnAction(e -> 
+            {
+            forestElevationView.setSelectedSpeciesSupplier(getSelectedSpecies);
+            brushRemoval(forestElevationView, brushSizeSlider);});
         enableBrushRemovalBtn.setPrefWidth(250);
 
         Button simulateBtn = new Button("Selected Species Only");
@@ -633,6 +647,7 @@ public class Interface extends BorderPane {
     }
 
     private void brushRemoval(ForestOnTerrainView forestElevationView, Slider brushSizeSlider){
+        //System.out.println(forestElevationView.getSelectedSpecies());
         brushRemovalMode = !brushRemovalMode; // toggle on/off
         if (brushRemovalMode){
             forestElevationView.enableBrushRemovalMode(() -> brushSizeSlider.getValue());
