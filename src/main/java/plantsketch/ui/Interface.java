@@ -831,7 +831,7 @@ public class Interface extends BorderPane {
                         updateBrushCursor(forestTemperatureView, newVal.doubleValue());
                         break;
                     case("Sunlight"):
-                        updateBrushCursor(forestTemperatureView, newVal.doubleValue());
+                        updateBrushCursor(forestSunlightView, newVal.doubleValue());
                         break;
                     case("Moisture"):
                         updateBrushCursor(forestMoistureView, newVal.doubleValue());
