@@ -30,18 +30,4 @@ public class AbioticFactors {
         return sunlightMap;
     }
 
-    public float getAdjustedMoisture(int x, int y) {
-        // Method stub
-        return 0.0f;
-    }
-
-    public float getAdjustedTemperature(int x, int y) {
-        // Method stub
-        return 0.0f;
-    }
-
-    public float getAdjustedSunlight(int x, int y) {
-        // Method stub
-        return 0.0f;
-    }
 }
