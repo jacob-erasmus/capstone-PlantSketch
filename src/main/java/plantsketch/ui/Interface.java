@@ -46,6 +46,7 @@ public class Interface extends BorderPane {
     private ArrayList<SimulationResult> saveStatesArray = new ArrayList<>();
     private int saveState;
     private boolean isUndo;
+    private int maxSaveStates = 30;
 
     private final Runnable onBack;
     private TestGrid testGrid;
@@ -57,7 +58,6 @@ public class Interface extends BorderPane {
     // UI Components
     private final TabPane tabs = new TabPane();
     private final ConsolePane console = new ConsolePane();
-    private final VBox parameterPanel = new VBox(10);
     private final Label statusLabel = new Label();
     private final CheckBox regeneratePinkNoise = new CheckBox("Re-generate pink noise?");
     // private final CheckBox regenerateSpecies = new CheckBox("Re-generate species placement?");
@@ -395,6 +395,17 @@ public class Interface extends BorderPane {
         try {
             if (!isUndo)
             {
+                // making a new 'branch' as the user has made an edit. can no longer redo
+                
+                if(saveStatesArray.size() -1 > saveState)
+                {
+                    for (int i = saveState; i < saveStatesArray.size(); i++)
+                    {
+                        saveStatesArray.remove(i);
+                    }
+                }
+                
+
                 if(isResimulation)
                 {
                     // index of which save state it is
@@ -413,7 +424,7 @@ public class Interface extends BorderPane {
                 }
                 // adds to the current save state
                 saveStatesArray.add(currentResult);
-                if (saveStatesArray.size() > 20) // maximum 20 save states
+                if (saveStatesArray.size() > maxSaveStates) // maximum 30 save states
                 {
                     saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
                     saveState--; // the index now caps out at 20
@@ -421,6 +432,7 @@ public class Interface extends BorderPane {
                 }
             }
 
+            
 
 
             // Update grid editors with current values
@@ -458,16 +470,38 @@ public class Interface extends BorderPane {
 
     private void undo()
     {
-        if(saveStatesArray.size() > 1)
+        if(saveStatesArray.size() > 1 && saveState > 0)
         {
             isUndo = true;
 
-            saveStatesArray.remove(saveState--); // removes last saveState then decrements by 1
+            // saveStatesArray.remove(saveState--); // removes last saveState then decrements by 1
+            saveState--;
             currentResult = saveStatesArray.get(saveState);
-            this.testGrid.undo(currentResult);
+            this.testGrid.loadSaveState(currentResult);
             executeSimulation(0, true, null); // choice doesnt matter because it
         }
 
+    }
+
+    /*
+        so the way undo and redo are going to work is this:
+            say you work for 6 save states
+            then undo 2
+            you can now redo those two undos and get back to 6 save states
+            BUT
+            as soon as you make a new change it will make a new 'branch' and you lose all the old save states that you undid and you cannot redo then 
+
+     */
+    private void redo()
+    {
+        if(saveStatesArray.size() > 1 && saveState +1 < saveStatesArray.size())
+        {
+            isUndo = true;
+
+            currentResult = saveStatesArray.get(++saveState);
+            this.testGrid.loadSaveState(currentResult);
+            executeSimulation(0, true, null); // choice doesnt matter because it
+        }
     }
 
 
@@ -488,28 +522,124 @@ public class Interface extends BorderPane {
 
     private VBox buildParameterPanelRun(){
 
-        final Map<String, CheckBox> speciesCheck = new HashMap<>();
-        parameterPanel.setPadding(new Insets(10));
-        parameterPanel.setPrefWidth(500);
-        parameterPanel.setStyle("-fx-font-family: Consolas, 'Courier New', monospace; -fx-font-size: 12px;");
-        
-        Label title = new Label("Parameter Controls");
-        title.setFont(Font.font("System", FontWeight.BOLD, 14));
-        
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setContent(parameterPanel);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setPrefHeight(800);
-        
-        // Create species checkboxes
-        speciesCheck.put("Boxwood", new CheckBox("Boxwood"));
-        speciesCheck.put("Snowy Mespilus", new CheckBox("Snowy Mespilus"));
-        speciesCheck.put("Mountain Pine", new CheckBox("Mountain Pine"));
-        speciesCheck.put("Silver Fir", new CheckBox("Silver Fir"));
-        speciesCheck.put("Silver Birch", new CheckBox("Silver Birch"));
-        speciesCheck.put("Sissile Oak", new CheckBox("Sissile Oak"));
-        speciesCheck.put("European Beech", new CheckBox("European Beech"));
 
+        // putting it all together
+        VBox container = new VBox(createAbioticsPanel(), createSpeciesPanel(), createStatesPanel());
+        return container;
+
+    }
+
+    // undo and save stuff (states)
+    private ScrollPane createStatesPanel()
+    {
+
+        TextField fileNameField = new TextField();
+        fileNameField.setPromptText("Enter file name you want to give your file (do not include file type): ");
+        fileNameField.setPrefWidth(250);
+
+        Button[] stateButtons = createStateButtons(fileNameField);
+
+        // undo and save menu
+        VBox stateContent = new VBox(10);
+        stateContent.getChildren().addAll
+        (
+            new Separator(),
+            stateButtons[0],
+            new Separator(),
+            stateButtons[1],
+            new Separator(),
+            stateButtons[2],
+            fileNameField);
+
+        ScrollPane statesPane = new ScrollPane();
+        statesPane.setFitToWidth(true);
+        statesPane.setFitToHeight(true);
+        statesPane.setContent(stateContent);
+
+        return statesPane;
+    }
+
+
+    private TitledPane createSpeciesPanel()
+    {
+        // species stuff:
+        final Map<String, CheckBox> speciesCheck = new HashMap<>();
+
+        CheckBox boxwood = new CheckBox("Boxwood");
+        boxwood.setStyle("-fx-text-fill: red;");
+        speciesCheck.put("Boxwood", boxwood);
+
+        CheckBox snowyMespilus = new CheckBox("Snowy Mespilus");
+        snowyMespilus.setStyle("-fx-text-fill: blue;");
+        speciesCheck.put("Snowy Mespilus", snowyMespilus);
+
+        CheckBox mountainPine = new CheckBox("Mountain Pine");
+        mountainPine.setStyle("-fx-text-fill: green;");
+        speciesCheck.put("Mountain Pine", mountainPine);
+
+        CheckBox silverFir = new CheckBox("Silver Fir");
+        silverFir.setStyle("-fx-text-fill: purple;");
+        speciesCheck.put("Silver Fir", silverFir);
+
+        CheckBox silverBirch = new CheckBox("Silver Birch");
+        silverBirch.setStyle("-fx-text-fill: pink;");
+        speciesCheck.put("Silver Birch", silverBirch);
+
+        CheckBox sissileOak = new CheckBox("Sissile Oak");
+        sissileOak.setStyle("-fx-text-fill: orange;");
+        speciesCheck.put("Sissile Oak", sissileOak);
+
+        CheckBox europeanBeech = new CheckBox("European Beech");
+        europeanBeech.setStyle("-fx-text-fill: brown;");
+        speciesCheck.put("European Beech", europeanBeech);
+
+        Button simulateBtn = new Button("Selected Species Only");
+        simulateBtn.setOnAction(e -> removeSpecies(currentResult, speciesCheck));
+        simulateBtn.setPrefWidth(250);
+
+        
+
+        GridPane gridPane = new GridPane();
+        int col = 0, row = 0;
+        
+        for (CheckBox boxes : speciesCheck.values()) {
+            boxes.setSelected(true);
+            gridPane.add(boxes, col, row);
+            col++;
+            if (col > 1) { // wrap after 2 columns
+                col = 0;
+                row++;
+            }
+        }
+        // define the supplier that always reflects current checkbox states
+        Supplier<Set<String>> getSelectedSpecies = () -> speciesCheck.entrySet().stream()
+            .filter(entry -> entry.getValue().isSelected())
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toSet());
+        // species window
+        VBox speciesContent = new VBox(10);
+        speciesContent.getChildren().addAll
+        (
+            gridPane,
+            new Separator(),
+            simulateBtn,
+            new Separator());
+
+        ScrollPane speciesPane = new ScrollPane();
+        speciesPane.setFitToWidth(true);
+        speciesPane.setFitToHeight(true);
+        speciesPane.setContent(speciesContent);
+
+        TitledPane speciesHeader = new TitledPane("Species Editing", speciesPane);
+        speciesHeader.setExpanded(false);
+
+        return speciesHeader;
+    }
+
+
+    private TitledPane createAbioticsPanel()
+    {
+         // abiotic stuff:
         Label temp = new Label("Temperature Slider: Min = "+ testGrid.getMinTemp() +"  ; Max = "+ testGrid.getMaxTemp());
         Slider tempSlider = new Slider(-15, 15, 0);
         tempSlider.setShowTickLabels(true);
@@ -556,27 +686,9 @@ public class Interface extends BorderPane {
         elevationSlider.setPrefWidth(250);
 
 
-        GridPane gridPane = new GridPane();
-        int col = 0, row = 0;
-        
-        for (CheckBox boxes : speciesCheck.values()) {
-            boxes.setSelected(true);
-            gridPane.add(boxes, col, row);
-            col++;
-            if (col > 1) { // wrap after 2 columns
-                col = 0;
-                row++;
-            }
-        }
-
-        // define the supplier that always reflects current checkbox states
-        Supplier<Set<String>> getSelectedSpecies = () -> speciesCheck.entrySet().stream()
-            .filter(entry -> entry.getValue().isSelected())
-            .map(Map.Entry::getKey)
-            .collect(Collectors.toSet());
-
+        // brush stuff
         Label brushSize = new Label("Brush Size");
-        Slider brushSizeSlider = new Slider(10, 100, 50);
+        Slider brushSizeSlider = new Slider(10, 90, 50);
         brushSizeSlider.setShowTickLabels(true);
         brushSizeSlider.setShowTickMarks(true);
         brushSizeSlider.setMajorTickUnit(20);
@@ -599,20 +711,11 @@ public class Interface extends BorderPane {
             brushRemoval(forestElevationView, brushSizeSlider);});
         enableBrushRemovalBtn.setPrefWidth(250);
 
-        Button simulateBtn = new Button("Selected Species Only");
-        simulateBtn.setOnAction(e -> removeSpecies(currentResult, speciesCheck));
-        simulateBtn.setPrefWidth(250);
 
-        // undo button
-        Button undoButton = new Button("Undo previous change !!NO REDO!!");
-        undoButton.setOnAction(e -> undo());
-        undoButton.setPrefWidth(250);
-
-        VBox panelContent = new VBox(10);
-        panelContent.getChildren().addAll
+        // menu for abiotics
+        VBox abioticContent = new VBox(10);
+        abioticContent.getChildren().addAll
         (
-            title,
-            new Separator(),
             elevation,
             elevationSlider,
             new Separator(),
@@ -628,22 +731,20 @@ public class Interface extends BorderPane {
             moist,
             moistSlider,
             new Separator(),
-            gridPane,
-            new Separator(),
             brushSize,
             brushSizeSlider,
             enableBrushRemovalBtn,
-            new Separator(),
-            simulateBtn,
-            new Separator(),
-            undoButton);
-        
+            new Separator());
 
-        scrollPane.setContent(panelContent);
-        
-        VBox container = new VBox(scrollPane);
-        return container;
+        ScrollPane slidersPane = new ScrollPane();
+        slidersPane.setFitToWidth(true);
+        slidersPane.setFitToHeight(true);
+        slidersPane.setContent(abioticContent);
 
+        TitledPane slidersHeader = new TitledPane("Abiotics Editing & Brush", slidersPane);
+        slidersHeader.setExpanded(false);
+
+        return slidersHeader;
     }
 
     private void brushRemoval(ForestOnTerrainView forestElevationView, Slider brushSizeSlider){
@@ -699,13 +800,37 @@ public class Interface extends BorderPane {
         return (float) slider.getValue();
     }
     
+    private Button[] createStateButtons(TextField fileNameField)
+    {
+        Button undoButton = new Button("Undo previous change");
+        undoButton.setOnAction(e -> undo());
+        undoButton.setPrefWidth(250);
 
+        Button redoButton = new Button("Redo previous undo");
+        redoButton.setOnAction(e -> redo());
+        redoButton.setPrefWidth(250);
+
+        Button saveButton = new Button("Create .pdb file");
+        saveButton.setOnAction(e -> {
+            String name = fileNameField.getText().trim();
+            if (!name.isEmpty()) 
+            {
+                new EcoVizOutput(currentResult).createFile(name+".pdb");
+            }});
+
+        saveButton.setPrefWidth(250);
+
+        Button[] stateButtons = {undoButton, redoButton, saveButton};;
+        return stateButtons;
+    }
 
 //*********** TEST VIEW METHODS****************\\
 
-
+    
 
     private VBox buildParameterPanelTest() {
+
+        VBox parameterPanel = new VBox(10);
         parameterPanel.setPadding(new Insets(10));
         parameterPanel.setPrefWidth(500);
         parameterPanel.setStyle("-fx-border-color: #ca9292ff; -fx-border-width: 1;");
@@ -753,10 +878,11 @@ public class Interface extends BorderPane {
         simulateBtn.setPrefWidth(250);
         simulateBtn.setOnAction(e -> executeSimulation(0, true, null));
 
-        // undo button
-        Button undoButton = new Button("Undo previous change !!NO REDO!!");
-        undoButton.setOnAction(e -> undo());
-        undoButton.setPrefWidth(250);
+        TextField fileNameField = new TextField();
+        fileNameField.setPromptText("Enter file name you want to give your file (do not include file type): ");
+        fileNameField.setPrefWidth(250);
+
+        Button[] stateButtons = createStateButtons(fileNameField);
 
         VBox panelContent = new VBox(10);
         panelContent.getChildren().addAll
@@ -769,7 +895,12 @@ public class Interface extends BorderPane {
             // regenerateSpecies,
             simulateBtn,
             new Separator(),
-            undoButton);
+            stateButtons[0],
+            new Separator(),
+            stateButtons[1],
+            new Separator(),
+            stateButtons[2],
+            fileNameField);
         
 
         scrollPane.setContent(panelContent);
