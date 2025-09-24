@@ -148,7 +148,7 @@ public class MainApp extends Application {
         stage.setScene(scene);
     }
 
-    /** Launch the TestView with selected configuration */
+    // this is the way to enter for all the presets and testing grids
     private void launchTestView(Stage stage, String mode, boolean isTestGrid, TextField sampleField) {
 
     
@@ -172,7 +172,7 @@ public class MainApp extends Application {
         Platform.runLater(() -> theInterface.initializeWithMode(mode));
     }
 
-    /** Show the wizard for custom folder selection */
+    // this is the method to enter for the file choosing option
     private void showWizard(Stage stage, boolean isTestGrid, TextField sampleField) {
         StartupWizard wizard = new StartupWizard(stage, (dataRoot, envFolder, sampleCount) -> {
             // Create TestView with custom folder configuration

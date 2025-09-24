@@ -289,7 +289,7 @@ public class TestGrid
     // make simulation result object
     public SimulationResult makeSimResult()
     {
-        simResult = new SimulationResult(forest, pinkNoise, dimX, dimY, gridSpacing, terrain.getElevationGrid());
+        simResult = new SimulationResult(forest, pinkNoise, dimX, dimY, gridSpacing, age, terrain, abiotics);
         new EcoVizOutput(simResult).createFile("testingGrid.pdb"); // and then make the file
         return simResult;
 // could potentially use my list of plants for this instead of the species maps
@@ -346,13 +346,8 @@ public class TestGrid
         logger.accept("Recalculated " + placed + " plants with same species positions");
     }
 
-    // add setters to change the values of the maps
 
-    // add setters to change viabilities of species and stuff
-
-    // be able to select species and stuff and turn on and off
-
-    // run method 
+    // run method for if it is not the first run
     public SimulationResult runChange(boolean pinkNoise) // , boolean updateSpecies
     {
         if (pinkNoise) {
@@ -372,6 +367,23 @@ public class TestGrid
         return simResult;
     }
 
+    public void undo(SimulationResult simResult)
+    {
+        this.forest = simResult.forest();
+        this.pinkNoise = simResult.samples();
+
+        // Update the grids within existing objects instead of replacing objects
+        this.temp.setGrid(simResult.abiotics().temperatureMap.getGrid());
+        this.age.setGrid(simResult.age().getGrid());
+        this.moist.setGrid(simResult.abiotics().moistureMap.getGrid());
+        this.sun.setGrid(simResult.abiotics().sunlightMap.getGrid());
+        this.terrain.setElevationGrid(simResult.terrain().getElevationGrid());
+        
+        // Update abiotics reference
+        this.abiotics = simResult.abiotics();
+    }
+
+    // run method only for the initial run
     public SimulationResult run(int choice, String fullPath) 
     {
         if (isTestGrid)
