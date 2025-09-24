@@ -55,6 +55,7 @@ public class Interface extends BorderPane {
     private int sampleCount;
     private boolean brushRemovalMode = false;
     private ForestOnTerrainView forestElevationView;
+    Supplier<Set<String>> getSelectedSpecies;
     // UI Components
     private final TabPane tabs = new TabPane();
     private final ConsolePane console = new ConsolePane();
@@ -612,7 +613,7 @@ public class Interface extends BorderPane {
             }
         }
         // define the supplier that always reflects current checkbox states
-        Supplier<Set<String>> getSelectedSpecies = () -> speciesCheck.entrySet().stream()
+        this.getSelectedSpecies = () -> speciesCheck.entrySet().stream()
             .filter(entry -> entry.getValue().isSelected())
             .map(Map.Entry::getKey)
             .collect(Collectors.toSet());
