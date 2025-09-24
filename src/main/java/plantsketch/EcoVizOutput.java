@@ -40,9 +40,12 @@ public class EcoVizOutput {
             {
                 for (Plant p: speciesMap.getPlants())
                 {
-                    writer.printf("%d %-4s %.2f %.2f %.2f %.2f 0 0 /n", p.getId(), p.getMnemonic(), p.getX(), p.getY(), p.getHeight(), p.getCanopyRadius());
+                    writer.printf("%d %-4s %.2f %.2f %.2f %.2f 0 0\n", p.getId(), p.getMnemonic(), p.getX(), p.getY(), p.getHeight(), p.getCanopyRadius());
                 }
             }
+            writer.println("0");
+
+            System.out.println("FILE SUCCESSFULLY SAVED");
 
         } catch (IOException e) {
             e.printStackTrace();

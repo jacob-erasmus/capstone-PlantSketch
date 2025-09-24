@@ -29,15 +29,7 @@ public class Interface extends BorderPane {
 //*********** NOTES AND TO DO ****************\\
 
 // must be able to change plant variables (ie max sunlight etc)
-// BRUSH TOOL
-// must save previous values
 // must read in slider values and apply them to the maps
-// ADD FILE READING! I HAVENT ADDED FILE READING FUNCTIONALITY TO THIS YET. WHEN YOU SELECT THE CHOOSE A FILE
-    // OPTION ON MAINAPP IT USES ELLAS STARTUP WIZARD STUFF SO THE DISPLAY IS TOTALLY DIFFERENT
-// hello
-// its me and i really really want to merge please
-
-
 
 
 //*********** INSTANCE VARIABLES ****************\\
@@ -69,7 +61,6 @@ public class Interface extends BorderPane {
     // private final CheckBox regenerateSpecies = new CheckBox("Re-generate species placement?");
     
     // Grid value editors
-    private final Map<String, float[][]> currentGridValues = new HashMap<>();
     private final Map<String, GridEditor> gridEditors = new HashMap<>();
     private final Map<String, Slider> sliders = new HashMap<>();
     
@@ -613,7 +604,7 @@ public class Interface extends BorderPane {
             then undo 2
             you can now redo those two undos and get back to 6 save states
             BUT
-            as soon as you make a new change it will make a new 'branch' and you lose all the old save states that you undid and you cannot redo then 
+            as soon as you make a new change it will make a new 'branch' and you lose all the old save states that you undid and you cannot redo them
 
      */
     private void redo()
@@ -719,8 +710,6 @@ public class Interface extends BorderPane {
                 }
             removeSpecies(currentResult, speciesCheck);});
         simulateBtn.setPrefWidth(250);
-
-        
 
         GridPane gridPane = new GridPane();
         int col = 0, row = 0;
@@ -1027,7 +1016,7 @@ public class Interface extends BorderPane {
             String name = fileNameField.getText().trim();
             if (!name.isEmpty()) 
             {
-                new EcoVizOutput(currentResult).createFile(name+".pdb");
+                new EcoVizOutput(currentResult).createFile( "src/outputPdbSaves/"+ name+".pdb");
             }});
 
         saveButton.setPrefWidth(100);
