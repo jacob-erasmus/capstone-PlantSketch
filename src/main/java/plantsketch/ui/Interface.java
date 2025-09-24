@@ -173,7 +173,7 @@ public class Interface extends BorderPane {
         zoomControls.getChildren().addAll(zoomOutBtn, zoomInBtn, defaultBtn, zoomLabel);
         
         // Create the view
-        forestElevationView= new ForestOnTerrainView(currentResult.forest(), currentResult.elevationGrid(), currentResult.gridSpacing()); 
+        forestElevationView= new ForestOnTerrainView(currentResult.forest(), currentResult.terrain().getElevationGrid(), currentResult.gridSpacing()); 
         ScrollPane forestElevationPane = new ScrollPane(forestElevationView);
         forestElevationPane.setFitToHeight(false);
         forestElevationPane.setFitToWidth(false);
@@ -385,8 +385,9 @@ public class Interface extends BorderPane {
     // here is execute simulation for the first time
     private void executeSimulation(int choice, boolean isResimulation, String fullPath) {
         tabs.getTabs().clear();
-        
 
+        // do i need to clear gridEditors here?
+        
         try {
             if (!isUndo)
             {
@@ -459,7 +460,7 @@ public class Interface extends BorderPane {
 
             saveStatesArray.remove(saveState--); // removes last saveState then decrements by 1
             currentResult = saveStatesArray.get(saveState);
-            testGrid.undo(currentResult);
+            this.testGrid.undo(currentResult);
             executeSimulation(0, true, null); // choice doesnt matter because it
         }
 
@@ -564,11 +565,11 @@ public class Interface extends BorderPane {
         }
 
         Label brushSize = new Label("Brush Size");
-        Slider brushSizeSlider = new Slider(1, 5, 1);
+        Slider brushSizeSlider = new Slider(10, 100, 50);
         brushSizeSlider.setShowTickLabels(true);
         brushSizeSlider.setShowTickMarks(true);
-        brushSizeSlider.setMajorTickUnit(1);
-        brushSizeSlider.setBlockIncrement(1);
+        brushSizeSlider.setMajorTickUnit(20);
+        brushSizeSlider.setBlockIncrement(20);
         brushSizeSlider.setPrefWidth(250);
         brushSizeSlider.setSnapToTicks(true);
         brushSizeSlider.setMinorTickCount(0);
@@ -587,6 +588,11 @@ public class Interface extends BorderPane {
         Button simulateBtn = new Button("Selected Species Only");
         simulateBtn.setOnAction(e -> removeSpecies(currentResult, speciesCheck));
         simulateBtn.setPrefWidth(250);
+
+        // undo button
+        Button undoButton = new Button("Undo previous change !!NO REDO!!");
+        undoButton.setOnAction(e -> undo());
+        undoButton.setPrefWidth(250);
 
         VBox panelContent = new VBox(10);
         panelContent.getChildren().addAll
@@ -614,7 +620,9 @@ public class Interface extends BorderPane {
             brushSizeSlider,
             enableBrushRemovalBtn,
             new Separator(),
-            simulateBtn);
+            simulateBtn,
+            new Separator(),
+            undoButton);
         
 
         scrollPane.setContent(panelContent);
@@ -656,6 +664,15 @@ public class Interface extends BorderPane {
             }else if(boxes.isSelected()){
                 if(result.forest().removedSpecies.containsKey(boxes.getText())){
                     result.forest().addSpeciesMapByName(boxes.getText());
+
+                    saveState++;
+                    saveStatesArray.add(result);
+                    if (saveStatesArray.size() > 20) // maximum 20 save states
+                    {
+                        saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
+                        saveState--; // the index now caps out at 20
+
+                    }
                 }          
             }
         }

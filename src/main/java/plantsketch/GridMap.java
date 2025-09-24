@@ -52,6 +52,17 @@ public class GridMap {
     }
 
     public void setGrid(float[][] newGrid) {
+        
+        /*
+        this.grid = new float[dimX][dimY];
+        for (int x =0; x < dimX; x++)
+        {
+            for (int y =0;y < dimY; y++)
+            {
+                grid[x][y] = newGrid[x][y];
+            }
+        }
+        */
         this.grid = newGrid;
     }
 }

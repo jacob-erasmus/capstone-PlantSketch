@@ -289,8 +289,15 @@ public class TestGrid
     // make simulation result object
     public SimulationResult makeSimResult()
     {
-        simResult = new SimulationResult(forest, pinkNoise, dimX, dimY, gridSpacing, age, terrain, abiotics);
-        new EcoVizOutput(simResult).createFile("testingGrid.pdb"); // and then make the file
+        simResult = new SimulationResult(forest, pinkNoise, dimX, dimY, gridSpacing, 
+            new AgeMap(dimX, dimY, gridSpacing, age.getGrid()), 
+            new Terrain(dimX, dimY, gridSpacing, abiotics, terrain.elevationMap), 
+            new AbioticFactors(new MoistureMap (dimX, dimY, gridSpacing, abiotics.getMoistureMap().getGrid()), 
+                new TemperatureMap(dimX, dimY, gridSpacing, abiotics.getTemperatureMap().getGrid()) , 
+                new SunlightMap(dimX, dimY, gridSpacing, abiotics.getSunlightMap().getGrid())));
+
+        //commenting this out to assist with merging
+//        new EcoVizOutput(simResult).createFile("testingGrid.pdb"); // and then make the file
         return simResult;
 // could potentially use my list of plants for this instead of the species maps
     }
@@ -371,8 +378,6 @@ public class TestGrid
     {
         this.forest = simResult.forest();
         this.pinkNoise = simResult.samples();
-
-        // Update the grids within existing objects instead of replacing objects
         this.temp.setGrid(simResult.abiotics().temperatureMap.getGrid());
         this.age.setGrid(simResult.age().getGrid());
         this.moist.setGrid(simResult.abiotics().moistureMap.getGrid());
