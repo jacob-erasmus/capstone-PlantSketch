@@ -8,8 +8,11 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
+import javafx.scene.Cursor;
+import javafx.scene.ImageCursor;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -41,6 +44,8 @@ public class TestView extends BorderPane {
     private SimulationResult currentResult;
     private boolean isTestGrid;
     private int sampleCount;
+    private boolean brushRemovalMode = false;
+    private ForestOnTerrainView forestElevationView;
     // UI Components
     private final TabPane tabs = new TabPane();
     private final ConsolePane console = new ConsolePane();
@@ -162,8 +167,8 @@ public class TestView extends BorderPane {
         zoomControls.getChildren().addAll(zoomOutBtn, zoomInBtn, defaultBtn, zoomLabel);
         
         // Create the view
-        ForestOnTerrainView forestView = new ForestOnTerrainView(currentResult.forest(), currentResult.elevationGrid(), currentResult.gridSpacing()); 
-        ScrollPane forestElevationPane = new ScrollPane(forestView);
+        forestElevationView= new ForestOnTerrainView(currentResult.forest(), currentResult.elevationGrid(), currentResult.gridSpacing()); 
+        ScrollPane forestElevationPane = new ScrollPane(forestElevationView);
         forestElevationPane.setFitToHeight(false);
         forestElevationPane.setFitToWidth(false);
         forestElevationPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
@@ -173,9 +178,9 @@ public class TestView extends BorderPane {
         
         zoomInBtn.setOnAction(e -> { 
             //limit
-            if(forestView.getHeight() != 3000){
+            if(forestElevationView.getHeight() != 3000){
                 zoomLevel[0] = zoomLevel[0] * 1.2;
-                forestView.zoomIn();
+                forestElevationView.zoomIn();
                 zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100));
             }else{
                 zoomLabel.setText("Max Zoom");
@@ -183,9 +188,9 @@ public class TestView extends BorderPane {
         });
 
         zoomOutBtn.setOnAction(e -> {
-            if(forestView.getHeight() != 256){
+            if(forestElevationView.getHeight() != 256){
                 zoomLevel[0] = zoomLevel[0] / 1.2;
-                forestView.zoomOut();
+                forestElevationView.zoomOut();
                 zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100));
             }else{
                 zoomLabel.setText("Min Zoom");
@@ -194,7 +199,7 @@ public class TestView extends BorderPane {
 
         defaultBtn.setOnAction(e -> {
             zoomLevel[0] = 1.0;
-            forestView.resetToDefault();
+            forestElevationView.resetToDefault();
             zoomLabel.setText("100%");
         });
         forestElevationContainer.getChildren().addAll(zoomControls, forestElevationPane);
@@ -454,7 +459,7 @@ public class TestView extends BorderPane {
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setContent(parameterPanel);
         scrollPane.setFitToWidth(true);
-        scrollPane.setPrefHeight(700);
+        scrollPane.setPrefHeight(800);
         
         // Create species checkboxes
         speciesCheck.put("boxwood", new CheckBox("Boxwood"));
@@ -534,6 +539,15 @@ public class TestView extends BorderPane {
         brushSizeSlider.setMinorTickCount(0);
         brushSizeSlider.showTickLabelsProperty();
         
+        //listen for changes
+        brushSizeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
+            if (brushRemovalMode){
+                updateBrushCursor(forestElevationView, newVal.doubleValue());
+            }
+        });
+        Button enableBrushRemovalBtn = new Button("Toggle Brush Removal Mode");
+        enableBrushRemovalBtn.setOnAction(e -> brushRemoval(forestElevationView, brushSizeSlider));
+        enableBrushRemovalBtn.setPrefWidth(250);
 
         Button simulateBtn = new Button("Selected Species Only");
         simulateBtn.setOnAction(e -> removeSpecies(currentResult, speciesCheck));
@@ -563,6 +577,7 @@ public class TestView extends BorderPane {
             new Separator(),
             brushSize,
             brushSizeSlider,
+            enableBrushRemovalBtn,
             new Separator(),
             simulateBtn);
         
@@ -574,6 +589,31 @@ public class TestView extends BorderPane {
 
     }
 
+    private void brushRemoval(ForestOnTerrainView forestElevationView, Slider brushSizeSlider){
+        brushRemovalMode = !brushRemovalMode; // toggle on/off
+        if (brushRemovalMode){
+            forestElevationView.enableBrushRemovalMode(() -> brushSizeSlider.getValue());
+            updateBrushCursor(forestElevationView, brushSizeSlider.getValue());
+        }else{
+            forestElevationView.disableBrushRemovalMode();
+            forestElevationView.setCursor(Cursor.DEFAULT);  
+            console.log("\nNumber of Remaining Plants: " + currentResult.forest().getAllPlants().size());
+        }
+        
+    }
+
+    private void updateBrushCursor(ForestOnTerrainView forestElevationView, double brushSize){
+//image as cursor - some glitches so commented out for now.
+//Will fix/improve.
+        //Image brushImage = new Image(getClass().getResource("/101064.png").toExternalForm());
+        //double scale = brushSize;
+        //Image scaledImg = new Image(brushImage.getUrl(), brushImage.getWidth() * scale, brushImage.getHeight() * scale, true, true);
+        //forestElevationView.setCursor(new ImageCursor(scaledImg, scaledImg.getWidth()/2, scaledImg.getHeight()/2));
+//basic crosshair cursor but no visual resize shown but functionally yes. 
+        forestElevationView.setCursor(Cursor.CROSSHAIR);
+
+        
+    }
     private void removeSpecies(SimulationResult result, Map<String, CheckBox> speciesCheck){
         for (CheckBox boxes : speciesCheck.values()) {
             if(boxes.isSelected()!=true && result.forest().removedSpecies.containsKey(boxes.getText()) != true){

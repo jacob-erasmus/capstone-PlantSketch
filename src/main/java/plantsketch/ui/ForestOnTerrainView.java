@@ -1,6 +1,11 @@
 package plantsketch.ui;
 
 import plantsketch.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
+
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ScrollPane;
@@ -46,7 +51,7 @@ public class ForestOnTerrainView extends Region {
     public void zoomIn(){
         int dimX = elevation.length;
         int dimY = elevation[0].length;
-        //increase render by 20% (capped at 3000px)
+        //increase render by 20% (capped at 3000)
         double currentSize = Math.max(vt.widthPx, vt.heightPx);
         double newSize = Math.min(currentSize * 1.2, 3000);
         this.vt = new ViewTransform(dimX, dimY, gridSpacing, newSize, newSize, useDefaultCellSize);
@@ -56,7 +61,7 @@ public class ForestOnTerrainView extends Region {
     public void zoomOut(){
         int dimX = elevation.length;
         int dimY = elevation[0].length;
-        //decrease render by 20% (capped at 80% of original)
+        //decrease render by 20% (capped at 256)
         double currentSize = Math.max(vt.widthPx, vt.heightPx);
         double newSize = Math.max(currentSize / 1.2, 256);
         this.vt = new ViewTransform(dimX, dimY, gridSpacing, newSize, newSize, useDefaultCellSize);
@@ -71,24 +76,7 @@ public class ForestOnTerrainView extends Region {
         updateRegionSize();
         draw();
     }
-    private void updateSize(){
-        double width = getWidth();
-        double height = getHeight();
-        if(width > 0 && height > 0){
-            //scale to fit viewtransform
-            int dimX = elevation.length;
-            int dimY = elevation[0].length;
-            this.vt = new ViewTransform(dimX, dimY, gridSpacing, width, height, useDefaultCellSize);
-            // Update canvas size
-            canvas.setWidth(vt.widthPx);
-            canvas.setHeight(vt.heightPx);
-            canvas.setLayoutX(0);
-            canvas.setLayoutY(0);
-            setPrefSize(vt.widthPx, vt.heightPx);
-            // Redraw with new dimensions
-            draw();
-        }
-    }
+
     private static Color parseColour(String hexOrName) {
         try { return Color.web(hexOrName); } catch (Exception e) { return Color.LIMEGREEN; }
     }
@@ -136,6 +124,52 @@ public class ForestOnTerrainView extends Region {
 
         g.setStroke(Color.BLACK);
         g.strokeRect(0.5, 0.5, vt.widthPx - 1, vt.heightPx - 1);
+    }
+    
+    public void enableBrushRemovalMode(Supplier<Double> brushSizeSupplier){
+        canvas.setOnMousePressed(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()));
+        canvas.setOnMouseDragged(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()));
+    }
+
+    public void disableBrushRemovalMode(){
+        canvas.setOnMousePressed(null);
+        canvas.setOnMouseDragged(null);
+        canvas.setOnMouseReleased(null);
+    }
+
+    private void applyBrushRemoval(double brushX, double brushY, double brushSize){
+        //System.out.print("brush");
+        double brushRadiusPx = brushSizeToPixels(brushSize);
+
+        List<Plant> toRemove = new ArrayList<>();
+        for(Plant p : forest.getAllPlants()){
+            double xPx = vt.meterXtoPx(p.getX());
+            double yPx = vt.meterYtoPx(p.getY());
+            double rPx = Math.max(2.0, vt.metersToPx(p.getCanopyRadius()));
+            //swapped so same as draw method
+            double dx = brushX - yPx;
+            double dy = brushY - xPx;
+            double dist = Math.hypot(dx,dy);
+            //if plant canopy contacts brush radius
+            if(dist <= (brushRadiusPx + rPx)){
+                toRemove.add(p);
+            }
+        }
+        if (!toRemove.isEmpty()){
+            for(Plant p : toRemove){
+                forest.removePlant(p);
+                //System.out.print("plant removed" + p);
+            }
+            System.out.print("removed " + toRemove.size() + " plants");
+            draw();
+        } 
+        //else {
+        //    System.out.println("none");
+        //}
+    }
+
+    private double brushSizeToPixels(double size){
+        return size * vt.cellPx;
     }
 
     @Override protected void layoutChildren() { canvas.relocate(0, 0); }

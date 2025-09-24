@@ -66,4 +66,8 @@ public final class ViewTransform {
 
     // --- meters → pixels for sizes (e.g., radius) ---
     public double metersToPx(double meters) { return (meters / gridSpacing) * cellPx; }
+
+    // --- pixels -> meters ---
+    public double pxToMeterX(double xPx) { return (xPx / cellPx) * gridSpacing; }
+    public double pxToMeterY(double yPx) { return (yPx / cellPx) * gridSpacing; }
 }
