@@ -5,6 +5,8 @@
 
 *.pdb
 
+output.pdb
+
 AGENTS.md
 # === IntelliJ / Eclipse / VSCode project files ===
 .idea/

@@ -23,8 +23,7 @@ public class FileManager {
     private int dimX;
     private int dimY;
 
-    private float[][] temperatureGrid; // We are going to store the maps here and have getters to get them after
-                                       // running the program
+    private float[][] temperatureGrid; // We are going to store the maps here and have getters to get them after// running the program
     private float[][] moistureGrid;
     private float[][] sunlightGrid;
     private float[][] elevationGrid;
@@ -54,8 +53,6 @@ public class FileManager {
 
                         if (name.endsWith(".elv")) {
                             System.out.println("Loading Elevation file: " + name);
-                            // going to have to change terrain constructoe to take in grid[][]
-                            // and to take in grid spacing, dimensions and yeah
                             elevationGrid = loadElv(file);
                             System.out.println(name + " Loaded :)");
                         }
@@ -70,7 +67,6 @@ public class FileManager {
                             if (name.contains("sun")) {
                                 System.out.println("Loading Sunlight File: " + name);
                                 sunlightGrid = loadTxt(file);
-                                // now edit constructors to allow accepting grid[][]
                                 System.out.println(name + " Loaded :)");
                             }
 
