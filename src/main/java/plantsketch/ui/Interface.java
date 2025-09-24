@@ -53,7 +53,6 @@ public class Interface extends BorderPane {
     // UI Components
     private final TabPane tabs = new TabPane();
     private final ConsolePane console = new ConsolePane();
-    private final VBox parameterPanel = new VBox(10);
     private final Label statusLabel = new Label();
     private final CheckBox regeneratePinkNoise = new CheckBox("Re-generate pink noise?");
     // private final CheckBox regenerateSpecies = new CheckBox("Re-generate species placement?");
@@ -484,28 +483,127 @@ public class Interface extends BorderPane {
 
     private VBox buildParameterPanelRun(){
 
-        final Map<String, CheckBox> speciesCheck = new HashMap<>();
-        parameterPanel.setPadding(new Insets(10));
-        parameterPanel.setPrefWidth(500);
-        parameterPanel.setStyle("-fx-font-family: Consolas, 'Courier New', monospace; -fx-font-size: 12px;");
-        
-        Label title = new Label("Parameter Controls");
-        title.setFont(Font.font("System", FontWeight.BOLD, 14));
-        
-        ScrollPane scrollPane = new ScrollPane();
-        scrollPane.setContent(parameterPanel);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setPrefHeight(800);
-        
-        // Create species checkboxes
-        speciesCheck.put("boxwood", new CheckBox("Boxwood"));
-        speciesCheck.put("snowyMespilus", new CheckBox("Snowy Mespilus"));
-        speciesCheck.put("mountainPine", new CheckBox("Mountain Pine"));
-        speciesCheck.put("silverFir", new CheckBox("Silver Fir"));
-        speciesCheck.put("silverBirch", new CheckBox("Silver Birch"));
-        speciesCheck.put("sissileOak", new CheckBox("Sissile Oak"));
-        speciesCheck.put("europeanBeech", new CheckBox("European Beech"));
+        // putting it all together
+        VBox container = new VBox(createAbioticsPanel(), createSpeciesPanel(), createStatesPanel());
+        return container;
 
+    }
+
+    // undo and save stuff (states)
+    private ScrollPane createStatesPanel()
+    {
+
+        Button undoButton = new Button("Undo previous change !!NO REDO!!");
+        undoButton.setOnAction(e -> undo());
+        undoButton.setPrefWidth(250);
+
+        TextField fileNameField = new TextField();
+        fileNameField.setPromptText("Enter file name you want to give your file (do not includ file type): ");
+        fileNameField.setPrefWidth(250);
+
+        Button saveButton = new Button("Create .pdb file");
+        saveButton.setOnAction(e -> {
+            String name = fileNameField.getText().trim();
+            if (!name.isEmpty()) 
+            {
+                new EcoVizOutput(currentResult).createFile(name+".pdb");
+            }});
+
+        saveButton.setPrefWidth(250);
+
+        // undo and save menu
+        VBox stateContent = new VBox(10);
+        stateContent.getChildren().addAll
+        (
+            undoButton,
+            new Separator(),
+            saveButton,
+            fileNameField);
+
+        ScrollPane statesPane = new ScrollPane();
+        statesPane.setFitToWidth(true);
+        statesPane.setFitToHeight(true);
+        statesPane.setContent(stateContent);
+
+        return statesPane;
+    }
+
+
+    private TitledPane createSpeciesPanel()
+    {
+        // species stuff:
+        final Map<String, CheckBox> speciesCheck = new HashMap<>();
+
+        CheckBox boxwood = new CheckBox("Boxwood");
+        boxwood.setStyle("-fx-text-fill: red;");
+        speciesCheck.put("boxwood", boxwood);
+
+        CheckBox snowyMespilus = new CheckBox("Snowy Mespilus");
+        snowyMespilus.setStyle("-fx-text-fill: blue;");
+        speciesCheck.put("snowyMespilus", snowyMespilus);
+
+        CheckBox mountainPine = new CheckBox("Mountain Pine");
+        mountainPine.setStyle("-fx-text-fill: green;");
+        speciesCheck.put("mountainPine", mountainPine);
+
+        CheckBox silverFir = new CheckBox("Silver Fir");
+        silverFir.setStyle("-fx-text-fill: purple;");
+        speciesCheck.put("silverFir", silverFir);
+
+        CheckBox silverBirch = new CheckBox("Silver Birch");
+        silverBirch.setStyle("-fx-text-fill: pink;");
+        speciesCheck.put("silverBirch", silverBirch);
+
+        CheckBox sissileOak = new CheckBox("Sissile Oak");
+        sissileOak.setStyle("-fx-text-fill: orange;");
+        speciesCheck.put("sissileOak", sissileOak);
+
+        CheckBox europeanBeech = new CheckBox("European Beech");
+        europeanBeech.setStyle("-fx-text-fill: brown;");
+        speciesCheck.put("europeanBeech", europeanBeech);
+
+        Button simulateBtn = new Button("Selected Species Only");
+        simulateBtn.setOnAction(e -> removeSpecies(currentResult, speciesCheck));
+        simulateBtn.setPrefWidth(250);
+
+        
+
+        GridPane gridPane = new GridPane();
+        int col = 0, row = 0;
+        
+        for (CheckBox boxes : speciesCheck.values()) {
+            boxes.setSelected(true);
+            gridPane.add(boxes, col, row);
+            col++;
+            if (col > 1) { // wrap after 2 columns
+                col = 0;
+                row++;
+            }
+        }
+
+        // species window
+        VBox speciesContent = new VBox(10);
+        speciesContent.getChildren().addAll
+        (
+            gridPane,
+            new Separator(),
+            simulateBtn);
+
+        ScrollPane speciesPane = new ScrollPane();
+        speciesPane.setFitToWidth(true);
+        speciesPane.setFitToHeight(true);
+        speciesPane.setContent(speciesContent);
+
+        TitledPane speciesHeader = new TitledPane("Species Editing", speciesPane);
+        speciesHeader.setExpanded(false);
+
+        return speciesHeader;
+    }
+
+
+    private TitledPane createAbioticsPanel()
+    {
+         // abiotic stuff:
         Label temp = new Label("Temperature Slider: Min = "+ testGrid.getMinTemp() +"  ; Max = "+ testGrid.getMaxTemp());
         Slider tempSlider = new Slider(-15, 15, 0);
         tempSlider.setShowTickLabels(true);
@@ -551,21 +649,9 @@ public class Interface extends BorderPane {
         elevationSlider.setSnapToTicks(true);
         elevationSlider.setPrefWidth(250);
 
-        GridPane gridPane = new GridPane();
-        int col = 0, row = 0;
-        
-        for (CheckBox boxes : speciesCheck.values()) {
-            boxes.setSelected(true);
-            gridPane.add(boxes, col, row);
-            col++;
-            if (col > 1) { // wrap after 2 columns
-                col = 0;
-                row++;
-            }
-        }
-
+        // brush stuff
         Label brushSize = new Label("Brush Size");
-        Slider brushSizeSlider = new Slider(10, 100, 50);
+        Slider brushSizeSlider = new Slider(10, 90, 50);
         brushSizeSlider.setShowTickLabels(true);
         brushSizeSlider.setShowTickMarks(true);
         brushSizeSlider.setMajorTickUnit(20);
@@ -585,20 +671,11 @@ public class Interface extends BorderPane {
         enableBrushRemovalBtn.setOnAction(e -> brushRemoval(forestElevationView, brushSizeSlider));
         enableBrushRemovalBtn.setPrefWidth(250);
 
-        Button simulateBtn = new Button("Selected Species Only");
-        simulateBtn.setOnAction(e -> removeSpecies(currentResult, speciesCheck));
-        simulateBtn.setPrefWidth(250);
 
-        // undo button
-        Button undoButton = new Button("Undo previous change !!NO REDO!!");
-        undoButton.setOnAction(e -> undo());
-        undoButton.setPrefWidth(250);
-
-        VBox panelContent = new VBox(10);
-        panelContent.getChildren().addAll
+        // menu for abiotics
+        VBox abioticContent = new VBox(10);
+        abioticContent.getChildren().addAll
         (
-            title,
-            new Separator(),
             elevation,
             elevationSlider,
             new Separator(),
@@ -614,22 +691,19 @@ public class Interface extends BorderPane {
             moist,
             moistSlider,
             new Separator(),
-            gridPane,
-            new Separator(),
             brushSize,
             brushSizeSlider,
-            enableBrushRemovalBtn,
-            new Separator(),
-            simulateBtn,
-            new Separator(),
-            undoButton);
-        
+            enableBrushRemovalBtn);
 
-        scrollPane.setContent(panelContent);
-        
-        VBox container = new VBox(scrollPane);
-        return container;
+        ScrollPane slidersPane = new ScrollPane();
+        slidersPane.setFitToWidth(true);
+        slidersPane.setFitToHeight(true);
+        slidersPane.setContent(abioticContent);
 
+        TitledPane slidersHeader = new TitledPane("Abiotics Editing & Brush", slidersPane);
+        slidersHeader.setExpanded(false);
+
+        return slidersHeader;
     }
 
     private void brushRemoval(ForestOnTerrainView forestElevationView, Slider brushSizeSlider){
@@ -691,6 +765,8 @@ public class Interface extends BorderPane {
 
 
     private VBox buildParameterPanelTest() {
+
+        VBox parameterPanel = new VBox(10);
         parameterPanel.setPadding(new Insets(10));
         parameterPanel.setPrefWidth(500);
         parameterPanel.setStyle("-fx-border-color: #ca9292ff; -fx-border-width: 1;");

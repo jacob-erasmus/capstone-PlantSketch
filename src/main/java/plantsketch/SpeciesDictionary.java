@@ -116,7 +116,7 @@ public class SpeciesDictionary {
                 "qupe",
                 sissileOakViabilityParameters,
                 sissileOakGrowthParameters,
-                "Yellow",
+                "Orange",
                 0.38f,
                 0.21f,
                 0.35f,
