@@ -9,5 +9,7 @@ public record SimulationResult(
         int dimX,
         int dimY,
         float gridSpacing,
-        float[][] elevationGrid
+        AgeMap age,
+        Terrain terrain,
+        AbioticFactors abiotics
 ) {}

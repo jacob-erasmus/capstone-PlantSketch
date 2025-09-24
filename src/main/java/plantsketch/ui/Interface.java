@@ -15,6 +15,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +37,12 @@ public class Interface extends BorderPane {
 
 
 //*********** INSTANCE VARIABLES ****************\\
+    
+
+    private ArrayList<SimulationResult> saveStatesArray = new ArrayList<>();
+    private int saveState;
+    private boolean isUndo;
+
     private final Runnable onBack;
     private TestGrid testGrid;
     private SimulationResult currentResult;
@@ -62,6 +69,8 @@ public class Interface extends BorderPane {
         this.sampleCount = sampleCount;
         this.testGrid = new TestGrid(console::log, isTestGrid, sampleCount);
         this.isTestGrid = isTestGrid;
+        isUndo = false;
+        saveState = 0;
         
         setupUI(mode);
         console.hookSystemStreams();
@@ -164,7 +173,7 @@ public class Interface extends BorderPane {
         zoomControls.getChildren().addAll(zoomOutBtn, zoomInBtn, defaultBtn, zoomLabel);
         
         // Create the view
-        forestElevationView= new ForestOnTerrainView(currentResult.forest(), currentResult.elevationGrid(), currentResult.gridSpacing()); 
+        forestElevationView= new ForestOnTerrainView(currentResult.forest(), currentResult.terrain().getElevationGrid(), currentResult.gridSpacing()); 
         ScrollPane forestElevationPane = new ScrollPane(forestElevationView);
         forestElevationPane.setFitToHeight(false);
         forestElevationPane.setFitToWidth(false);
@@ -376,23 +385,39 @@ public class Interface extends BorderPane {
     // here is execute simulation for the first time
     private void executeSimulation(int choice, boolean isResimulation, String fullPath) {
         tabs.getTabs().clear();
-        
 
+        // do i need to clear gridEditors here?
+        
         try {
-            if(isResimulation)
+            if (!isUndo)
             {
-                console.log("Re-simulating with new parameters...");
-            
-                boolean wasChange = readGridEditors();
-                // Update TestGrid with new values
-                if (regeneratePinkNoise.isSelected()) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected()); // if need to regenerate pink noise
-                else if (wasChange) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected()); // if there was actually a change to anything
+                if(isResimulation)
+                {
+                    // index of which save state it is
+                    saveState++;
+                    console.log("Re-simulating with new parameters...");
+                
+                    boolean wasChange = readGridEditors();
+                    // Update TestGrid with new values
+                    if (regeneratePinkNoise.isSelected()) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected()); // if need to regenerate pink noise
+                    else if (wasChange) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected()); // if there was actually a change to anything
+                }
+                else
+                {
+                    currentResult = testGrid.run(choice, fullPath);
+                
+                }
+                // adds to the current save state
+                saveStatesArray.add(currentResult);
+                if (saveStatesArray.size() > 20) // maximum 20 save states
+                {
+                    saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
+                    saveState--; // the index now caps out at 20
+
+                }
             }
-            else
-            {
-                currentResult = testGrid.run(choice, fullPath);
-            
-            }
+
+
 
             // Update grid editors with current values
             if (isTestGrid) updateGridEditors();
@@ -401,7 +426,7 @@ public class Interface extends BorderPane {
             createTabs();
             
             if (isTestGrid) updateStatusDisplay();
-            console.log("✓ Test simulation complete. Plants placed: " + currentResult.forest().getAllPlants().size());
+            console.log("✓ Simulation complete. Plants placed: " + currentResult.forest().getAllPlants().size());
 
             int numSpecies = 0;
             for (SpeciesMap sm : currentResult.forest().getOverallSpeciesMap()) 
@@ -411,6 +436,7 @@ public class Interface extends BorderPane {
             }
             
             console.log("Number of species: " + numSpecies);
+            isUndo = false;
             updateVisualization();
 
         } catch (Exception ex) 
@@ -426,6 +452,19 @@ public class Interface extends BorderPane {
         return t;
     }
 
+    private void undo()
+    {
+        if(saveStatesArray.size() > 1)
+        {
+            isUndo = true;
+
+            saveStatesArray.remove(saveState--); // removes last saveState then decrements by 1
+            currentResult = saveStatesArray.get(saveState);
+            this.testGrid.undo(currentResult);
+            executeSimulation(0, true, null); // choice doesnt matter because it
+        }
+
+    }
 
 
 //*********** RUN VIEW METHODS ****************\\
@@ -526,11 +565,11 @@ public class Interface extends BorderPane {
         }
 
         Label brushSize = new Label("Brush Size");
-        Slider brushSizeSlider = new Slider(1, 5, 1);
+        Slider brushSizeSlider = new Slider(10, 100, 50);
         brushSizeSlider.setShowTickLabels(true);
         brushSizeSlider.setShowTickMarks(true);
-        brushSizeSlider.setMajorTickUnit(1);
-        brushSizeSlider.setBlockIncrement(1);
+        brushSizeSlider.setMajorTickUnit(20);
+        brushSizeSlider.setBlockIncrement(20);
         brushSizeSlider.setPrefWidth(250);
         brushSizeSlider.setSnapToTicks(true);
         brushSizeSlider.setMinorTickCount(0);
@@ -549,6 +588,11 @@ public class Interface extends BorderPane {
         Button simulateBtn = new Button("Selected Species Only");
         simulateBtn.setOnAction(e -> removeSpecies(currentResult, speciesCheck));
         simulateBtn.setPrefWidth(250);
+
+        // undo button
+        Button undoButton = new Button("Undo previous change !!NO REDO!!");
+        undoButton.setOnAction(e -> undo());
+        undoButton.setPrefWidth(250);
 
         VBox panelContent = new VBox(10);
         panelContent.getChildren().addAll
@@ -576,7 +620,9 @@ public class Interface extends BorderPane {
             brushSizeSlider,
             enableBrushRemovalBtn,
             new Separator(),
-            simulateBtn);
+            simulateBtn,
+            new Separator(),
+            undoButton);
         
 
         scrollPane.setContent(panelContent);
@@ -618,6 +664,15 @@ public class Interface extends BorderPane {
             }else if(boxes.isSelected()){
                 if(result.forest().removedSpecies.containsKey(boxes.getText())){
                     result.forest().addSpeciesMapByName(boxes.getText());
+
+                    saveState++;
+                    saveStatesArray.add(result);
+                    if (saveStatesArray.size() > 20) // maximum 20 save states
+                    {
+                        saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
+                        saveState--; // the index now caps out at 20
+
+                    }
                 }          
             }
         }
@@ -683,6 +738,11 @@ public class Interface extends BorderPane {
         simulateBtn.setPrefWidth(250);
         simulateBtn.setOnAction(e -> executeSimulation(0, true, null));
 
+        // undo button
+        Button undoButton = new Button("Undo previous change !!NO REDO!!");
+        undoButton.setOnAction(e -> undo());
+        undoButton.setPrefWidth(250);
+
         VBox panelContent = new VBox(10);
         panelContent.getChildren().addAll
         (
@@ -692,7 +752,9 @@ public class Interface extends BorderPane {
             new Separator(),
             regeneratePinkNoise,
             // regenerateSpecies,
-            simulateBtn);
+            simulateBtn,
+            new Separator(),
+            undoButton);
         
 
         scrollPane.setContent(panelContent);
@@ -704,12 +766,25 @@ public class Interface extends BorderPane {
     // puts in the values for the right tab
     private void updateGridEditors() 
     {
-        gridEditors.get("Temperature").setValues(testGrid.getTemperatureGrid());
+
+        float[][] tempGrid = testGrid.getTemperatureGrid();
+        System.out.println("Updating temp grid: " + tempGrid[0][0] + ", " + tempGrid[0][1]); // Debug
+
+        gridEditors.get("Temperature").setValues(tempGrid);
         gridEditors.get("Age").setValues(testGrid.getAgeGrid());
         gridEditors.get("Moisture").setValues(testGrid.getMoistureGrid());
         gridEditors.get("Sunlight").setValues(testGrid.getSunlightGrid());
         gridEditors.get("Elevation").setValues(testGrid.getElevationGrid());
         gridEditors.get("Slope").setValues(testGrid.getSlopeGrid());
+
+        /*
+        gridEditors.get("Temperature").setValues(currentResult.temp().getGrid());
+        gridEditors.get("Age").setValues(currentResult.age().getGrid());
+        gridEditors.get("Moisture").setValues(currentResult.moist().getGrid());
+        gridEditors.get("Sunlight").setValues(currentResult.sun().getGrid());
+        gridEditors.get("Elevation").setValues(currentResult.terrain().getElevationGrid());
+        gridEditors.get("Slope").setValues(currentResult.terrain().getSlopeGrid());
+         */
     }
 
     // reads in values from the screen grids
