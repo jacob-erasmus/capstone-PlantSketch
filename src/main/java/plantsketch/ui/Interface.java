@@ -50,7 +50,7 @@ public class Interface extends BorderPane {
     private boolean isTestGrid;
     private int sampleCount;
     private boolean brushRemovalMode = false;
-    private ForestOnTerrainView forestElevationView;
+    private ForestOnMapView forestElevationView;
     // UI Components
     private final TabPane tabs = new TabPane();
     private final ConsolePane console = new ConsolePane();
@@ -154,14 +154,17 @@ public class Interface extends BorderPane {
     public void createTabs()
     {
         tabs.getTabs().clear();
-        createForestElevationTab();
+        createForestOnMapTab(currentResult.terrain().getElevationGrid(), "Elevation");
+        createForestOnMapTab(currentResult.abiotics().getMoistureMap().getGrid(), "Moisture");
+        createForestOnMapTab(currentResult.abiotics().getSunlightMap().getGrid(), "Sunlight");
+        createForestOnMapTab(currentResult.abiotics().getTemperatureMap().getGrid(), "Temperature");
         createPinkNoiseTab();
         createForestTab();
 
     }
     
     // Create Forest + Elevation tab with zoom controls
-    private void createForestElevationTab(){
+    private void createForestOnMapTab(float[][] map, String mapType){
         VBox forestElevationContainer = new VBox(5);
         HBox zoomControls = new HBox(10);
         zoomControls.setAlignment(Pos.CENTER_LEFT);
@@ -179,7 +182,7 @@ public class Interface extends BorderPane {
         zoomControls.getChildren().addAll(zoomOutBtn, zoomInBtn, defaultBtn, zoomLabel);
         
         // Create the view
-        forestElevationView= new ForestOnTerrainView(currentResult.forest(), currentResult.terrain().getElevationGrid(), currentResult.gridSpacing()); 
+        forestElevationView= new ForestOnMapView(currentResult.forest(), map, currentResult.gridSpacing()); 
         ScrollPane forestElevationPane = new ScrollPane(forestElevationView);
         forestElevationPane.setFitToHeight(false);
         forestElevationPane.setFitToWidth(false);
@@ -216,7 +219,7 @@ public class Interface extends BorderPane {
         });
         forestElevationContainer.getChildren().addAll(zoomControls, forestElevationPane);
         VBox.setVgrow(forestElevationPane, Priority.ALWAYS);
-        tabs.getTabs().add(makeTab("Forest + Elevation", forestElevationContainer));
+        tabs.getTabs().add(makeTab(mapType, forestElevationContainer));
     }
 
     // Create Pink Noise tab with zoom controls
@@ -535,23 +538,13 @@ public class Interface extends BorderPane {
     private ScrollPane createStatesPanel()
     {
 
-        TextField fileNameField = new TextField();
-        fileNameField.setPromptText("Enter file name you want to give your file (do not include file type): ");
-        fileNameField.setPrefWidth(250);
-
-        Button[] stateButtons = createStateButtons(fileNameField);
+        HBox stateButtons = createStateButtons();
 
         // undo and save menu
         VBox stateContent = new VBox(10);
         stateContent.getChildren().addAll
         (
-            new Separator(),
-            stateButtons[0],
-            new Separator(),
-            stateButtons[1],
-            new Separator(),
-            stateButtons[2],
-            fileNameField);
+            stateButtons);
 
         ScrollPane statesPane = new ScrollPane();
         statesPane.setFitToWidth(true);
@@ -739,7 +732,7 @@ public class Interface extends BorderPane {
         return slidersHeader;
     }
 
-    private void brushRemoval(ForestOnTerrainView forestElevationView, Slider brushSizeSlider){
+    private void brushRemoval(ForestOnMapView forestElevationView, Slider brushSizeSlider){
         brushRemovalMode = !brushRemovalMode; // toggle on/off
         if (brushRemovalMode){
             forestElevationView.enableBrushRemovalMode(() -> brushSizeSlider.getValue());
@@ -752,7 +745,7 @@ public class Interface extends BorderPane {
         
     }
 
-    private void updateBrushCursor(ForestOnTerrainView forestElevationView, double brushSize){
+    private void updateBrushCursor(ForestOnMapView forestElevationView, double brushSize){
 //image as cursor - some glitches so commented out for now.
 //Will fix/improve.
         //Image brushImage = new Image(getClass().getResource("/101064.png").toExternalForm());
@@ -792,15 +785,19 @@ public class Interface extends BorderPane {
         return (float) slider.getValue();
     }
     
-    private Button[] createStateButtons(TextField fileNameField)
+    private HBox createStateButtons()
     {
-        Button undoButton = new Button("Undo previous change");
+        Button undoButton = new Button("Undo");
         undoButton.setOnAction(e -> undo());
-        undoButton.setPrefWidth(250);
+        undoButton.setPrefWidth(60);
 
-        Button redoButton = new Button("Redo previous undo");
+        Button redoButton = new Button("Redo");
         redoButton.setOnAction(e -> redo());
-        redoButton.setPrefWidth(250);
+        redoButton.setPrefWidth(60);
+
+        TextField fileNameField = new TextField();
+        fileNameField.setPromptText("Enter file name:");
+        fileNameField.setPrefWidth(120);
 
         Button saveButton = new Button("Create .pdb file");
         saveButton.setOnAction(e -> {
@@ -810,10 +807,15 @@ public class Interface extends BorderPane {
                 new EcoVizOutput(currentResult).createFile(name+".pdb");
             }});
 
-        saveButton.setPrefWidth(250);
+        saveButton.setPrefWidth(100);
 
-        Button[] stateButtons = {undoButton, redoButton, saveButton};;
-        return stateButtons;
+        Button[] stateButtons = {undoButton, redoButton, saveButton};
+
+        HBox stateButtonRow = new HBox(5); // spacing of 5px between buttons
+        stateButtonRow.getChildren().addAll(stateButtons);
+        stateButtonRow.getChildren().add(fileNameField);
+
+        return stateButtonRow;
     }
 
 
@@ -870,11 +872,7 @@ public class Interface extends BorderPane {
         simulateBtn.setPrefWidth(250);
         simulateBtn.setOnAction(e -> executeSimulation(0, true, null));
 
-        TextField fileNameField = new TextField();
-        fileNameField.setPromptText("Enter file name you want to give your file (do not include file type): ");
-        fileNameField.setPrefWidth(250);
-
-        Button[] stateButtons = createStateButtons(fileNameField);
+        HBox stateButtons = createStateButtons();
 
         VBox panelContent = new VBox(10);
         panelContent.getChildren().addAll
@@ -886,13 +884,7 @@ public class Interface extends BorderPane {
             regeneratePinkNoise,
             // regenerateSpecies,
             simulateBtn,
-            new Separator(),
-            stateButtons[0],
-            new Separator(),
-            stateButtons[1],
-            new Separator(),
-            stateButtons[2],
-            fileNameField);
+            stateButtons);
         
 
         scrollPane.setContent(panelContent);
