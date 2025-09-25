@@ -153,6 +153,7 @@ public class ForestOnMapView extends Region {
 
     private void applyBrushRemoval(double brushX, double brushY, double brushSize){
         //System.out.print("brush" + selectedSpecies);
+        long brushRemovalStartTime = System.nanoTime();
         double brushRadiusPx = brushSizeToPixels(brushSize);
         setSelectedSpecies();
         List<Plant> toRemove = new ArrayList<>();
@@ -178,8 +179,8 @@ public class ForestOnMapView extends Region {
                 forest.removePlant(p);
                 //System.out.print("plant removed" + p);
             }
-            System.out.print("removed " + toRemove.size() + " plants");
             draw();
+            System.out.println("Apply Brush Removal Elapsed Time: " + (System.nanoTime() - brushRemovalStartTime) + " (nanoseconds). Removed " + toRemove.size() + " plants");
         } 
     }
 

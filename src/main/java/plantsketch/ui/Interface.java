@@ -987,6 +987,7 @@ public class Interface extends BorderPane {
     }
     
     private void removeSpecies(SimulationResult result, Map<String, CheckBox> speciesCheck){
+        long startTime = System.nanoTime();
         for (CheckBox boxes : speciesCheck.values()) {
             if(boxes.isSelected()!=true && result.forest().removedSpecies.containsKey(boxes.getText()) != true){
                 result.forest().removeSpecies(boxes.getText());
@@ -999,6 +1000,7 @@ public class Interface extends BorderPane {
             }
         }
         createTabs();
+        console.log("Species Filter Remove and Visualise Elapsed Time: " + (System.nanoTime() - startTime) + " nanoseconds.");
     }
 
     public float readSlider(Slider slider)
