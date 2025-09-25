@@ -1,10 +1,7 @@
 
-// this class is the gui for the testing grid (2x2)
-
 package plantsketch.ui;
 
 import plantsketch.*;
-import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -30,6 +27,8 @@ public class Interface extends BorderPane {
 
 // must be able to change plant variables (ie max sunlight etc)
 // must read in slider values and apply them to the maps
+// edit species variables.
+// i have added getters and setters so i simply need to just edit speciesList values in TestGrid
 
 
 //*********** INSTANCE VARIABLES ****************\\

@@ -445,7 +445,7 @@ public class TestGrid
         dimY = fm.getDimY();
         gridSpacing = fm.getGridSpacing();
 
-        logger.accept("Dimensions: " + dimX + " × " + dimY + ", spacing " + gridSpacing + "m");
+        logger.accept("Dimensions: " + dimX + " x " + dimY + ", spacing " + gridSpacing + "m");
 
         temp = new TemperatureMap(dimX, dimY, gridSpacing, fm.getTemperatureGrid());
         age = new AgeMap(dimX, dimY, gridSpacing, fm.getAgeGrid());
