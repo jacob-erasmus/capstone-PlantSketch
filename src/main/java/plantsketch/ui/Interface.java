@@ -55,6 +55,11 @@ public class Interface extends BorderPane {
     private int sampleCount;
     private boolean brushRemovalMode = false;
     private ForestOnMapView forestElevationView;
+    private ForestOnMapView forestTemperatureView;
+    private ForestOnMapView forestSunlightView;
+    private ForestOnMapView forestMoistureView;
+    private ForestView forestView;
+    
     Supplier<Set<String>> getSelectedSpecies;
     // UI Components
     private final TabPane tabs = new TabPane();
@@ -159,7 +164,7 @@ public class Interface extends BorderPane {
     public void createTabs()
     {
         tabs.getTabs().clear();
-        createForestOnMapTab(currentResult.terrain().getElevationGrid(), "Elevation");
+        createForestOnMapTab(currentResult.terrain().getElevationGrid(), "Environment (Elevation)");
         createForestOnMapTab(currentResult.abiotics().getMoistureMap().getGrid(), "Moisture");
         createForestOnMapTab(currentResult.abiotics().getSunlightMap().getGrid(), "Sunlight");
         createForestOnMapTab(currentResult.abiotics().getTemperatureMap().getGrid(), "Temperature");
@@ -170,7 +175,7 @@ public class Interface extends BorderPane {
     
     // Create Forest + Elevation tab with zoom controls
     private void createForestOnMapTab(float[][] map, String mapType){
-        VBox forestElevationContainer = new VBox(5);
+        VBox mapContainer = new VBox(5);
         HBox zoomControls = new HBox(10);
         zoomControls.setAlignment(Pos.CENTER_LEFT);
         zoomControls.setPadding(new Insets(5));
@@ -185,46 +190,150 @@ public class Interface extends BorderPane {
         defaultBtn.setPrefSize(100, 30);
         
         zoomControls.getChildren().addAll(zoomOutBtn, zoomInBtn, defaultBtn, zoomLabel);
-        
-        // Create the view
-        forestElevationView= new ForestOnMapView(currentResult.forest(), map, currentResult.gridSpacing()); 
-        ScrollPane forestElevationPane = new ScrollPane(forestElevationView);
-        forestElevationPane.setFitToHeight(false);
-        forestElevationPane.setFitToWidth(false);
-        forestElevationPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-        forestElevationPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-        // Zoom track
-        final double[] zoomLevel = {1.0};
-        
-        zoomInBtn.setOnAction(e -> { 
-            //limit
-            if(forestElevationView.getHeight() != 3000){
-                zoomLevel[0] = zoomLevel[0] * 1.2;
-                forestElevationView.zoomIn();
-                zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100));
-            }else{
-                zoomLabel.setText("Max Zoom");
-            }
-        });
 
-        zoomOutBtn.setOnAction(e -> {
-            if(forestElevationView.getHeight() != 256){
-                zoomLevel[0] = zoomLevel[0] / 1.2;
-                forestElevationView.zoomOut();
-                zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100));
-            }else{
-                zoomLabel.setText("Min Zoom");
-            }
-        });
+        //Create the view
+        ScrollPane mapPane = null;
+        switch (mapType) {
+                case "Environment (Elevation)":
+                    this.forestElevationView = new ForestOnMapView(currentResult.forest(), map, currentResult.gridSpacing());
+                    mapPane = new ScrollPane(forestElevationView);
+                    
+                    // Zoom track
+                    final double[] zoomLevel = {1.0};
+                    zoomInBtn.setOnAction(e -> { 
+                        //limit
+                        if(forestElevationView.getHeight() != 3000){
+                            zoomLevel[0] = zoomLevel[0] * 1.2;
+                            forestElevationView.zoomIn();
+                            zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100));
+                        }else{
+                            zoomLabel.setText("Max Zoom");
+                        }
+                    });
+                    zoomOutBtn.setOnAction(e -> {
+                        if(forestElevationView.getHeight() != 256){
+                            zoomLevel[0] = zoomLevel[0] / 1.2;
+                            forestElevationView.zoomOut();
+                            zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100));
+                        }else{
+                            zoomLabel.setText("Min Zoom");
+                        }
+                    });
+                    defaultBtn.setOnAction(e -> {
+                        zoomLevel[0] = 1.0;
+                        forestElevationView.resetToDefault();
+                        zoomLabel.setText("100%");
+                    });
 
-        defaultBtn.setOnAction(e -> {
-            zoomLevel[0] = 1.0;
-            forestElevationView.resetToDefault();
-            zoomLabel.setText("100%");
-        });
-        forestElevationContainer.getChildren().addAll(zoomControls, forestElevationPane);
-        VBox.setVgrow(forestElevationPane, Priority.ALWAYS);
-        tabs.getTabs().add(makeTab(mapType, forestElevationContainer));
+                    mapContainer.getChildren().addAll(zoomControls, mapPane);
+                    break;
+
+                case "Moisture":
+                    this.forestMoistureView = new ForestOnMapView(currentResult.forest(), map, currentResult.gridSpacing());
+                    mapPane = new ScrollPane(forestMoistureView);
+
+                    // Zoom track
+                    final double[] zoomMLevel = {1.0};
+                    zoomInBtn.setOnAction(e -> { 
+                        //limit
+                        if(forestMoistureView.getHeight() != 3000){
+                            zoomMLevel[0] = zoomMLevel[0] * 1.2;
+                            forestMoistureView.zoomIn();
+                            zoomLabel.setText(String.format("%.0f%%", zoomMLevel[0] * 100));
+                        }else{
+                            zoomLabel.setText("Max Zoom");
+                        }
+                    });
+                    zoomOutBtn.setOnAction(e -> {
+                        if(forestMoistureView.getHeight() != 256){
+                            zoomMLevel[0] = zoomMLevel[0] / 1.2;
+                            forestMoistureView.zoomOut();
+                            zoomLabel.setText(String.format("%.0f%%", zoomMLevel[0] * 100));
+                        }else{
+                            zoomLabel.setText("Min Zoom");
+                        }
+                    });
+                    defaultBtn.setOnAction(e -> {
+                        zoomMLevel[0] = 1.0;
+                        forestMoistureView.resetToDefault();
+                        zoomLabel.setText("100%");
+                    });
+                    
+                    mapContainer.getChildren().addAll(zoomControls, mapPane);
+                    break;
+                case "Sunlight":
+                    this.forestSunlightView = new ForestOnMapView(currentResult.forest(), map, currentResult.gridSpacing());
+                    mapPane = new ScrollPane(forestSunlightView);
+
+                    // Zoom track
+                    final double[] zoomSLevel = {1.0};
+                    zoomInBtn.setOnAction(e -> { 
+                        //limit
+                        if(forestSunlightView.getHeight() != 3000){
+                            zoomSLevel[0] = zoomSLevel[0] * 1.2;
+                            forestSunlightView.zoomIn();
+                            zoomLabel.setText(String.format("%.0f%%", zoomSLevel[0] * 100));
+                        }else{
+                            zoomLabel.setText("Max Zoom");
+                        }
+                    });
+                    zoomOutBtn.setOnAction(e -> {
+                        if(forestSunlightView.getHeight() != 256){
+                            zoomSLevel[0] = zoomSLevel[0] / 1.2;
+                            forestSunlightView.zoomOut();
+                            zoomLabel.setText(String.format("%.0f%%", zoomSLevel[0] * 100));
+                        }else{
+                            zoomLabel.setText("Min Zoom");
+                        }
+                    });
+                    defaultBtn.setOnAction(e -> {
+                        zoomSLevel[0] = 1.0;
+                        forestSunlightView.resetToDefault();
+                        zoomLabel.setText("100%");
+                    });
+                    
+                    mapContainer.getChildren().addAll(zoomControls, mapPane);
+                    break;
+                case "Temperature":
+                    this.forestTemperatureView = new ForestOnMapView(currentResult.forest(), map, currentResult.gridSpacing());
+                    mapPane = new ScrollPane(forestTemperatureView);
+
+                    // Zoom track
+                    final double[] zoomTLevel = {1.0};
+                    zoomInBtn.setOnAction(e -> { 
+                        //limit
+                        if(forestTemperatureView.getHeight() != 3000){
+                            zoomTLevel[0] = zoomTLevel[0] * 1.2;
+                            forestTemperatureView.zoomIn();
+                            zoomLabel.setText(String.format("%.0f%%", zoomTLevel[0] * 100));
+                        }else{
+                            zoomLabel.setText("Max Zoom");
+                        }
+                    });
+                    zoomOutBtn.setOnAction(e -> {
+                        if(forestTemperatureView.getHeight() != 256){
+                            zoomTLevel[0] = zoomTLevel[0] / 1.2;
+                            forestTemperatureView.zoomOut();
+                            zoomLabel.setText(String.format("%.0f%%", zoomTLevel[0] * 100));
+                        }else{
+                            zoomLabel.setText("Min Zoom");
+                        }
+                    });
+                    defaultBtn.setOnAction(e -> {
+                        zoomTLevel[0] = 1.0;
+                        forestTemperatureView.resetToDefault();
+                        zoomLabel.setText("100%");
+                    });
+                    
+                    mapContainer.getChildren().addAll(zoomControls, mapPane);
+                    break;
+            }
+        mapPane.setFitToHeight(false);
+        mapPane.setFitToWidth(false);
+        mapPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        mapPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);     
+        VBox.setVgrow(mapPane, Priority.ALWAYS);
+        tabs.getTabs().add(makeTab(mapType, mapContainer));
     }
 
     // Create Pink Noise tab with zoom controls
@@ -305,7 +414,7 @@ public class Interface extends BorderPane {
         zoomControls.getChildren().addAll(zoomOutBtn, zoomInBtn, defaultBtn, zoomLabel);
         
         // Create the view
-        ForestView forestView = new ForestView(currentResult.forest(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()); 
+        forestView = new ForestView(currentResult.forest(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()); 
         ScrollPane forestViewPane = new ScrollPane(forestView);
         forestViewPane.setFitToHeight(false);
         forestViewPane.setFitToWidth(false);
@@ -406,7 +515,6 @@ public class Interface extends BorderPane {
             if (!isUndo)
             {
                 // making a new 'branch' as the user has made an edit. can no longer redo
-                
                 if(saveStatesArray.size() -1 > saveState)
                 {
                     for (int i = saveState; i < saveStatesArray.size(); i++)
@@ -419,13 +527,15 @@ public class Interface extends BorderPane {
                 if(isResimulation)
                 {
                     // index of which save state it is
-                    saveState++;
-                    console.log("Re-simulating with new parameters...");
-                
-                    boolean wasChange = readGridEditors();
-                    // Update TestGrid with new values
-                    if (regeneratePinkNoise.isSelected()) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected()); // if need to regenerate pink noise
-                    else if (wasChange) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected()); // if there was actually a change to anything
+                        saveState++;
+                        console.log("Re-simulating with new parameters...");
+                    if(isTestGrid)
+                    {
+                        boolean wasChange = readGridEditors();
+                        // Update TestGrid with new values
+                        if (regeneratePinkNoise.isSelected()) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected(), false); // if need to regenerate pink noise
+                        else if (wasChange) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected(), false); // if there was actually a change to anything
+                    }
                 }
                 else
                 {
@@ -443,7 +553,10 @@ public class Interface extends BorderPane {
             }
 
             
-
+            // for undo/redo of main run
+            if (isUndo && !isTestGrid && isResimulation){
+                currentResult = testGrid.runChange(false, true);
+            }
 
             // Update grid editors with current values
             if (isTestGrid) updateGridEditors();
@@ -486,6 +599,7 @@ public class Interface extends BorderPane {
 
             // saveStatesArray.remove(saveState--); // removes last saveState then decrements by 1
             saveState--;
+            System.out.print(saveState);
             currentResult = saveStatesArray.get(saveState);
             this.testGrid.loadSaveState(currentResult);
             executeSimulation(0, true, null); // choice doesnt matter because it
@@ -594,7 +708,16 @@ public class Interface extends BorderPane {
         speciesCheck.put("European Beech", europeanBeech);
 
         Button simulateBtn = new Button("Selected Species Only");
-        simulateBtn.setOnAction(e -> removeSpecies(currentResult, speciesCheck));
+        simulateBtn.setOnAction(e -> {
+            saveState++;
+            saveStatesArray.add(currentResult);
+                if (saveStatesArray.size() > 20) // maximum 20 save states
+                {
+                    saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
+                    saveState--; // the index now caps out at 20
+
+                }
+            removeSpecies(currentResult, speciesCheck);});
         simulateBtn.setPrefWidth(250);
 
         
@@ -700,14 +823,105 @@ public class Interface extends BorderPane {
         //listen for changes
         brushSizeSlider.valueProperty().addListener((obs, oldVal, newVal) -> {
             if (brushRemovalMode){
-                updateBrushCursor(forestElevationView, newVal.doubleValue());
+                switch(tabs.getSelectionModel().getSelectedItem().getText()){
+                    case("Environment (Elevation)"):
+                        updateBrushCursor(forestElevationView, newVal.doubleValue());
+                        break;
+                    case("Temperature"):
+                        updateBrushCursor(forestTemperatureView, newVal.doubleValue());
+                        break;
+                    case("Sunlight"):
+                        updateBrushCursor(forestTemperatureView, newVal.doubleValue());
+                        break;
+                    case("Moisture"):
+                        updateBrushCursor(forestMoistureView, newVal.doubleValue());
+                        break;
+                }
+                
             }
         });
+
+        //listen for tab change, bringover brush changes and set brush off.
+        tabs.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
+            if (newTab != null) {
+                brushRemovalMode = false;
+                saveState++;
+                saveStatesArray.add(currentResult);
+                if (saveStatesArray.size() > 20) // maximum 20 save states
+                {
+                    saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
+                    saveState--; // the index now caps out at 20
+
+                }
+                console.log("\nNumber of Remaining Plants: " + currentResult.forest().getAllPlants().size());
+                switch(newTab.getText()){
+                    case("Environment (Elevation)"):
+                            forestElevationView.disableBrushRemovalMode();
+                            forestElevationView.setCursor(Cursor.DEFAULT);  
+                            forestElevationView.draw();
+                            break;
+                        case("Temperature"):
+                            forestTemperatureView.disableBrushRemovalMode();
+                            forestTemperatureView.setCursor(Cursor.DEFAULT);  
+                            forestTemperatureView.draw();
+                            break;
+                        case("Sunlight"):
+                            forestSunlightView.disableBrushRemovalMode();
+                            forestSunlightView.setCursor(Cursor.DEFAULT);  
+                            forestSunlightView.draw();
+                            break;
+                        case("Moisture"):
+                            forestMoistureView.disableBrushRemovalMode();
+                            forestMoistureView.setCursor(Cursor.DEFAULT);  
+                            forestMoistureView.draw();
+                            break;
+                        case("Pink Noise"):
+                            System.out.println("Brush functions aren't applicabe for Pink Noise tab <-> FOR VISUAL PURPOSES ONLY");
+                            break;
+                        case("Forest"):
+                            forestView.draw();
+                            System.out.println("Brush functions can't be applied directly on Forest tab, only carried over <-> FOR VISUAL PURPOSES ONLY");
+                            break;
+                }
+            }
+        });
+
         Button enableBrushRemovalBtn = new Button("Toggle Brush Removal Mode");
         enableBrushRemovalBtn.setOnAction(e -> 
             {
-            forestElevationView.setSelectedSpeciesSupplier(getSelectedSpecies);
-            brushRemoval(forestElevationView, brushSizeSlider);});
+            if (!brushRemovalMode){
+                saveState++;
+                saveStatesArray.add(currentResult);
+                if (saveStatesArray.size() > 20) // maximum 20 save states
+                {
+                    saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
+                    saveState--; // the index now caps out at 20
+                }
+            }
+            switch(tabs.getSelectionModel().getSelectedItem().getText()){
+                    case("Environment (Elevation)"):
+                        forestElevationView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                        brushRemoval(forestElevationView, brushSizeSlider);
+                        break;
+                    case("Temperature"):
+                        forestTemperatureView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                        brushRemoval(forestTemperatureView, brushSizeSlider);
+                        break;
+                    case("Sunlight"):
+                        forestSunlightView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                        brushRemoval(forestSunlightView, brushSizeSlider);
+                        break;
+                    case("Moisture"):
+                        forestMoistureView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                        brushRemoval(forestMoistureView, brushSizeSlider);
+                        break;
+                    case("Pink Noise"):
+                        System.out.println("Brush functions are disabled for Pink Noise tab <-> FOR VISUAL PURPOSES ONLY");
+                        break;
+                    case("Forest"):
+                        System.out.println("Brush functions are disabled for Forest tab <-> FOR VISUAL PURPOSES ONLY");
+                        break;
+            }    });
         enableBrushRemovalBtn.setPrefWidth(250);
 
 
@@ -746,20 +960,20 @@ public class Interface extends BorderPane {
         return slidersHeader;
     }
 
-    private void brushRemoval(ForestOnMapView forestElevationView, Slider brushSizeSlider){
+    private void brushRemoval(ForestOnMapView mapView, Slider brushSizeSlider){
         brushRemovalMode = !brushRemovalMode; // toggle on/off
         if (brushRemovalMode){
-            forestElevationView.enableBrushRemovalMode(() -> brushSizeSlider.getValue());
-            updateBrushCursor(forestElevationView, brushSizeSlider.getValue());
+            mapView.enableBrushRemovalMode(() -> brushSizeSlider.getValue());
+            updateBrushCursor(mapView, brushSizeSlider.getValue());
         }else{
-            forestElevationView.disableBrushRemovalMode();
-            forestElevationView.setCursor(Cursor.DEFAULT);  
+            mapView.disableBrushRemovalMode();
+            mapView.setCursor(Cursor.DEFAULT);  
             console.log("\nNumber of Remaining Plants: " + currentResult.forest().getAllPlants().size());
         }
         
     }
 
-    private void updateBrushCursor(ForestOnMapView forestElevationView, double brushSize){
+    private void updateBrushCursor(ForestOnMapView mapView, double brushSize){
 //image as cursor - some glitches so commented out for now.
 //Will fix/improve.
         //Image brushImage = new Image(getClass().getResource("/101064.png").toExternalForm());
@@ -767,7 +981,7 @@ public class Interface extends BorderPane {
         //Image scaledImg = new Image(brushImage.getUrl(), brushImage.getWidth() * scale, brushImage.getHeight() * scale, true, true);
         //forestElevationView.setCursor(new ImageCursor(scaledImg, scaledImg.getWidth()/2, scaledImg.getHeight()/2));
 //basic crosshair cursor but no visual resize shown but functionally yes. 
-        forestElevationView.setCursor(Cursor.CROSSHAIR);
+        mapView.setCursor(Cursor.CROSSHAIR);
 
         
     }
@@ -780,14 +994,7 @@ public class Interface extends BorderPane {
                 if(result.forest().removedSpecies.containsKey(boxes.getText())){
                     result.forest().addSpeciesMapByName(boxes.getText());
 
-                    saveState++;
-                    saveStatesArray.add(result);
-                    if (saveStatesArray.size() > 20) // maximum 20 save states
-                    {
-                        saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
-                        saveState--; // the index now caps out at 20
-
-                    }
+                    //moved saved state to the button call
                 }          
             }
         }

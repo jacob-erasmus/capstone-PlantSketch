@@ -355,12 +355,14 @@ public class TestGrid
 
 
     // run method for if it is not the first run
-    public SimulationResult runChange(boolean pinkNoise) // , boolean updateSpecies
+    public SimulationResult runChange(boolean pinkNoise, boolean runUndo) // , boolean updateSpecies
     {
         if (pinkNoise) {
             pinkNoise();
         }
+        if (!runUndo){
             placementLoop();
+        }
             assembleForest();
             makeSimResult();
         /*

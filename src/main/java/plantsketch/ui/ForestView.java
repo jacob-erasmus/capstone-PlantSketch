@@ -69,7 +69,7 @@ public class ForestView extends Region {
         try { return Color.web(hexOrName); } catch (Exception e) { return Color.LIMEGREEN; }
     }
 
-    private void draw() {
+    public void draw() {
         canvas.setWidth(vt.widthPx);
         canvas.setHeight(vt.heightPx);
         GraphicsContext g = canvas.getGraphicsContext2D();

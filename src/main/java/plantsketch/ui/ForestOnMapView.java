@@ -88,7 +88,7 @@ public class ForestOnMapView extends Region {
         try { return Color.web(hexOrName); } catch (Exception e) { return Color.LIMEGREEN; }
     }
 
-    private void draw() {
+    public void draw() {
         canvas.setWidth(vt.widthPx);
         canvas.setHeight(vt.heightPx);
         GraphicsContext g = canvas.getGraphicsContext2D();
@@ -152,7 +152,7 @@ public class ForestOnMapView extends Region {
     }
 
     private void applyBrushRemoval(double brushX, double brushY, double brushSize){
-        System.out.print("brush" + selectedSpecies);
+        //System.out.print("brush" + selectedSpecies);
         double brushRadiusPx = brushSizeToPixels(brushSize);
         setSelectedSpecies();
         List<Plant> toRemove = new ArrayList<>();
