@@ -41,4 +41,21 @@ public class GrowthParameters {
                 ", lifeSpan=" + lifeSpan +
                 '}';
     }
+
+    // SETTERS
+    public void setMaxHeightOpen(float maxHeightOpen) {
+        this.maxHeightOpen = maxHeightOpen;
+    }
+
+    public void setMaxHeightClosed(float maxHeightClosed) {
+        this.maxHeightClosed = maxHeightClosed;
+    }
+
+    public void setQ(float q) {
+        this.q = q;
+    }
+
+    public void setLifeSpan(float lifeSpan) {
+        this.lifeSpan = lifeSpan;
+    }
 }

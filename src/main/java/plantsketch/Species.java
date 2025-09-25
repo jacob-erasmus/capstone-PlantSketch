@@ -152,4 +152,88 @@ public class Species {
                 ",\n  growthPeriod='" + growthPeriod + '\'' +
                 "\n}";
     }
+
+    // SETTERS
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setMnemonic(String mnemonic) {
+        this.mnemonic = mnemonic;
+    }
+
+    public void setColour(String colour) {
+        this.colour = colour;
+    }
+
+    public void setRadiusMultiplierOpen(float radiusMultiplierOpen) {
+        this.radiusMultiplierOpen = radiusMultiplierOpen;
+    }
+
+    public void setRadiusMultiplierClosed(float radiusMultiplierClosed) {
+        this.radiusMultiplierClosed = radiusMultiplierClosed;
+    }
+
+    public void setLeafTransparency(float leafTransparency) {
+        this.leafTransparency = leafTransparency;
+    }
+
+    public void setMoistureAbsorbtion(float moistureAbsorbtion) {
+        this.moistureAbsorbtion = moistureAbsorbtion;
+    }
+
+    public void setGrowthPeriod(String growthPeriod) {
+        this.growthPeriod = growthPeriod;
+    }
+
+    // Viability setters
+    public void setSunlightC(float sunlightC) {
+        viabilityParameters.setSunlightC(sunlightC);
+    }
+
+    public void setSunlightR(float sunlightR) {
+        viabilityParameters.setSunlightR(sunlightR);
+    }
+
+    public void setMoistureC(float moistureC) {
+        viabilityParameters.setMoistureC(moistureC);
+    }
+
+    public void setMoistureR(float moistureR) {
+        viabilityParameters.setMoistureR(moistureR);
+    }
+
+    public void setTemperatureC(float temperatureC) {
+        viabilityParameters.setTemperatureC(temperatureC);
+    }
+
+    public void setTemperatureR(float temperatureR) {
+        viabilityParameters.setTemperatureR(temperatureR);
+    }
+
+    public void setSlopeC(float slopeC) {
+        viabilityParameters.setSlopeC(slopeC);
+    }
+
+    public void setSlopeR(float slopeR) {
+        viabilityParameters.setSlopeR(slopeR);
+    }
+
+    // Growth setters
+    public void setMaxHeightOpen(float maxHeightOpen) {
+        growthParameters.setMaxHeightOpen(maxHeightOpen);
+    }
+
+    public void setMaxHeightClosed(float maxHeightClosed) {
+        growthParameters.setMaxHeightClosed(maxHeightClosed);
+    }
+
+    public void setQ(float q) {
+        growthParameters.setQ(q);
+    }
+
+    public void setLifeSpan(float lifeSpan) {
+        growthParameters.setLifeSpan(lifeSpan);
+    }
 }

@@ -71,4 +71,38 @@ public class ViabilityParameters {
                 ", slopeR=" + slopeR +
                 '}';
     }
+
+    // SETTERS
+
+    public void setSunlightC(float sunlightC) {
+        this.sunlightC = sunlightC;
+    }
+
+    public void setSunlightR(float sunlightR) {
+        this.sunlightR = sunlightR;
+    }
+
+    public void setMoistureC(float moistureC) {
+        this.moistureC = moistureC;
+    }
+
+    public void setMoistureR(float moistureR) {
+        this.moistureR = moistureR;
+    }
+
+    public void setTemperatureC(float temperatureC) {
+        this.temperatureC = temperatureC;
+    }
+
+    public void setTemperatureR(float temperatureR) {
+        this.temperatureR = temperatureR;
+    }
+
+    public void setSlopeC(float slopeC) {
+        this.slopeC = slopeC;
+    }
+
+    public void setSlopeR(float slopeR) {
+        this.slopeR = slopeR;
+    }
 }
