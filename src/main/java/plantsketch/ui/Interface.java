@@ -28,7 +28,16 @@ public class Interface extends BorderPane {
 // must be able to change plant variables (ie max sunlight etc)
 // must read in slider values and apply them to the maps
 // edit species variables.
-// i have added getters and setters so i simply need to just edit speciesList values in TestGrid
+// i have added getters and setters so i simply need to just edit speciesList values in TestGrid (global species changes)
+// make checking/ unchecking species automatic on button click
+
+
+// species editing:
+    // pull down menu for each species
+    // be able to edit each value for the species
+    // when done, it'll run
+    // on button click (explain it is on button click because it is global)
+    // brush is still automatic though and on the brush stroke
 
 
 //*********** INSTANCE VARIABLES ****************\\
@@ -499,8 +508,6 @@ public class Interface extends BorderPane {
     private void executeSimulation(int choice, boolean isResimulation, String fullPath) {
         tabs.getTabs().clear();
 
-        // do i need to clear gridEditors here?
-        
         try {
             if (!isUndo)
             {
