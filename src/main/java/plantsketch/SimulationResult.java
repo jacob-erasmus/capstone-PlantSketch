@@ -11,5 +11,6 @@ public record SimulationResult(
         float gridSpacing,
         AgeMap age,
         Terrain terrain,
-        AbioticFactors abiotics
+        AbioticFactors abiotics,
+        List<Species> speciesList
 ) {}

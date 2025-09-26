@@ -65,6 +65,8 @@ public class Interface extends BorderPane {
     
     Supplier<Set<String>> getSelectedSpecies;
     GridPane speciesPanelEditor;
+    String[] speciesParameters = {"sunlightC", "sunlightR", "moistureC", "moistureR", "temperatureC", "temperatureR", "slopeC", "slopeR", "maxHeightOpen", "maxHeightClosed", "q", "lifeSpan"};
+    TextField[] textFields;
     // UI Components
     private final TabPane tabs = new TabPane();
     private final ConsolePane console = new ConsolePane();
@@ -176,6 +178,7 @@ public class Interface extends BorderPane {
 
     }
     
+
     // Create Forest + Elevation tab with zoom controls
     private void createForestOnMapTab(float[][] map, String mapType){
         VBox mapContainer = new VBox(5);
@@ -464,8 +467,10 @@ public class Interface extends BorderPane {
     
         // bottom info not used for run
         if(isTestGrid) updateStatusDisplay();
+        
         console.log("Plants: " + currentResult.forest().getAllPlants().size());
     }
+
 
     // This is just for the second screen with the options 
     public void initializeWithMode(String mode) {
@@ -533,7 +538,6 @@ public class Interface extends BorderPane {
                     if(isTestGrid)
                     {
                         boolean wasChange = readGridEditors();
-                        wasChange = true;
                         // Update TestGrid with new values
                         if (regeneratePinkNoise.isSelected()) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected(), false); // if need to regenerate pink noise
                         else if (wasChange) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected(), false); // if there was actually a change to anything
@@ -561,12 +565,18 @@ public class Interface extends BorderPane {
             }
 
             // Update grid editors with current values
-            if (isTestGrid) updateGridEditors();
+            if (isTestGrid) 
+            {
+                updateGridEditors();
+                updateStatusDisplay();
+
+            }
             // else updateSliderEditors();
             
+            updateSpeciesPanelEditor();
+
             createTabs();
             
-            if (isTestGrid) updateStatusDisplay();
             // console.log("✓ Simulation complete. Plants placed: " + currentResult.forest().getAllPlants().size());
 
             int numSpecies = 0;
@@ -644,9 +654,9 @@ public class Interface extends BorderPane {
             species.getTemperatureC(), species.getTemperatureR(), species.getSlopeC(), species.getSlopeR(), species.getMaxHeightOpen(),
             species.getMaxHeightClosed(), species.getQ(), species.getLifeSpan()};
 
+        textFields = new TextField[speciesParameters.length];
+
         // how tf are we supposed to directly change viability? Maybe add that to the brush or something?
-        String[] speciesParameters = {"sunlightC", "sunlightR", "moistureC", "moistureR", 
-            "temperatureC", "temperatureR", "slopeC", "slopeR", "maxHeightOpen", "maxHeightClosed", "q", "lifeSpan"};
 
         int row = 1;
         for (int i = 0; i < speciesParameters.length; i++) {
@@ -660,6 +670,7 @@ public class Interface extends BorderPane {
             parameterValue.setPromptText(String.valueOf(parameterValues[index]));
             parameterValue.setPrefWidth(200);
 
+// POTENTIALLY NOT WORKING
             parameterValue.textProperty().addListener((obs, oldText, newText) -> {
                 if (!newText.trim().isEmpty()) {
                     try {
@@ -686,6 +697,7 @@ public class Interface extends BorderPane {
             });
 
             speciesPanelEditor.add(parameterValue, 1, index);
+            textFields[i] = parameterValue;
         }
 
 
@@ -693,8 +705,20 @@ public class Interface extends BorderPane {
 
     }
 
-    public GridPane updateSpeciesPanelEditor(Species species)
+// NOT WORKING
+    public GridPane updateSpeciesPanelEditor()
     {
+        for (int i = 0; i < testGrid.getSpeciesList().size(); i++)
+        {
+            float[] parameterValues = {testGrid.getSpeciesList().get(i).getSunlightC(), testGrid.getSpeciesList().get(i).getSunlightR(), testGrid.getSpeciesList().get(i).getMoistureC(), testGrid.getSpeciesList().get(i).getMoistureR(), 
+            testGrid.getSpeciesList().get(i).getTemperatureC(), testGrid.getSpeciesList().get(i).getTemperatureR(), testGrid.getSpeciesList().get(i).getSlopeC(), testGrid.getSpeciesList().get(i).getSlopeR(), testGrid.getSpeciesList().get(i).getMaxHeightOpen(),
+            testGrid.getSpeciesList().get(i).getMaxHeightClosed(), testGrid.getSpeciesList().get(i).getQ(), testGrid.getSpeciesList().get(i).getLifeSpan()};
+
+            for (int j = 0; j < speciesParameters.length; j++) {
+            textFields[j].setPromptText(String.valueOf(parameterValues[j]));
+        }
+        }
+
 
         
 
@@ -706,12 +730,12 @@ public class Interface extends BorderPane {
         Button updateSpeciesParametersButton = new Button ("Update species parameters");
 
         updateSpeciesParametersButton.setOnAction(e -> {
-            /*
+            
             for (Species species : testGrid.getSpeciesList())
             {
                 createSpeciesPanelEditor(species);
             }
-            */
+            
             executeSimulation(0, true, null);
         }
             );

@@ -295,7 +295,8 @@ public class TestGrid
             new Terrain(dimX, dimY, gridSpacing, abiotics, terrain.elevationMap), 
             new AbioticFactors(new MoistureMap (dimX, dimY, gridSpacing, abiotics.getMoistureMap().getGrid()), 
                 new TemperatureMap(dimX, dimY, gridSpacing, abiotics.getTemperatureMap().getGrid()) , 
-                new SunlightMap(dimX, dimY, gridSpacing, abiotics.getSunlightMap().getGrid())));
+                new SunlightMap(dimX, dimY, gridSpacing, abiotics.getSunlightMap().getGrid())), 
+                new ArrayList<Species>(speciesList));
 
         //commenting this out to assist with merging
 //        new EcoVizOutput(simResult).createFile("testingGrid.pdb"); // and then make the file
@@ -386,6 +387,7 @@ public class TestGrid
         this.moist.setGrid(simResult.abiotics().moistureMap.getGrid());
         this.sun.setGrid(simResult.abiotics().sunlightMap.getGrid());
         this.terrain.setElevationGrid(simResult.terrain().getElevationGrid());
+        this.speciesList = simResult.speciesList();
         
         // Update abiotics reference
         this.abiotics = simResult.abiotics();
