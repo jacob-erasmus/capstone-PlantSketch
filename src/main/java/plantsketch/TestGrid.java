@@ -66,6 +66,7 @@ public class TestGrid
         this.isTestGrid = isTestGrid;
         // gonna leave the testing grids at the preset sample count of 30
         if (!isTestGrid) this.sampleCount = sampleCount;
+        initialiseTest();
         
     }
 
@@ -294,7 +295,8 @@ public class TestGrid
             new Terrain(dimX, dimY, gridSpacing, abiotics, terrain.elevationMap), 
             new AbioticFactors(new MoistureMap (dimX, dimY, gridSpacing, abiotics.getMoistureMap().getGrid()), 
                 new TemperatureMap(dimX, dimY, gridSpacing, abiotics.getTemperatureMap().getGrid()) , 
-                new SunlightMap(dimX, dimY, gridSpacing, abiotics.getSunlightMap().getGrid())));
+                new SunlightMap(dimX, dimY, gridSpacing, abiotics.getSunlightMap().getGrid())), 
+                new ArrayList<Species>(speciesList));
 
         //commenting this out to assist with merging
 //        new EcoVizOutput(simResult).createFile("testingGrid.pdb"); // and then make the file
@@ -385,6 +387,7 @@ public class TestGrid
         this.moist.setGrid(simResult.abiotics().moistureMap.getGrid());
         this.sun.setGrid(simResult.abiotics().sunlightMap.getGrid());
         this.terrain.setElevationGrid(simResult.terrain().getElevationGrid());
+        this.speciesList = simResult.speciesList();
         
         // Update abiotics reference
         this.abiotics = simResult.abiotics();
@@ -395,7 +398,6 @@ public class TestGrid
     {
         if (isTestGrid)
         {
-            initialiseTest();
 
             if (choice == 1) {
                 loadPreset1();
@@ -445,7 +447,7 @@ public class TestGrid
         dimY = fm.getDimY();
         gridSpacing = fm.getGridSpacing();
 
-        logger.accept("Dimensions: " + dimX + " × " + dimY + ", spacing " + gridSpacing + "m");
+        logger.accept("Dimensions: " + dimX + " x " + dimY + ", spacing " + gridSpacing + "m");
 
         temp = new TemperatureMap(dimX, dimY, gridSpacing, fm.getTemperatureGrid());
         age = new AgeMap(dimX, dimY, gridSpacing, fm.getAgeGrid());
@@ -453,16 +455,6 @@ public class TestGrid
         sun = new SunlightMap(dimX, dimY, gridSpacing, fm.getSunlightGrid());
         abiotics = new AbioticFactors(moist, temp, sun);
         terrain = new Terrain(dimX, dimY, gridSpacing, abiotics, fm.getElevationGrid());
-
-        SpeciesDictionary dict = new SpeciesDictionary();
-        speciesList = List.of(
-                dict.loadBoxwood(),
-                dict.loadSnowyMespilus(),
-                dict.loadMountainPine(),
-                dict.loadSilverFir(),
-                dict.loadSilverBirch(),
-                dict.loadSissileOak(),
-                dict.loadEuropeanBeech());
 
     }
 
@@ -691,4 +683,15 @@ public class TestGrid
     public void setNumPlants(int numPlants) {
         this.numPlants = numPlants;
     }
+
+    public List<Species> getSpeciesList()
+    {
+        return speciesList;
+    }
+
+    public void setSpeciesList(List<Species> newSpeciesList)
+    {
+        this.speciesList = newSpeciesList;
+    }
+
 }
