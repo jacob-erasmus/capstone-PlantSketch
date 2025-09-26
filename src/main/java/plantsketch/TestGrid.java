@@ -66,6 +66,7 @@ public class TestGrid
         this.isTestGrid = isTestGrid;
         // gonna leave the testing grids at the preset sample count of 30
         if (!isTestGrid) this.sampleCount = sampleCount;
+        initialiseTest();
         
     }
 
@@ -395,7 +396,6 @@ public class TestGrid
     {
         if (isTestGrid)
         {
-            initialiseTest();
 
             if (choice == 1) {
                 loadPreset1();
@@ -453,16 +453,6 @@ public class TestGrid
         sun = new SunlightMap(dimX, dimY, gridSpacing, fm.getSunlightGrid());
         abiotics = new AbioticFactors(moist, temp, sun);
         terrain = new Terrain(dimX, dimY, gridSpacing, abiotics, fm.getElevationGrid());
-
-        SpeciesDictionary dict = new SpeciesDictionary();
-        speciesList = List.of(
-                dict.loadBoxwood(),
-                dict.loadSnowyMespilus(),
-                dict.loadMountainPine(),
-                dict.loadSilverFir(),
-                dict.loadSilverBirch(),
-                dict.loadSissileOak(),
-                dict.loadEuropeanBeech());
 
     }
 
@@ -691,4 +681,15 @@ public class TestGrid
     public void setNumPlants(int numPlants) {
         this.numPlants = numPlants;
     }
+
+    public List<Species> getSpeciesList()
+    {
+        return speciesList;
+    }
+
+    public void setSpeciesList(List<Species> newSpeciesList)
+    {
+        this.speciesList = newSpeciesList;
+    }
+
 }
