@@ -30,6 +30,8 @@ public class ForestOnMapView extends Region {
     private boolean useDefaultCellSize;
     private Set<String> selectedSpecies;
     private Supplier<Set<String>> selectedSpeciesSupplier;
+    private final Canvas mapCanvas = new Canvas();
+    private final Canvas forestCanvas = new Canvas();
     private Map<String, Color> colorCache = new HashMap<>();
     private float mapMin, mapMax, mapRange;
 
@@ -123,11 +125,16 @@ public class ForestOnMapView extends Region {
     }
 
     public void draw() {
-        canvas.setWidth(vt.widthPx);
-        canvas.setHeight(vt.heightPx);
-        GraphicsContext g = canvas.getGraphicsContext2D();
-        g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawMap();
+        drawForest();
+        
+    }
 
+    private void drawMap(){
+        mapCanvas.setWidth(vt.widthPx);
+        mapCanvas.setHeight(vt.heightPx);
+        GraphicsContext g = mapCanvas.getGraphicsContext2D();
+        g.clearRect(0, 0, mapCanvas.getWidth(), mapCanvas.getHeight());
         // 1) draw elevation as grayscale (cells) - using cached min/max and pre-computed colors
         double cs = vt.cellPx;
         for (int x = 0; x < vt.dimX; x++) {
@@ -141,7 +148,15 @@ public class ForestOnMapView extends Region {
                 g.fillRect(py, px, cs, cs);
             }
         }
+        g.setStroke(Color.BLACK);
+        g.strokeRect(0.5, 0.5, vt.widthPx -1, vt.heightPx -1);
+    }
 
+    private void drawForest(){
+        forestCanvas.setWidth(vt.widthPx);
+        forestCanvas.setHeight(vt.heightPx);
+        GraphicsContext g = forestCanvas.getGraphicsContext2D();
+        g.clearRect(0, 0, forestCanvas.getWidth(), forestCanvas.getHeight());
         // 2) draw plants on top (meters)
         for (SpeciesMap sm : forest.getSpeciesMapList()) {
                 Color c = colorCache.computeIfAbsent(sm.getSpecies().getColour(),
@@ -158,8 +173,8 @@ public class ForestOnMapView extends Region {
 
         g.setStroke(Color.BLACK);
         g.strokeRect(0.5, 0.5, vt.widthPx -1, vt.heightPx -1);
-    }
 
+    }
     private void setSelectedSpecies(){
         this.selectedSpecies = (selectedSpeciesSupplier != null) ? selectedSpeciesSupplier.get() : Collections.emptySet();
     }
