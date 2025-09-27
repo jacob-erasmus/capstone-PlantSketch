@@ -8,9 +8,32 @@ import javafx.scene.paint.Color;
 public class GridHeatMapView extends Region {
     private final float[][] grid;
     private final Canvas canvas = new Canvas();
+    private final float gridMin, gridMax, gridRange;
+
+    // Pre-computed grayscale colors to avoid creating new Color objects
+    private static final Color[] GRAYSCALE = new Color[256];
+    static {
+        for (int i = 0; i < 256; i++) {
+            double gray = i / 255.0;
+            GRAYSCALE[i] = Color.color(gray, gray, gray);
+        }
+    }
 
     public GridHeatMapView(float[][] grid) {
         this.grid = grid;
+
+        // Calculate min/max once in constructor instead of every draw()
+        float min = Float.MAX_VALUE, max = -Float.MAX_VALUE;
+        for (float[] row : grid) {
+            for (float val : row) {
+                if (val < min) min = val;
+                if (val > max) max = val;
+            }
+        }
+        this.gridMin = min;
+        this.gridMax = max;
+        this.gridRange = Math.max(1e-12f, max - min);
+
         getChildren().add(canvas);
         draw();
         // size to content
@@ -34,24 +57,12 @@ public class GridHeatMapView extends Region {
         canvas.setHeight(h);
         GraphicsContext g = canvas.getGraphicsContext2D();
 
-        // min/max
-        float min = Float.MAX_VALUE, max = -Float.MAX_VALUE;
-        for (int r = 0; r < rows; r++)
-            for (int c = 0; c < cols; c++) {
-                float v = grid[r][c];
-                if (v < min)
-                    min = v;
-                if (v > max)
-                    max = v;
-            }
-        double range = Math.max(1e-12, max - min);
-
+        // Draw using cached min/max and pre-computed colors
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
-                double t = (grid[r][c] - min) / range; // 0..1
-                // grayscale (dark = low, bright = high) – invert if you want
-                double gray = t;
-                g.setFill(Color.color(gray, gray, gray));
+                double t = (grid[r][c] - gridMin) / gridRange; // 0..1
+                int grayIndex = Math.max(0, Math.min(255, (int) Math.round(t * 255)));
+                g.setFill(GRAYSCALE[grayIndex]);
                 g.fillRect(c * cell, r * cell, cell, cell);
             }
         }

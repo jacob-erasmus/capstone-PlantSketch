@@ -5,6 +5,8 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ForestView extends Region {
     private final Forest forest;
@@ -15,6 +17,7 @@ public class ForestView extends Region {
     int dimX;
     int dimY;
     float gridSpacing;
+    private Map<String, Color> colorCache = new HashMap<>();
 
 
     public ForestView(Forest forest, int dimX, int dimY, float gridSpacing) {
@@ -80,8 +83,9 @@ public class ForestView extends Region {
 
         // draw plants per species map
         for (SpeciesMap sm : forest.getSpeciesMapList()) { // you may need to add a getter returning the list
-            Color c = parseColour(sm.getSpecies().getColour());
-            g.setFill(c.deriveColor(0, 1, 1, 0.85));
+            Color c = colorCache.computeIfAbsent(sm.getSpecies().getColour(),
+                colorStr -> parseColour(colorStr).deriveColor(0, 1, 1, 0.85));
+            g.setFill(c);
 
             for (Plant p : sm.getPlants()) {
                 double xPx = vt.meterXtoPx(p.getX());

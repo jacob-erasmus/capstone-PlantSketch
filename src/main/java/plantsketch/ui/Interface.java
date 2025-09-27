@@ -2,6 +2,7 @@
 package plantsketch.ui;
 
 import plantsketch.*;
+import plantsketch.util.PerformanceTimer;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
@@ -137,11 +138,16 @@ public class Interface extends BorderPane {
         backBtn.setOnAction(e -> {
             if (onBack != null) onBack.run();
         });
-        
+
+        Button perfBtn = new Button("Performance Stats");
+        perfBtn.setOnAction(e -> {
+            PerformanceTimer.printStats();
+        });
+
         Label title = new Label("Test Mode: " + mode);
         title.setFont(Font.font("System", FontWeight.BOLD, 16));
-        
-        return new ToolBar(backBtn, new Separator(), title);
+
+        return new ToolBar(backBtn, new Separator(), perfBtn, new Separator(), title);
     }
     
     private HBox buildLogHeader() {
@@ -515,6 +521,7 @@ public class Interface extends BorderPane {
 
     // here is execute simulation for the first time
     private void executeSimulation(int choice, boolean isResimulation, String fullPath) {
+        PerformanceTimer.start("execute_simulation");
         tabs.getTabs().clear();
 
         try {
@@ -590,10 +597,12 @@ public class Interface extends BorderPane {
             isUndo = false;
             updateVisualization();
 
-        } catch (Exception ex) 
+        } catch (Exception ex)
         {
             ex.printStackTrace();
             console.log("✗ Test simulation failed: " + ex.getMessage());
+        } finally {
+            PerformanceTimer.end("execute_simulation");
         }
     }
 
@@ -1134,8 +1143,21 @@ public class Interface extends BorderPane {
                 }          
             }
         }
-        createTabs();
+        refreshForestViews();
         console.log("Species Filter Remove and Visualise Elapsed Time: " + (System.nanoTime() - startTime) + " nanoseconds.");
+    }
+
+    private void refreshForestViews() {
+        PerformanceTimer.start("refresh_forest_views");
+
+        // Only redraw forest-related views, not environment maps
+        if (forestElevationView != null) forestElevationView.draw();
+        if (forestTemperatureView != null) forestTemperatureView.draw();
+        if (forestSunlightView != null) forestSunlightView.draw();
+        if (forestMoistureView != null) forestMoistureView.draw();
+        if (forestView != null) forestView.draw();
+
+        PerformanceTimer.end("refresh_forest_views");
     }
 
     public float readSlider(Slider slider)
@@ -1329,10 +1351,12 @@ public class Interface extends BorderPane {
             testGrid.setSunlightGrid(newSun);
             wasChange = true;
         }        
-        if(gridEditors.get("Elevation").isEdited()) 
+        // Elevation editing disabled for performance - slope recalculation is expensive
+        if(gridEditors.get("Elevation").isEdited())
         {
-            testGrid.setElevationGrid(newElev);
-            wasChange = true;
+            console.log("Warning: Elevation editing disabled for performance reasons");
+            // Reset elevation values to original state
+            gridEditors.get("Elevation").setValues(testGrid.getElevationGrid());
         }
 
         return wasChange;

@@ -6,7 +6,7 @@
 *.pdb
 
 output.pdb
-
+CLAUDE.md
 AGENTS.md
 # === IntelliJ / Eclipse / VSCode project files ===
 .idea/
