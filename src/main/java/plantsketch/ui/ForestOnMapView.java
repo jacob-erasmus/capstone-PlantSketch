@@ -28,7 +28,8 @@ public class ForestOnMapView extends Region {
     private boolean useDefaultCellSize;
     private Set<String> selectedSpecies;
     private Supplier<Set<String>> selectedSpeciesSupplier;
-    private WritableImage mapImage;
+    private final Canvas mapCanvas = new Canvas();
+    private final Canvas forestCanvas = new Canvas();
 
     public ForestOnMapView(Forest forest, float[][] map, float gridSpacing) {
         this.forest = forest;
@@ -43,19 +44,23 @@ public class ForestOnMapView extends Region {
         this.vt = new ViewTransform(dimX, dimY, gridSpacing, dimX, dimY, useDefaultCellSize);
         //renderzoom
         updateRegionSize();
-        canvas.setLayoutX(0);
-        canvas.setLayoutY(0);
-        getChildren().add(canvas);
-        renderMap();
-        draw();
+        mapCanvas.setLayoutX(0);
+        mapCanvas.setLayoutY(0);
+        forestCanvas.setLayoutX(0);
+        forestCanvas.setLayoutY(0);
+        getChildren().addAll(mapCanvas, forestCanvas);
+        drawMap();
+        drawForest();
     }
 
     private void updateRegionSize(){
         setPrefSize(vt.widthPx, vt.heightPx);
         setMinSize(vt.widthPx, vt.heightPx);
         setMaxSize(vt.widthPx, vt.heightPx);
-        canvas.setWidth(vt.widthPx);
-        canvas.setHeight(vt.heightPx);
+        mapCanvas.setWidth(vt.widthPx);
+        mapCanvas.setHeight(vt.heightPx);
+        forestCanvas.setWidth(vt.widthPx);
+        forestCanvas.setHeight(vt.heightPx);
         requestLayout();
     }
     public void zoomIn(){
@@ -66,8 +71,8 @@ public class ForestOnMapView extends Region {
         double newSize = Math.min(currentSize * 1.2, 3000);
         this.vt = new ViewTransform(dimX, dimY, gridSpacing, newSize, newSize, useDefaultCellSize);
         updateRegionSize();
-        renderMap();
-        draw();
+        drawMap();
+        drawForest();
     }
     public void zoomOut(){
         int dimX = map.length;
@@ -77,8 +82,8 @@ public class ForestOnMapView extends Region {
         double newSize = Math.max(currentSize / 1.2, 256);
         this.vt = new ViewTransform(dimX, dimY, gridSpacing, newSize, newSize, useDefaultCellSize);
         updateRegionSize();
-        renderMap();
-        draw();
+        drawMap();
+        drawForest();
     }
     public void resetToDefault(){
         int dimX = map.length;
@@ -86,20 +91,19 @@ public class ForestOnMapView extends Region {
         //reset
         this.vt = new ViewTransform(dimX, dimY, gridSpacing, dimX, dimY, useDefaultCellSize);
         updateRegionSize();
-        renderMap();
-        draw();
+        drawMap();
+        drawForest();
     }
 
     private static Color parseColour(String hexOrName) {
         try { return Color.web(hexOrName); } catch (Exception e) { return Color.LIMEGREEN; }
     }
 
-    public void draw() {
-        canvas.setWidth(vt.widthPx);
-        canvas.setHeight(vt.heightPx);
-        GraphicsContext g = canvas.getGraphicsContext2D();
-        // 1) draw cached image
-        g.drawImage(mapImage, 0, 0);
+    public void drawForest() {
+        forestCanvas.setWidth(vt.widthPx);
+        forestCanvas.setHeight(vt.heightPx);
+        GraphicsContext g = forestCanvas.getGraphicsContext2D();
+        g.clearRect(0, 0, forestCanvas.getWidth(), forestCanvas.getHeight());
 
         // 2) draw plants on top (meters)
         for (SpeciesMap sm : forest.getSpeciesMapList()) {
@@ -118,9 +122,15 @@ public class ForestOnMapView extends Region {
         g.strokeRect(0.5, 0.5, vt.widthPx - 1, vt.heightPx - 1);
     }
     
-    private void renderMap(){
-        mapImage = new WritableImage((int) vt.widthPx, (int) vt.heightPx);
-        GraphicsContext g = new Canvas(vt.widthPx, vt.heightPx).getGraphicsContext2D();
+    public void draw(){
+        drawMap();
+        drawForest();
+    }
+    private void drawMap(){
+        mapCanvas.setWidth(vt.widthPx);
+        mapCanvas.setHeight(vt.heightPx);
+        GraphicsContext g = mapCanvas.getGraphicsContext2D();
+        g.clearRect(0, 0, mapCanvas.getWidth(), mapCanvas.getHeight());
         // 1) draw elevation as grayscale (cells)
         float min = Float.MAX_VALUE, max = -Float.MAX_VALUE;
         for (int x = 0; x < vt.dimX; x++) {
@@ -143,7 +153,8 @@ public class ForestOnMapView extends Region {
                 // swapping them to fix mirror image thing:   g.fillRect(px, py, cs, cs);
             }
         }
-        g.getCanvas().snapshot(null, mapImage);
+        g.setStroke(Color.BLACK);
+        g.strokeRect(0.5, 0.5, vt.widthPx -1, vt.heightPx -1);
     }
 
     private void setSelectedSpecies(){
@@ -154,14 +165,14 @@ public class ForestOnMapView extends Region {
         this.selectedSpeciesSupplier = supplier;
     }
     public void enableBrushRemovalMode(Supplier<Double> brushSizeSupplier){
-        canvas.setOnMousePressed(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()));
-        canvas.setOnMouseDragged(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()));
+        forestCanvas.setOnMousePressed(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()));
+        forestCanvas.setOnMouseDragged(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()));
     }
 
     public void disableBrushRemovalMode(){
-        canvas.setOnMousePressed(null);
-        canvas.setOnMouseDragged(null);
-        canvas.setOnMouseReleased(null);
+        forestCanvas.setOnMousePressed(null);
+        forestCanvas.setOnMouseDragged(null);
+        forestCanvas.setOnMouseReleased(null);
     }
 
     private void applyBrushRemoval(double brushX, double brushY, double brushSize){
@@ -192,7 +203,7 @@ public class ForestOnMapView extends Region {
                 forest.removePlant(p);
                 //System.out.print("plant removed" + p);
             }
-            draw();
+            drawForest();
             System.out.println("Apply Brush Removal Elapsed Time: " + (System.nanoTime() - brushRemovalStartTime) + " (nanoseconds). Removed " + toRemove.size() + " plants");
         } 
     }
@@ -201,5 +212,5 @@ public class ForestOnMapView extends Region {
         return size * vt.cellPx;
     }
 
-    @Override protected void layoutChildren() { canvas.relocate(0, 0); }
+    @Override protected void layoutChildren() { mapCanvas.relocate(0, 0); forestCanvas.relocate(0, 0);}
 }
