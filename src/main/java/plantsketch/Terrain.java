@@ -1,5 +1,7 @@
 package plantsketch;
 
+import plantsketch.util.PerformanceTimer;
+
 public class Terrain {
     int width;
     int height;
@@ -19,6 +21,9 @@ public class Terrain {
         this.elevationMap = elevation;
         this.slopeMap = new float[width][height];
         this.abioticFactors = abioticFactors;
+
+        // Pre-calculate all slope values once
+        calculateSlopeGrid();
     }
 
     // Get Elevation Method
@@ -26,15 +31,32 @@ public class Terrain {
         return elevationMap[x][y];
     }
 
-    // Get Slope Method
-    public float getSlope(int x, int y) {
-        // Boundary checking - use forward/backward differences for edges
-        int maxX = width-1;
-        int maxY = height-1;
+    // Get Slope Method - now returns cached value
+    public float
 
-        if (x < 0 || x > maxX || y < 0 || y > maxY) {
+    getSlope(int x, int y) {
+        if (x < 0 || x >= width || y < 0 || y >= height) {
             throw new IllegalArgumentException("Coordinates out of bounds");
         }
+        return slopeMap[x][y];
+    }
+
+    // Calculate slope for all grid positions and cache the results
+    private void calculateSlopeGrid() {
+        PerformanceTimer.start("slope_calculation_grid");
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                slopeMap[x][y] = calculateSlopeAt(x, y);
+            }
+        }
+        PerformanceTimer.end("slope_calculation_grid");
+    }
+
+    // Calculate slope at a specific position (extracted from original getSlope method)
+    private float calculateSlopeAt(int x, int y) {
+        // Boundary checking - use forward/backward differences for edges
+        int maxX = width - 1;
+        int maxY = height - 1;
 
         // Approximate partial derivatives using appropriate differences
         float dzdx, dzdy;
@@ -62,14 +84,14 @@ public class Terrain {
             // Central difference for interior points
             dzdy = (elevationMap[x][y + 1] - elevationMap[x][y - 1]) / (2 * gridSpacing);
         }
+
         // normal vector
         Vector n = new Vector(-dzdx, -dzdy, 1);
         n.normalise();
         // vertical vector
         Vector vertical = new Vector(0, 0, 1);
         double dotProduct = n.dot(vertical);
-        float slope = (float) Math.toDegrees(Math.acos(dotProduct));
-        return slope;
+        return (float) Math.toDegrees(Math.acos(dotProduct));
     }
 
     // Set Abiotic Factors
@@ -89,15 +111,7 @@ public class Terrain {
         return elevationMap;
     }   
 
-    public void setElevationGrid(float[][] elevation) {
-        this.elevationMap = elevation;
-    }
-
     public float[][] getSlopeGrid() {
         return slopeMap;
-    }
-
-    public void setSlopeGrid(float[][] slope) {
-        this.slopeMap = slope;
     }
 }

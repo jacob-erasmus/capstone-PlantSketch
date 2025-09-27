@@ -5,9 +5,11 @@ import plantsketch.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -28,8 +30,16 @@ public class ForestOnMapView extends Region {
     private boolean useDefaultCellSize;
     private Set<String> selectedSpecies;
     private Supplier<Set<String>> selectedSpeciesSupplier;
-    private final Canvas mapCanvas = new Canvas();
-    private final Canvas forestCanvas = new Canvas();
+    private Map<String, Color> colorCache = new HashMap<>();
+    private float mapMin, mapMax, mapRange;
+
+    // Pre-computed grayscale colors to avoid creating new Color objects
+    private static final Color[] GRAYSCALE = new Color[256];
+    static {
+        for (int i = 0; i < 256; i++) {
+            GRAYSCALE[i] = Color.rgb(i, i, i);
+        }
+    }
 
     public ForestOnMapView(Forest forest, float[][] map, float gridSpacing) {
         this.forest = forest;
@@ -42,6 +52,19 @@ public class ForestOnMapView extends Region {
         }
         this.gridSpacing = gridSpacing;
         this.vt = new ViewTransform(dimX, dimY, gridSpacing, dimX, dimY, useDefaultCellSize);
+
+        // Calculate min/max once in constructor instead of every draw()
+        mapMin = Float.MAX_VALUE;
+        mapMax = -Float.MAX_VALUE;
+        for (int x = 0; x < dimX; x++) {
+            for (int y = 0; y < dimY; y++) {
+                float v = map[x][y];
+                if (v < mapMin) mapMin = v;
+                if (v > mapMax) mapMax = v;
+            }
+        }
+        mapRange = Math.max(1e-9f, mapMax - mapMin);
+
         //renderzoom
         updateRegionSize();
         mapCanvas.setLayoutX(0);
@@ -99,15 +122,30 @@ public class ForestOnMapView extends Region {
         try { return Color.web(hexOrName); } catch (Exception e) { return Color.LIMEGREEN; }
     }
 
-    public void drawForest() {
-        forestCanvas.setWidth(vt.widthPx);
-        forestCanvas.setHeight(vt.heightPx);
-        GraphicsContext g = forestCanvas.getGraphicsContext2D();
-        g.clearRect(0, 0, forestCanvas.getWidth(), forestCanvas.getHeight());
+    public void draw() {
+        canvas.setWidth(vt.widthPx);
+        canvas.setHeight(vt.heightPx);
+        GraphicsContext g = canvas.getGraphicsContext2D();
+        g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
+        // 1) draw elevation as grayscale (cells) - using cached min/max and pre-computed colors
+        double cs = vt.cellPx;
+        for (int x = 0; x < vt.dimX; x++) {
+            for (int y = 0; y < vt.dimY; y++) {
+                double t = (map[x][y] - mapMin) / mapRange;
+                int gray = Math.max(0, Math.min(255, (int) Math.round(t * 255)));
+                g.setFill(GRAYSCALE[gray]);
+
+                double px = vt.cellXtoPx(x);
+                double py = vt.cellYtoPx(y);
+                g.fillRect(py, px, cs, cs);
+            }
+        }
 
         // 2) draw plants on top (meters)
         for (SpeciesMap sm : forest.getSpeciesMapList()) {
-                Color c = parseColour(sm.getSpecies().getColour()).deriveColor(0, 1, 1, 0.85);
+                Color c = colorCache.computeIfAbsent(sm.getSpecies().getColour(),
+                    colorStr -> parseColour(colorStr).deriveColor(0, 1, 1, 0.85));
                 g.setFill(c);
                 for (Plant p : sm.getPlants()) {
                     double xPx = vt.meterXtoPx(p.getX());
@@ -115,44 +153,9 @@ public class ForestOnMapView extends Region {
                     double rPx = Math.max(2.0, vt.metersToPx(p.getCanopyRadius()));
                     g.fillOval(yPx - rPx, xPx - rPx, rPx * 2, rPx * 2);
                     // swappiing them to plaster fix mirror image thing:    g.fillOval(xPx - rPx, yPx - rPx, rPx * 2, rPx * 2);
-                }     
+                }
         }
 
-        g.setStroke(Color.BLACK);
-        g.strokeRect(0.5, 0.5, vt.widthPx - 1, vt.heightPx - 1);
-    }
-    
-    public void draw(){
-        drawMap();
-        drawForest();
-    }
-    private void drawMap(){
-        mapCanvas.setWidth(vt.widthPx);
-        mapCanvas.setHeight(vt.heightPx);
-        GraphicsContext g = mapCanvas.getGraphicsContext2D();
-        g.clearRect(0, 0, mapCanvas.getWidth(), mapCanvas.getHeight());
-        // 1) draw elevation as grayscale (cells)
-        float min = Float.MAX_VALUE, max = -Float.MAX_VALUE;
-        for (int x = 0; x < vt.dimX; x++) {
-            for (int y = 0; y < vt.dimY; y++) {
-                float v = map[x][y];
-                if (v < min) min = v;
-                if (v > max) max = v;
-            }
-        }
-        double cs = vt.cellPx;
-        for (int x = 0; x < vt.dimX; x++) {
-            for (int y = 0; y < vt.dimY; y++) {
-                double t = (map[x][y] - min) / Math.max(1e-9, (max - min));
-                int gray = (int) Math.round(t * 255);
-                g.setFill(Color.rgb(gray, gray, gray));
-                
-                double px = vt.cellXtoPx(x);
-                double py = vt.cellYtoPx(y);
-                g.fillRect(py, px, cs, cs);
-                // swapping them to fix mirror image thing:   g.fillRect(px, py, cs, cs);
-            }
-        }
         g.setStroke(Color.BLACK);
         g.strokeRect(0.5, 0.5, vt.widthPx -1, vt.heightPx -1);
     }

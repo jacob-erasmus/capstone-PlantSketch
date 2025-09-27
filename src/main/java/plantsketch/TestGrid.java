@@ -3,6 +3,7 @@
 // to test that we are cooking sufficiently
 package plantsketch;
 
+import plantsketch.util.PerformanceTimer;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -115,7 +116,7 @@ public class TestGrid
         age.setGrid(makeRandomGrid(minAge, maxAge));
         moist.setGrid(makeRandomGrid(minMoist, maxMoist));
         sun.setGrid(makeRandomGrid(minSun, maxSun));
-        terrain.setElevationGrid(makeRandomGrid(minElev, maxElev));
+        terrain = new Terrain(dimX, dimY, gridSpacing, abiotics, makeRandomGrid(minElev, maxElev));
     }
     
     // Preset 1
@@ -141,7 +142,7 @@ public class TestGrid
             {5.5f, 6.0f}
         });
 
-        terrain.setElevationGrid(new float[][] {
+        terrain = new Terrain(dimX, dimY, gridSpacing, abiotics, new float[][] {
             {60.0f, 65.0f},
             {68.0f, 74.0f}
         });
@@ -180,7 +181,7 @@ public class TestGrid
             {6f, 11f}
         });
 
-        terrain.setElevationGrid(new float[][] {
+        terrain = new Terrain(dimX, dimY, gridSpacing, abiotics, new float[][] {
             {60.0f, 87.0f},
             {65.0f, 90.0f}
         });
@@ -359,6 +360,7 @@ public class TestGrid
     // run method for if it is not the first run
     public SimulationResult runChange(boolean pinkNoise, boolean runUndo) // , boolean updateSpecies
     {
+        PerformanceTimer.start("run_change");
         if (pinkNoise) {
             pinkNoise();
         }
@@ -375,6 +377,7 @@ public class TestGrid
             makeSimResult();
         }
         */
+        PerformanceTimer.end("run_change");
         return simResult;
     }
 
@@ -386,7 +389,7 @@ public class TestGrid
         this.age.setGrid(simResult.age().getGrid());
         this.moist.setGrid(simResult.abiotics().moistureMap.getGrid());
         this.sun.setGrid(simResult.abiotics().sunlightMap.getGrid());
-        this.terrain.setElevationGrid(simResult.terrain().getElevationGrid());
+        this.terrain = new Terrain(dimX, dimY, gridSpacing, abiotics, simResult.terrain().getElevationGrid());
         this.speciesList = simResult.speciesList();
         
         // Update abiotics reference
@@ -394,8 +397,9 @@ public class TestGrid
     }
 
     // run method only for the initial run
-    public SimulationResult run(int choice, String fullPath) 
+    public SimulationResult run(int choice, String fullPath)
     {
+        PerformanceTimer.start("initial_run");
         if (isTestGrid)
         {
 
@@ -412,6 +416,7 @@ public class TestGrid
             assembleForest();
             makeSimResult();
 
+            PerformanceTimer.end("initial_run");
             return simResult;
         }
         
@@ -426,7 +431,11 @@ public class TestGrid
             } else if (choice == 4) {
                 loadD("src/target/classes/D4-1024");
             } else if (choice == 5){
-                loadD(fullPath);
+                if (fullPath != null) {
+                    loadD(fullPath);
+                } else {
+                    throw new IllegalArgumentException("Custom folder path cannot be null");
+                }
             }
 
             pinkNoise();
@@ -434,6 +443,7 @@ public class TestGrid
             assembleForest();
             makeSimResult();
 
+            PerformanceTimer.end("initial_run");
             return simResult;
         }
     }
@@ -659,9 +669,6 @@ public class TestGrid
         return terrain.getElevationGrid();
     }
 
-    public void setElevationGrid(float[][] currentElevGrid) {
-        this.terrain.setElevationGrid(currentElevGrid);
-    }
 
     public float[][] getSlopeGrid() {
         return terrain.getSlopeGrid();

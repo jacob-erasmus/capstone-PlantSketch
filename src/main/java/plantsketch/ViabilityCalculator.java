@@ -1,5 +1,7 @@
 package plantsketch;
 
+import plantsketch.util.PerformanceTimer;
+
 public class ViabilityCalculator {
 
     private Terrain terrain;
@@ -37,6 +39,8 @@ public class ViabilityCalculator {
     }
 
     public float viabililty(Species species, int x, int y) {
+        PerformanceTimer.start("viability_calculation");
+
         // calculating the viablility wrt slope
         double cs = species.getSlopeC();
         double rs = species.getSlopeR();
@@ -63,6 +67,9 @@ public class ViabilityCalculator {
 
         // now we take the minimum as that is the deciding factor on the viability of
         // the species
-        return (float) Math.min(Math.min(fs, ft), Math.min(fe, fm));
+        float result = (float) Math.min(Math.min(fs, ft), Math.min(fe, fm));
+
+        PerformanceTimer.end("viability_calculation");
+        return result;
     }
 }
