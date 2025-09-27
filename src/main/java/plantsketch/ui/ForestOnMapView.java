@@ -186,8 +186,11 @@ public class ForestOnMapView extends Region {
         forestCanvas.setOnMousePressed(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()));
         forestCanvas.setOnMouseDragged(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()));
     }
-
-    public void disableBrushRemovalMode(){
+    public void enableBrushAgeMode(Supplier<Double> brushSizeSupplier, Supplier<Double> ageSupplier, TestGrid testGrid){
+        forestCanvas.setOnMousePressed(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get(), ageSupplier.get(), testGrid));
+        forestCanvas.setOnMouseDragged(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get(), ageSupplier.get(), testGrid));
+    }
+    public void disableBrushMode(){
         forestCanvas.setOnMousePressed(null);
         forestCanvas.setOnMouseDragged(null);
         forestCanvas.setOnMouseReleased(null);
@@ -226,6 +229,62 @@ public class ForestOnMapView extends Region {
         } 
     }
 
+    private void applyBrushAge(double brushX, double brushY, double brushSize, double ageFactor, TestGrid testGrid){
+        long brushStartTime = System.nanoTime();
+        double brushRadiusPx = brushSizeToPixels(brushSize);
+        List<Plant> toChange = new ArrayList<>();
+        double brushXMeters = vt.pxToMeterX(brushX);
+        double brushYMeters = vt.pxToMeterY(brushY);
+        double brushRadiusMeters = vt.pxToMeterX(brushRadiusPx);
+        // bounding box in cell indices
+        int minCellX = Math.max(0, (int)((brushXMeters - brushRadiusMeters) / gridSpacing));
+        int maxCellX = Math.min(map.length - 1, (int)((brushXMeters + brushRadiusMeters) / gridSpacing));
+        int minCellY = Math.max(0, (int)((brushYMeters - brushRadiusMeters) / gridSpacing));
+        int maxCellY = Math.min(map[0].length - 1, (int)((brushYMeters + brushRadiusMeters) / gridSpacing));
+
+        // --- Step 4: Loop through cells & check circular distance ---
+        for (int cx = minCellX; cx <= maxCellX; cx++) {
+            for (int cy = minCellY; cy <= maxCellY; cy++) {
+                // Find center of this cell in meters
+                double cellXMeters = cx * gridSpacing + gridSpacing / 2.0;
+                double cellYMeters = cy * gridSpacing + gridSpacing / 2.0;
+
+                // Distance from brush center to this cell
+                double dx = brushXMeters - cellXMeters;
+                double dy = brushYMeters - cellYMeters;
+                double dist = Math.hypot(dx, dy);
+
+                // Apply only if inside circular brush
+                if (dist <= brushRadiusMeters) {
+                    testGrid.adjustAge(cx, cy, (float)ageFactor);
+                }
+            }
+        }
+
+        for(Plant p : forest.getAllPlants()){
+            double xPx = vt.meterXtoPx(p.getX());
+            double yPx = vt.meterYtoPx(p.getY());
+            double rPx = Math.max(2.0, vt.metersToPx(p.getCanopyRadius()));
+            //swapped so same as draw method
+            double dx = brushX - yPx;
+            double dy = brushY - xPx;
+            double dist = Math.hypot(dx,dy);
+            //if plant canopy contacts brush radius
+            if(dist <= (brushRadiusPx + rPx)){
+                toChange.add(p);
+                //age change
+            }
+        }
+        if (!toChange.isEmpty()){
+            for(Plant p : toChange){
+                int xCell = (int) (p.getX() / gridSpacing);
+                int yCell = (int) (p.getY() / gridSpacing);
+                testGrid.changePlantAge(xCell, yCell, (float)ageFactor, p);
+            }
+            drawForest();
+            System.out.println("Brush Elapsed Time: " + (System.nanoTime() - brushStartTime) + " (nanoseconds). Changed ages of " + toChange.size() + " plants");
+        } 
+    }
     private double brushSizeToPixels(double size){
         return size * vt.cellPx;
     }

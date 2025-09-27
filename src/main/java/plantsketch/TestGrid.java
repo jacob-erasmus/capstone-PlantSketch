@@ -279,6 +279,20 @@ public class TestGrid
 
     }
 
+    public void adjustAge(int x, int y, float ageFactor){
+        age.setAdjustment(x, y, ageFactor);
+    }
+    public void changePlantAge(int x, int y, float ageFactor, Plant p){
+        float cohortAge = age.getAge(x, y);
+        float cap = Math.min(cohortAge, p.getLifeSpan());
+        Random r = new Random();
+        float plantAge = r.nextFloat() * cap * p.getSpecies().getViabilityAtPoint();
+        float height = new GrowthFunction().calculateSize(p.getSpecies(), plantAge, p.isAllometryOpen());
+        float canopy = height * (p.isAllometryOpen() ? p.getSpecies().getRadiusMultiplierOpen() : p.getSpecies().getRadiusMultiplierClosed());
+        p.setAge(plantAge);
+        p.setHeight(height);
+        p.setCanopyRadius(canopy);
+    }
     // assemble forest
     public Forest assembleForest()
     {
