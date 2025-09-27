@@ -183,12 +183,12 @@ public class ForestOnMapView extends Region {
         this.selectedSpeciesSupplier = supplier;
     }
     public void enableBrushRemovalMode(Supplier<Double> brushSizeSupplier){
-        forestCanvas.setOnMousePressed(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()));
-        forestCanvas.setOnMouseDragged(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()));
+        forestCanvas.setOnMousePressed(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()/3));
+        forestCanvas.setOnMouseDragged(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()/3));
     }
     public void enableBrushAgeMode(Supplier<Double> brushSizeSupplier, Supplier<Double> ageSupplier, TestGrid testGrid){
-        forestCanvas.setOnMousePressed(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get(), ageSupplier.get(), testGrid));
-        forestCanvas.setOnMouseDragged(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get(), ageSupplier.get(), testGrid));
+        forestCanvas.setOnMousePressed(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get()/3, ageSupplier.get(), testGrid));
+        forestCanvas.setOnMouseDragged(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get()/3, ageSupplier.get(), testGrid));
     }
     public void disableBrushMode(){
         forestCanvas.setOnMousePressed(null);
