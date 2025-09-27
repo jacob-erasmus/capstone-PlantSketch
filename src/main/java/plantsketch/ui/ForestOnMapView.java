@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
@@ -27,6 +28,7 @@ public class ForestOnMapView extends Region {
     private boolean useDefaultCellSize;
     private Set<String> selectedSpecies;
     private Supplier<Set<String>> selectedSpeciesSupplier;
+    private WritableImage mapImage;
 
     public ForestOnMapView(Forest forest, float[][] map, float gridSpacing) {
         this.forest = forest;
@@ -44,6 +46,7 @@ public class ForestOnMapView extends Region {
         canvas.setLayoutX(0);
         canvas.setLayoutY(0);
         getChildren().add(canvas);
+        renderMap();
         draw();
     }
 
@@ -63,6 +66,7 @@ public class ForestOnMapView extends Region {
         double newSize = Math.min(currentSize * 1.2, 3000);
         this.vt = new ViewTransform(dimX, dimY, gridSpacing, newSize, newSize, useDefaultCellSize);
         updateRegionSize();
+        renderMap();
         draw();
     }
     public void zoomOut(){
@@ -73,6 +77,7 @@ public class ForestOnMapView extends Region {
         double newSize = Math.max(currentSize / 1.2, 256);
         this.vt = new ViewTransform(dimX, dimY, gridSpacing, newSize, newSize, useDefaultCellSize);
         updateRegionSize();
+        renderMap();
         draw();
     }
     public void resetToDefault(){
@@ -81,6 +86,7 @@ public class ForestOnMapView extends Region {
         //reset
         this.vt = new ViewTransform(dimX, dimY, gridSpacing, dimX, dimY, useDefaultCellSize);
         updateRegionSize();
+        renderMap();
         draw();
     }
 
@@ -92,7 +98,29 @@ public class ForestOnMapView extends Region {
         canvas.setWidth(vt.widthPx);
         canvas.setHeight(vt.heightPx);
         GraphicsContext g = canvas.getGraphicsContext2D();
-        g.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        // 1) draw cached image
+        g.drawImage(mapImage, 0, 0);
+
+        // 2) draw plants on top (meters)
+        for (SpeciesMap sm : forest.getSpeciesMapList()) {
+                Color c = parseColour(sm.getSpecies().getColour()).deriveColor(0, 1, 1, 0.85);
+                g.setFill(c);
+                for (Plant p : sm.getPlants()) {
+                    double xPx = vt.meterXtoPx(p.getX());
+                    double yPx = vt.meterYtoPx(p.getY());
+                    double rPx = Math.max(2.0, vt.metersToPx(p.getCanopyRadius()));
+                    g.fillOval(yPx - rPx, xPx - rPx, rPx * 2, rPx * 2);
+                    // swappiing them to plaster fix mirror image thing:    g.fillOval(xPx - rPx, yPx - rPx, rPx * 2, rPx * 2);
+                }     
+        }
+
+        g.setStroke(Color.BLACK);
+        g.strokeRect(0.5, 0.5, vt.widthPx - 1, vt.heightPx - 1);
+    }
+    
+    private void renderMap(){
+        mapImage = new WritableImage((int) vt.widthPx, (int) vt.heightPx);
+        GraphicsContext g = new Canvas(vt.widthPx, vt.heightPx).getGraphicsContext2D();
         // 1) draw elevation as grayscale (cells)
         float min = Float.MAX_VALUE, max = -Float.MAX_VALUE;
         for (int x = 0; x < vt.dimX; x++) {
@@ -115,24 +143,9 @@ public class ForestOnMapView extends Region {
                 // swapping them to fix mirror image thing:   g.fillRect(px, py, cs, cs);
             }
         }
-
-        // 2) draw plants on top (meters)
-        for (SpeciesMap sm : forest.getSpeciesMapList()) {
-                Color c = parseColour(sm.getSpecies().getColour()).deriveColor(0, 1, 1, 0.85);
-                g.setFill(c);
-                for (Plant p : sm.getPlants()) {
-                    double xPx = vt.meterXtoPx(p.getX());
-                    double yPx = vt.meterYtoPx(p.getY());
-                    double rPx = Math.max(2.0, vt.metersToPx(p.getCanopyRadius()));
-                    g.fillOval(yPx - rPx, xPx - rPx, rPx * 2, rPx * 2);
-                    // swappiing them to plaster fix mirror image thing:    g.fillOval(xPx - rPx, yPx - rPx, rPx * 2, rPx * 2);
-                }     
-        }
-
-        g.setStroke(Color.BLACK);
-        g.strokeRect(0.5, 0.5, vt.widthPx - 1, vt.heightPx - 1);
+        g.getCanvas().snapshot(null, mapImage);
     }
-    
+
     private void setSelectedSpecies(){
         this.selectedSpecies = (selectedSpeciesSupplier != null) ? selectedSpeciesSupplier.get() : Collections.emptySet();
     }
