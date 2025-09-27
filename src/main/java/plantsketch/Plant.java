@@ -92,7 +92,7 @@ public class Plant {
     // Plant setters
     // ============================
 
-    public void setAge(int currentAge) {
+    public void setAge(float currentAge) {
         this.currentAge = currentAge;
     }
 

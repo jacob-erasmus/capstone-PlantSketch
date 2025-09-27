@@ -58,6 +58,7 @@ public class Interface extends BorderPane {
     private boolean isTestGrid;
     private int sampleCount;
     private boolean brushRemovalMode = false;
+    private boolean brushAgeMode = false;
     private ForestOnMapView forestElevationView;
     private ForestOnMapView forestTemperatureView;
     private ForestOnMapView forestSunlightView;
@@ -951,7 +952,6 @@ public class Interface extends BorderPane {
         elevationSlider.setSnapToTicks(true);
         elevationSlider.setPrefWidth(250);
 
-
         // brush stuff
         Label brushSize = new Label("Brush Size");
         Slider brushSizeSlider = new Slider(10, 90, 50);
@@ -989,6 +989,7 @@ public class Interface extends BorderPane {
         tabs.getSelectionModel().selectedItemProperty().addListener((obs, oldTab, newTab) -> {
             if (newTab != null) {
                 brushRemovalMode = false;
+                brushAgeMode = false;
                 saveState++;
                 saveStatesArray.add(currentResult);
                 if (saveStatesArray.size() > 20) // maximum 20 save states
@@ -1000,22 +1001,22 @@ public class Interface extends BorderPane {
                 console.log("\nNumber of Remaining Plants: " + currentResult.forest().getAllPlants().size());
                 switch(newTab.getText()){
                     case("Environment (Elevation)"):
-                            forestElevationView.disableBrushRemovalMode();
+                            forestElevationView.disableBrushMode();
                             forestElevationView.setCursor(Cursor.DEFAULT);  
                             forestElevationView.draw();
                             break;
                         case("Temperature"):
-                            forestTemperatureView.disableBrushRemovalMode();
+                            forestTemperatureView.disableBrushMode();
                             forestTemperatureView.setCursor(Cursor.DEFAULT);  
                             forestTemperatureView.draw();
                             break;
                         case("Sunlight"):
-                            forestSunlightView.disableBrushRemovalMode();
+                            forestSunlightView.disableBrushMode();
                             forestSunlightView.setCursor(Cursor.DEFAULT);  
                             forestSunlightView.draw();
                             break;
                         case("Moisture"):
-                            forestMoistureView.disableBrushRemovalMode();
+                            forestMoistureView.disableBrushMode();
                             forestMoistureView.setCursor(Cursor.DEFAULT);  
                             forestMoistureView.draw();
                             break;
@@ -1068,7 +1069,43 @@ public class Interface extends BorderPane {
             }    });
         enableBrushRemovalBtn.setPrefWidth(250);
 
-
+        Button enableAgeChangeBtn = new Button("Toggle Brush Age Mode");
+        enableAgeChangeBtn.setOnAction(e -> 
+            {
+            if (!brushAgeMode){
+                saveState++;
+                saveStatesArray.add(currentResult);
+                if (saveStatesArray.size() > 20) // maximum 20 save states
+                {
+                    saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
+                    saveState--; // the index now caps out at 20
+                }
+            }
+            switch(tabs.getSelectionModel().getSelectedItem().getText()){
+                    case("Environment (Elevation)"):
+                        forestElevationView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                        brushAge(forestElevationView, brushSizeSlider, ageSlider);
+                        break;
+                    case("Temperature"):
+                        forestTemperatureView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                        brushAge(forestTemperatureView, brushSizeSlider, ageSlider);
+                        break;
+                    case("Sunlight"):
+                        forestSunlightView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                        brushAge(forestSunlightView, brushSizeSlider, ageSlider);
+                        break;
+                    case("Moisture"):
+                        forestMoistureView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                        brushAge(forestMoistureView, brushSizeSlider, ageSlider);
+                        break;
+                    case("Pink Noise"):
+                        System.out.println("Brush functions are disabled for Pink Noise tab <-> FOR VISUAL PURPOSES ONLY");
+                        break;
+                    case("Forest"):
+                        System.out.println("Brush functions are disabled for Forest tab <-> FOR VISUAL PURPOSES ONLY");
+                        break;
+            }    });
+        enableAgeChangeBtn.setPrefWidth(250);
         // menu for abiotics
         VBox abioticContent = new VBox(10);
         abioticContent.getChildren().addAll
@@ -1091,6 +1128,7 @@ public class Interface extends BorderPane {
             brushSize,
             brushSizeSlider,
             enableBrushRemovalBtn,
+            enableAgeChangeBtn,
             new Separator());
 
         ScrollPane slidersPane = new ScrollPane();
@@ -1110,13 +1148,24 @@ public class Interface extends BorderPane {
             mapView.enableBrushRemovalMode(() -> brushSizeSlider.getValue());
             updateBrushCursor(mapView, brushSizeSlider.getValue());
         }else{
-            mapView.disableBrushRemovalMode();
+            mapView.disableBrushMode();
             mapView.setCursor(Cursor.DEFAULT);  
             console.log("\nNumber of Remaining Plants: " + currentResult.forest().getAllPlants().size());
         }
         
     }
 
+    private void brushAge(ForestOnMapView mapView, Slider brushSlider, Slider ageSlider){
+        brushAgeMode = !brushAgeMode;
+        if(brushAgeMode){
+            mapView.enableBrushAgeMode((() -> brushSlider.getValue()), (() -> ageSlider.getValue()), testGrid);
+            updateBrushCursor(mapView, brushSlider.getValue());
+        }else{
+            mapView.disableBrushMode();
+            mapView.setCursor(Cursor.DEFAULT);  
+            console.log("\nNumber of Remaining Plants: " + currentResult.forest().getAllPlants().size());
+        }
+    }
     private void updateBrushCursor(ForestOnMapView mapView, double brushSize){
 //image as cursor - some glitches so commented out for now.
 //Will fix/improve.
