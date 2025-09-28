@@ -1,7 +1,10 @@
 package plantsketch;
 
-//extracts logic that the Terrain class uses to calculate the slope
+//
 
+/**
+ * extracts logic that the Terrain class uses to calculate the slope
+ */
 public class Vector {
     float x;
     float y;

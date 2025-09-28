@@ -1,7 +1,11 @@
 package plantsketch;
 
-//The table class is used to hold a cumulative viability and a species for a point
-
+/**
+ * Table - Species Viability Data Holder
+ *
+ * Simple container that pairs a species with its cumulative viability score
+ * at a specific location. Used in sampling and selection algorithms.
+ */
 public class Table {
     Species species;
     float addedViability;

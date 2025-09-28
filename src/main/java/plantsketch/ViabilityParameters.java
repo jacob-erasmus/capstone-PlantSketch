@@ -1,6 +1,11 @@
-// Handles tolerance ranges for abiotic conditions
 package plantsketch;
 
+/**
+ * ViabilityParameters - Species Environmental Tolerance Data
+ *
+ * Stores optimal values (C) and tolerance ranges (R) for environmental factors
+ * that determine where a species can survive. Used in viability calculations.
+ */
 public class ViabilityParameters {
     private float sunlightC;
     private float sunlightR;
