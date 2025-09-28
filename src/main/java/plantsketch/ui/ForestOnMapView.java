@@ -207,9 +207,10 @@ public class ForestOnMapView extends Region {
             //swapped so same as draw method
             double dx = brushX - xPx;
             double dy = brushY - yPx;
-            double dist = Math.hypot(dx,dy);
+            double distSquared = dx*dx + dy*dy;
+            double thresholdSquared = (brushRadiusPx + rPx) * (brushRadiusPx + rPx);
             //if plant canopy contacts brush radius
-            if(dist <= (brushRadiusPx + rPx)){
+            if(distSquared <= thresholdSquared){
                 toRemove.add(p);
             }
         }
@@ -225,8 +226,8 @@ public class ForestOnMapView extends Region {
 
     private void applyBrushAge(double brushX, double brushY, double brushSize, double ageFactor, SimulationEngine simulationEngine){
         long brushStartTime = System.nanoTime();
-        double brushRadiusPx = brushSizeToPixels(brushSize);
         List<Plant> toChange = new ArrayList<>();
+        double brushRadiusPx = brushSizeToPixels(brushSize);
         double brushXMeters = vt.pxToMeterX(brushX);
         double brushYMeters = vt.pxToMeterY(brushY);
         double brushRadiusMeters = vt.pxToMeterX(brushRadiusPx);
@@ -246,10 +247,11 @@ public class ForestOnMapView extends Region {
                 // Distance from brush center to this cell
                 double dx = brushXMeters - cellXMeters;
                 double dy = brushYMeters - cellYMeters;
-                double dist = Math.hypot(dx, dy);
+                double distMSquared = dx*dx + dy*dy;
+                double brushRadiusMetersSquared = brushRadiusMeters * brushRadiusMeters;
 
                 // Apply only if inside circular brush
-                if (dist <= brushRadiusMeters) {
+                if (distMSquared <= brushRadiusMetersSquared) {
                     simulationEngine.adjustAge(cx, cy, (float)ageFactor);
                 }
             }
@@ -262,9 +264,10 @@ public class ForestOnMapView extends Region {
             //swapped so same as draw method
             double dx = brushX - xPx;
             double dy = brushY - yPx;
-            double dist = Math.hypot(dx,dy);
+            double distSquared = dx*dx + dy*dy;
+            double thresholdSquared = (brushRadiusPx + rPx) * (brushRadiusPx + rPx);
             //if plant canopy contacts brush radius
-            if(dist <= (brushRadiusPx + rPx)){
+            if(distSquared <= thresholdSquared){
                 toChange.add(p);
                 //age change
             }
@@ -276,7 +279,7 @@ public class ForestOnMapView extends Region {
                 simulationEngine.changePlantAge(xCell, yCell, (float)ageFactor, p);
             }
             drawForest();
-            System.out.println("Brush Elapsed Time: " + (System.nanoTime() - brushStartTime) + " (nanoseconds). Changed ages of " + toChange.size() + " plants");
+            //System.out.println("Brush Elapsed Time: " + (System.nanoTime() - brushStartTime) + " (nanoseconds). Changed ages of " + toChange.size() + " plants");
         } 
     }
     private double brushSizeToPixels(double size){
