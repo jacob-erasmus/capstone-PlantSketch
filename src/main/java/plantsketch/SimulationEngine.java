@@ -259,8 +259,8 @@ public class SimulationEngine
             float cohortAge = age.getAge(xCell, yCell);
             //float cap = Math.min(cohortAge, chosen.getLifeSpan());
             float plantAge = rAge * cohortAge * chosen.getViabilityAtPoint();
-            if(rAge > chosen.getLifeSpan()){
-                continue;
+            if(plantAge > chosen.getLifeSpan()){
+                plantAge = chosen.getLifeSpan();
             }
             boolean isOpen = density > openOrClosedDensity;
             float height = new GrowthFunction().calculateSize(chosen, plantAge, isOpen);
@@ -297,19 +297,16 @@ public class SimulationEngine
         float cohortAge = age.getAge(x, y);
         System.out.println("cohort Age: " + cohortAge);
         //plant dies
-        if (cohortAge > p.getLifeSpan()){
-            forest.removePlant(p);
-        }else{
-            //float cap = Math.min(cohortAge, p.getLifeSpan());
-            float plantAge = rAge * cohortAge * p.getSpecies().getViabilityAtPoint();
-            if(plantAge <= p.getLifeSpan()){
-                float height = new GrowthFunction().calculateSize(p.getSpecies(), plantAge, p.isAllometryOpen());
-                float canopy = height * (p.isAllometryOpen() ? p.getSpecies().getRadiusMultiplierOpen() : p.getSpecies().getRadiusMultiplierClosed());
-                p.setAge(plantAge);
-                p.setHeight(height);
-                p.setCanopyRadius(canopy);
-            }
+        float plantAge = rAge * cohortAge * p.getSpecies().getViabilityAtPoint();
+        if (plantAge > p.getLifeSpan()){
+            plantAge = p.getLifeSpan();
         }
+            float height = new GrowthFunction().calculateSize(p.getSpecies(), plantAge, p.isAllometryOpen());
+            float canopy = height * (p.isAllometryOpen() ? p.getSpecies().getRadiusMultiplierOpen() : p.getSpecies().getRadiusMultiplierClosed());
+            p.setAge(plantAge);
+            p.setHeight(height);
+            p.setCanopyRadius(canopy);
+
     }
     // assemble forest
     public Forest assembleForest()
