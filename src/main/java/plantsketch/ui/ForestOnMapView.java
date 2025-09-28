@@ -274,8 +274,10 @@ public class ForestOnMapView extends Region {
         }
         if (!toChange.isEmpty()){
             for(Plant p : toChange){
+                //int xCell = (int) vt.meterXToCellX(p.getX());
                 int xCell = (int) (p.getX() / gridSpacing);
                 int yCell = (int) (p.getY() / gridSpacing);
+                //int yCell = (int) vt.meterXToCellX(p.getY());
                 simulationEngine.changePlantAge(xCell, yCell, (float)ageFactor, p);
             }
             drawForest();

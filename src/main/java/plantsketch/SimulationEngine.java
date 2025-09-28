@@ -13,7 +13,7 @@ public class SimulationEngine
     boolean isTestGrid = true;
     private final Consumer<String> logger;
     private final Random r = new Random();
-    private final float rAge = r.nextFloat();
+    private final float randomFloat = r.nextFloat();
     // set values
     int sampleCount = 30;
     float gridSpacing = 25f; // in metres
@@ -258,7 +258,8 @@ public class SimulationEngine
 
             float cohortAge = age.getAge(xCell, yCell);
             //float cap = Math.min(cohortAge, chosen.getLifeSpan());
-            float plantAge = rAge * cohortAge * chosen.getViabilityAtPoint();
+            cohortAge = Math.min(cohortAge, 650);
+            float plantAge = randomFloat * cohortAge * chosen.getViabilityAtPoint();
             if(plantAge > chosen.getLifeSpan()){
                 plantAge = chosen.getLifeSpan();
             }
@@ -291,14 +292,38 @@ public class SimulationEngine
         }
     }
     public void changePlantAge(int x, int y, float ageFactor, Plant p){
+        float oldCanopy = p.getCanopyRadius();
+        float oldHeight = p.getHeight();
+        float oldAge = p.getAge(); // Get the plant's current stored age
+        
+        // Calculate new values
         float cohortAge = age.getAge(x, y);
-        //plant dies
-        float plantAge = rAge * cohortAge * p.getSpecies().getViabilityAtPoint();
+        float plantAge = randomFloat * cohortAge * p.getVigour();
+    
+        // Debug shrinking
+        if (plantAge < oldAge) {
+            System.out.println("=== AGE DECREASED ===");
+            System.out.println("Plant stored age: " + oldAge + " -> calculated age: " + plantAge);
+            System.out.println("Current cohort age: " + cohortAge);
+            System.out.println("What cohort age would give old plant age " + oldAge + "? " + 
+                            (oldAge / (randomFloat * p.getVigour()))); //p.getSpecies().getViabilityAtPoint())));
+        }
+    
         if (plantAge > p.getLifeSpan()){
-            plantAge = p.getLifeSpan();
+            plantAge = p.getLifeSpan();  
         }
             float height = new GrowthFunction().calculateSize(p.getSpecies(), plantAge, p.isAllometryOpen());
             float canopy = height * (p.isAllometryOpen() ? p.getSpecies().getRadiusMultiplierOpen() : p.getSpecies().getRadiusMultiplierClosed());
+        if (canopy < oldCanopy) {
+            System.out.println("SHRINKING PLANT:");
+            System.out.println("  Cohort age: " + cohortAge);
+            System.out.println("  Original plant age: " + oldAge);
+            System.out.println("  Capped plant age: " + plantAge);
+            System.out.println("  Lifespan: " + p.getLifeSpan());
+            System.out.println("  Old canopy: " + oldCanopy + " -> New canopy: " + canopy);
+            System.out.println("Allometry open? " + p.isAllometryOpen());
+            System.out.println("  Species: " + p.getSpecies().getName());
+        }
             p.setAge(plantAge);
             p.setHeight(height);
             p.setCanopyRadius(canopy);
