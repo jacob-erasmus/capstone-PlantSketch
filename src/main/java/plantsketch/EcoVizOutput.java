@@ -30,8 +30,8 @@ public class EcoVizOutput {
         {
             // header
             writer.println("3.0");
-           // writer.println(dimx + " " + dimy); // he said he wanted 0 0
-           writer.println("0 0");
+            writer.println(dimx + " " + dimy); // he said he wanted 0 0
+            //writer.println("0 0");
             writer.println("0");
             writer.println(numTrees);
 
@@ -55,10 +55,13 @@ public class EcoVizOutput {
 }
 /*
  
-    3.0
-    0 0
+    3.0(version number)
+    dimX(int) dimY(int)
     0
-    numTrees
-    TreeID(int) speciesName(4xchar) posx posy height canopyRadius 0 0
-
+    numTrees(int)
+    TreeID(int) speciesName(4xchar) posX(float) posY(float) heightOfTree(float) canopyRadius(float) 0 0
+    TreeID(int) speciesName(4xchar) posX(float) posY(float) heightOfTree(float) canopyRadius(float) 0 0
+    ...
+    TreeID(int) speciesName(4xchar) posX(float) posY(float) heightOfTree(float) canopyRadius(float) 0 0
+    0(terminating zero)
  */
