@@ -35,7 +35,7 @@ public class SimulationEngine
     int numPlants;
 
     // Preset Boundary values (based on ranges from literature)
-    float minTemp = -2.0f; // 1.5 lower than coldest tree
+    float minTemp = -1.5f; // 1 lower than coldest tree
     float maxTemp = 13.0f; // 1 higher
     float minAge = 0.0f; // no trees
     float maxAge = 650.0f; // 50 higher than oldest species
@@ -44,7 +44,7 @@ public class SimulationEngine
     float minSun = 0.0f; // no sun
     float maxSun = 13.0f; // 1 higher
 // arbitrary values for elev
-    float minElev = 60.0f;
+    float minElev = 0.0f;
     float maxElev = 100.0f; // the problem with this is that the slop is often far too high
     // temp change with elevation? air?
     float minSlope = 0.0f; // flat

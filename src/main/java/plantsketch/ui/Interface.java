@@ -577,15 +577,30 @@ public class Interface extends BorderPane {
                     // index of which save state it is
                         saveState++;
                         console.log("Re-simulating with new parameters...");
+
+                        boolean gridChanges = false;
+                        if (isTestGrid) gridChanges = readGridEditors();
+
                         // Update TestGrid with new values
-                        if (regeneratePinkNoise.isSelected() && isTestGrid) currentResult = simulationEngine.runChange(regeneratePinkNoise.isSelected(), false); // if need to regenerate pink noise
-                        else if (wasChange) currentResult = simulationEngine.runChange(regeneratePinkNoise.isSelected(), false); // if there was actually a change to anything
+                        if (regeneratePinkNoise.isSelected() && isTestGrid) {
+                            currentResult = simulationEngine.runChange(regeneratePinkNoise.isSelected(), false);
+                        } 
+                        else if (gridChanges || wasChange) 
+                        { // Use gridChanges OR wasChange
+                            currentResult = simulationEngine.runChange(regeneratePinkNoise.isSelected(), false);
+                        } 
+                        else 
+                        {
+                            console.log("No changes detected - skipping simulation");
+                            return; // Don't run simulation if no changes
+                        }
                 }
                 else
                 {
                     currentResult = simulationEngine.run(choice, fullPath);
                 
                 }
+                
                 // adds to the current save state
                 saveStatesArray.add(currentResult);
                 if (saveStatesArray.size() > maxSaveStates) // maximum 30 save states
