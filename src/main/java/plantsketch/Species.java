@@ -45,6 +45,21 @@ public class Species {
         this.viabilityAtPoint = viabilityAtPoint;
     }
 
+    public Species(Species other) 
+    {
+        this.name = other.name;
+        this.mnemonic = other.mnemonic;
+        this.viabilityParameters = new ViabilityParameters(other.viabilityParameters);
+        this.growthParameters = new GrowthParameters(other.growthParameters);
+        this.colour = other.colour;
+        this.radiusMultiplierOpen = other.radiusMultiplierOpen;
+        this.radiusMultiplierClosed = other.radiusMultiplierClosed;
+        this.leafTransparency = other.leafTransparency;
+        this.moistureAbsorbtion = other.moistureAbsorbtion;
+        this.growthPeriod = other.growthPeriod;
+        this.viabilityAtPoint = other.viabilityAtPoint;
+    }
+
     // ===== Core getters =====
     public String getName() {
         return name;

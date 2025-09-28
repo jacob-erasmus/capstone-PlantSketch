@@ -35,7 +35,7 @@ public class SimulationEngine
     int numPlants;
 
     // Preset Boundary values (based on ranges from literature)
-    float minTemp = -2.0f; // 1.5 lower than coldest tree
+    float minTemp = -1.5f; // 1 lower than coldest tree
     float maxTemp = 13.0f; // 1 higher
     float minAge = 0.0f; // no trees
     float maxAge = 650.0f; // 50 higher than oldest species
@@ -44,7 +44,7 @@ public class SimulationEngine
     float minSun = 0.0f; // no sun
     float maxSun = 13.0f; // 1 higher
 // arbitrary values for elev
-    float minElev = 60.0f;
+    float minElev = 0.0f;
     float maxElev = 100.0f; // the problem with this is that the slop is often far too high
     // temp change with elevation? air?
     float minSlope = 0.0f; // flat
@@ -292,7 +292,6 @@ public class SimulationEngine
     }
     public void changePlantAge(int x, int y, float ageFactor, Plant p){
         float cohortAge = age.getAge(x, y);
-
         //plant dies
         float plantAge = rAge * cohortAge * p.getSpecies().getViabilityAtPoint();
         if (plantAge > p.getLifeSpan()){
@@ -317,13 +316,17 @@ public class SimulationEngine
     // make simulation result object
     public SimulationResult makeSimResult()
     {
+        List<Species> deepCopy = new ArrayList<>();
+        for (Species s : speciesList) {
+            deepCopy.add(new Species(s)); // assuming Species has a copy constructor
+        }
         simResult = new SimulationResult(forest, pinkNoise, dimX, dimY, gridSpacing, 
             new AgeMap(dimX, dimY, gridSpacing, age.getGrid()), 
             new Terrain(dimX, dimY, gridSpacing, abiotics, terrain.elevationMap), 
             new AbioticFactors(new MoistureMap (dimX, dimY, gridSpacing, abiotics.getMoistureMap().getGrid()), 
                 new TemperatureMap(dimX, dimY, gridSpacing, abiotics.getTemperatureMap().getGrid()) , 
                 new SunlightMap(dimX, dimY, gridSpacing, abiotics.getSunlightMap().getGrid())), 
-                new ArrayList<Species>(speciesList));
+                deepCopy);
 
         //commenting this out to assist with merging
 //        new EcoVizOutput(simResult).createFile("testingGrid.pdb"); // and then make the file
