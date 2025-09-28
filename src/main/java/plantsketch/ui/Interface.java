@@ -22,71 +22,27 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-/**
- * The main user interface controller for the PlantSketch ecological simulation application.
- * This is the heart of the UI system - it manages everything the user sees and interacts with.
- *
- * Key responsibilities:
- * - Creates and manages all visualization tabs (forest views, environmental maps, etc.)
- * - Handles user interactions (brush tools, species selection, parameter editing)
- * - Coordinates between the simulation engine and the visual components
- * - Manages undo/redo functionality with save states
- * - Supports both Test Mode (2x2 grid) and Run Mode (full datasets)
- *
- * Architecture:
- * - Uses JavaFX BorderPane layout: toolbar at top, tabs in center, parameter panel on right
- * - Maintains multiple view objects for different data visualizations
- * - Implements a state management system for undo/redo operations
- * - Provides interactive editing tools (brush removal, age modification, species filtering)
- *
- * The interface adapts based on the simulation mode:
- * - Test Mode: Shows editable 2x2 parameter grids for experimentation
- * - Run Mode: Shows real environmental data with brush tools and species management
- */
 public class Interface extends BorderPane {
+    
 
-    // ==================== STATE MANAGEMENT ====================
-    // Undo/redo system: maintains a history of simulation states
-    private ArrayList<SimulationResult> saveStatesArray = new ArrayList<>();  // Stack of previous simulation states
-    private int saveState;                                                    // Current position in the state history
-    private boolean isUndo;                                                   // Flag to prevent save state creation during undo/redo
-    private int maxSaveStates = 10;                                          // Maximum number of states to keep in memory
+//*********** NOTES AND TO DO ****************\\
 
-    // ==================== CORE COMPONENTS ====================
-    private final Runnable onBack;                     // Callback to return to main menu
-    private SimulationEngine simulationEngine;         // The brain of the simulation - handles all ecological calculations
-    private SimulationResult currentResult;            // The current state of the simulation (forest, environment, etc.)
-    private boolean isTestGrid;                        // True = Test Mode (2x2 grid), False = Run Mode (full datasets)
-    private int sampleCount;                           // Number of plant samples to generate
+// must be able to change plant variables (ie max sunlight etc)
+// must read in slider values and apply them to the maps
+// edit species variables.
+// i have added getters and setters so i simply need to just edit speciesList values in TestGrid (global species changes)
+// make checking/ unchecking species automatic on button click
 
-    // ==================== INTERACTION MODES ====================
-    // These flags track which interactive tool is currently active
-    private boolean brushRemovalMode = false;         // True when user can click-drag to remove plants
-    private boolean brushAgeMode = false;             // True when user can click-drag to modify plant ages
 
-    // ==================== VISUALIZATION COMPONENTS ====================
-    // Multiple view objects - each shows the forest overlaid on different environmental data
-    private ForestOnMapView forestElevationView;      // Forest + elevation background
-    private ForestOnMapView forestTemperatureView;    // Forest + temperature background
-    private ForestOnMapView forestSunlightView;       // Forest + sunlight background
-    private ForestOnMapView forestMoistureView;       // Forest + moisture background
-    private ForestOnMapView forestAgeView;            // Forest + age background
-    private ForestView forestView;                     // Forest-only view (no environmental background)
+// species editing:
+    // pull down menu for each species
+    // be able to edit each value for the species
+    // when done, it'll run
+    // on button click (explain it is on button click because it is global)
+    // brush is still automatic though and on the brush stroke
 
-    // ==================== SPECIES MANAGEMENT ====================
-    Supplier<Set<String>> getSelectedSpecies;         // Function that returns currently selected species names
-    GridPane speciesPanelEditor;                       // UI panel for editing species parameters
-    // All the ecological parameters that can be edited for each species
-    String[] speciesParameters = {"sunlightC", "sunlightR", "moistureC", "moistureR",
-                                  "temperatureC", "temperatureR", "slopeC", "slopeR",
-                                  "maxHeightOpen", "maxHeightClosed", "q", "lifeSpan"};
-    TextField[] textFields;                            // Input fields for species parameter editing
+    // WHEN UNDO UPDATE SPECIES PARAMETERS TAB
 
-    // ==================== MAIN UI COMPONENTS ====================
-    private final TabPane tabs = new TabPane();                                        // Container for all visualization tabs
-    private final ConsolePane console = new ConsolePane();                             // Debug/log output area
-    private final Label statusLabel = new Label();                                     // Bottom status bar (shows grid values in Test Mode)
-    private final CheckBox regeneratePinkNoise = new CheckBox("Re-generate pink noise?"); // Option to create new random environmental variation
 
     private ArrayList<SimulationResult> saveStatesArray = new ArrayList<>();
     private int saveState;
@@ -127,34 +83,19 @@ public class Interface extends BorderPane {
     
 //*********** CONSTRUCTOR ****************\\
 
-    /**
-     * Creates the main interface for the PlantSketch simulation.
-     * This sets up the entire UI system and initializes the simulation engine.
-     *
-     * @param onBack Callback function to return to the main menu (passed from MainApp)
-     * @param mode The simulation mode string (for display in toolbar)
-     * @param isTestGrid True for Test Mode (2x2 grids), False for Run Mode (full datasets)
-     * @param sampleCount Number of plant samples to generate in the simulation
-     */
+
     public Interface(Runnable onBack, String mode, boolean isTestGrid, int sampleCount) {
-        // Store configuration parameters
         this.onBack = onBack;
         this.sampleCount = sampleCount;
-        this.isTestGrid = isTestGrid;
-
-        // Initialize the simulation engine - this is the core computational component
-        // Pass console::log as a logging function so the engine can write to our console
         this.simulationEngine = new SimulationEngine(console::log, isTestGrid, sampleCount);
-
-        // Initialize state management system
-        isUndo = false;    // Not currently in an undo/redo operation
-        saveState = 0;     // Start at the first state position
-
-        // Build the entire user interface layout
+        this.isTestGrid = isTestGrid;
+        isUndo = false;
+        saveState = 0;
+        
         setupUI(mode);
-
-        // Redirect System.out and System.err to our console pane for debugging
         console.hookSystemStreams();
+
+        
     }
     
 
@@ -168,7 +109,7 @@ public class Interface extends BorderPane {
         // Center - split between tabs and console
         var logHeader = buildLogHeader();
 
-        // this is the lhs thing with all the windows, visual panes and terminal
+        // this is the lhs thing with all of the windows, visual panes and terminal
         var logBox = new VBox(logHeader, console.getNode());
  
         var split = new SplitPane();
@@ -231,118 +172,86 @@ public class Interface extends BorderPane {
         return statusBar;
     }
 
-    /**
-     * Creates all visualization tabs that display different environmental data layers.
-     * This is the main tab creation method that gets called whenever simulation results change.
-     * Each tab shows the forest overlaid on a different type of environmental data.
-     */
+    // Create visualization tabs at the top
     public void createTabs()
     {
-        // Remove all existing tabs first (this prevents duplicate tabs when refreshing)
         tabs.getTabs().clear();
-
-        // Create tabs for each environmental layer - these all use the same ForestOnMapView component
-        // but with different background data layers to show how environmental conditions affect plant growth
         createForestOnMapTab(currentResult.terrain().getElevationGrid(), "Environment (Elevation)");
         createForestOnMapTab(currentResult.abiotics().getMoistureMap().getGrid(), "Moisture");
         createForestOnMapTab(currentResult.abiotics().getSunlightMap().getGrid(), "Sunlight");
         createForestOnMapTab(currentResult.abiotics().getTemperatureMap().getGrid(), "Temperature");
         createForestOnMapTab(simulationEngine.getAgeGrid(), "Age");
+        createPinkNoiseTab();
+        createForestTab();
 
-        // These two tabs use different visualization components (not ForestOnMapView)
-        createPinkNoiseTab();  // Shows the random sampling pattern used for plant placement
-        createForestTab();     // Shows just the forest without environmental background
     }
     
 
-    /**
-     * Creates a tab that displays the forest overlaid on environmental data (elevation, moisture, etc.).
-     * Each environmental layer gets its own tab with identical zoom controls but different background data.
-     * This method handles the repetitive setup that's needed for each environmental visualization.
-     */
+    // Create Forest + Elevation tab with zoom controls
     private void createForestOnMapTab(float[][] map, String mapType){
-        // Main container for this tab - VBox stacks zoom controls on top, map view below
-        VBox mapContainer = new VBox(5); // 5px spacing between elements
-
-        // Create zoom control bar that sits at the top of each environmental tab
-        HBox zoomControls = new HBox(10); // Horizontal layout with 10px spacing
-        zoomControls.setAlignment(Pos.CENTER_LEFT);  // Align controls to left side
-        zoomControls.setPadding(new Insets(5));      // 5px padding around the controls
-
-        // Create zoom buttons and label - same design across all environmental tabs
-        Button zoomInBtn = new Button("+");      // Increases zoom by 20%
-        Button zoomOutBtn = new Button("-");     // Decreases zoom by 20%
-        Button defaultBtn = new Button("Default"); // Resets to 1:1 scale
-        Label zoomLabel = new Label("100%");      // Shows current zoom percentage
-
-        // Make buttons consistent size for better visual alignment
-        zoomInBtn.setPrefSize(30, 30);   // Square buttons for +/-
+        VBox mapContainer = new VBox(5);
+        HBox zoomControls = new HBox(10);
+        zoomControls.setAlignment(Pos.CENTER_LEFT);
+        zoomControls.setPadding(new Insets(5));
+        
+        Button zoomInBtn = new Button("+");
+        Button zoomOutBtn = new Button("-");
+        Button defaultBtn = new Button("Default");
+        Label zoomLabel = new Label("100%");
+        
+        zoomInBtn.setPrefSize(30, 30);
         zoomOutBtn.setPrefSize(30, 30);
-        defaultBtn.setPrefSize(100, 30); // Wider button for "Default" text
-
-        // Add all zoom controls to the horizontal container in logical order
+        defaultBtn.setPrefSize(100, 30);
+        
         zoomControls.getChildren().addAll(zoomOutBtn, zoomInBtn, defaultBtn, zoomLabel);
 
-        // Create the main visualization component based on which environmental layer was requested
-        // Each case creates the same type of view but stores it in a different instance variable
-        // so we can update each view independently when the simulation changes
+        //Create the view
         ScrollPane mapPane = null;
         switch (mapType) {
                 case "Environment (Elevation)":
-                    // Create elevation view - shows forest overlaid on terrain height data
                     this.forestElevationView = new ForestOnMapView(currentResult.forest(), map, currentResult.gridSpacing());
-                    mapPane = new ScrollPane(forestElevationView); // Wrap in scroll pane for panning large maps
-
-                    // Track zoom level for this specific view (each environmental tab has independent zoom)
-                    // Using array because lambda expressions need "effectively final" variables
-                    final double[] zoomLevel = {1.0}; // Start at 100% zoom
-
-                    // Zoom In: Increase size by 20% each click, capped at 3000px to prevent memory issues
-                    zoomInBtn.setOnAction(e -> {
-                        if(forestElevationView.getHeight() != 3000){ // Check if we're at maximum zoom
-                            zoomLevel[0] = zoomLevel[0] * 1.2;          // Increase zoom by 20%
-                            forestElevationView.zoomIn();               // Tell the view to zoom in
-                            zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100)); // Update label
+                    mapPane = new ScrollPane(forestElevationView);
+                    
+                    // Zoom track
+                    final double[] zoomLevel = {1.0};
+                    zoomInBtn.setOnAction(e -> { 
+                        //limit
+                        if(forestElevationView.getHeight() != 3000){
+                            zoomLevel[0] = zoomLevel[0] * 1.2;
+                            forestElevationView.zoomIn();
+                            zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100));
                         }else{
-                            zoomLabel.setText("Max Zoom");              // Show we've hit the limit
+                            zoomLabel.setText("Max Zoom");
                         }
                     });
-
-                    // Zoom Out: Decrease size by 20% each click, capped at 256px to maintain readability
                     zoomOutBtn.setOnAction(e -> {
-                        if(forestElevationView.getHeight() != 256){  // Check if we're at minimum zoom
-                            zoomLevel[0] = zoomLevel[0] / 1.2;          // Decrease zoom by 20%
-                            forestElevationView.zoomOut();              // Tell the view to zoom out
-                            zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100)); // Update label
+                        if(forestElevationView.getHeight() != 256){
+                            zoomLevel[0] = zoomLevel[0] / 1.2;
+                            forestElevationView.zoomOut();
+                            zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100));
                         }else{
-                            zoomLabel.setText("Min Zoom");              // Show we've hit the limit
+                            zoomLabel.setText("Min Zoom");
                         }
                     });
-
-                    // Reset to Default: Return to 1:1 scale (100% zoom)
                     defaultBtn.setOnAction(e -> {
-                        zoomLevel[0] = 1.0;                          // Reset zoom tracking
-                        forestElevationView.resetToDefault();        // Tell view to reset scale
-                        zoomLabel.setText("100%");                   // Update label to show default
+                        zoomLevel[0] = 1.0;
+                        forestElevationView.resetToDefault();
+                        zoomLabel.setText("100%");
                     });
 
-                    // Add zoom controls and map to the container (controls on top, map below)
                     mapContainer.getChildren().addAll(zoomControls, mapPane);
                     break;
 
                 case "Moisture":
-                    // Create moisture view - shows forest overlaid on soil moisture data
-                    // This helps visualize how water availability affects plant distribution
                     this.forestMoistureView = new ForestOnMapView(currentResult.forest(), map, currentResult.gridSpacing());
                     mapPane = new ScrollPane(forestMoistureView);
 
-                    // Independent zoom tracking for moisture tab (separate from elevation tab)
+                    // Zoom track
                     final double[] zoomMLevel = {1.0};
-
-                    // Same zoom behavior as elevation tab, but operates on moisture view instance
-                    zoomInBtn.setOnAction(e -> {
-                        if(forestMoistureView.getHeight() != 3000){   // 3000px zoom limit
-                            zoomMLevel[0] = zoomMLevel[0] * 1.2;        // 20% zoom increase
+                    zoomInBtn.setOnAction(e -> { 
+                        //limit
+                        if(forestMoistureView.getHeight() != 3000){
+                            zoomMLevel[0] = zoomMLevel[0] * 1.2;
                             forestMoistureView.zoomIn();
                             zoomLabel.setText(String.format("%.0f%%", zoomMLevel[0] * 100));
                         }else{
@@ -350,8 +259,8 @@ public class Interface extends BorderPane {
                         }
                     });
                     zoomOutBtn.setOnAction(e -> {
-                        if(forestMoistureView.getHeight() != 256){    // 256px minimum size
-                            zoomMLevel[0] = zoomMLevel[0] / 1.2;        // 20% zoom decrease
+                        if(forestMoistureView.getHeight() != 256){
+                            zoomMLevel[0] = zoomMLevel[0] / 1.2;
                             forestMoistureView.zoomOut();
                             zoomLabel.setText(String.format("%.0f%%", zoomMLevel[0] * 100));
                         }else{
@@ -359,20 +268,18 @@ public class Interface extends BorderPane {
                         }
                     });
                     defaultBtn.setOnAction(e -> {
-                        zoomMLevel[0] = 1.0;                          // Reset to 100%
+                        zoomMLevel[0] = 1.0;
                         forestMoistureView.resetToDefault();
                         zoomLabel.setText("100%");
                     });
-
+                    
                     mapContainer.getChildren().addAll(zoomControls, mapPane);
                     break;
                 case "Sunlight":
-                    // Create sunlight view - shows forest overlaid on light availability data
-                    // Critical for understanding photosynthesis potential in different areas
                     this.forestSunlightView = new ForestOnMapView(currentResult.forest(), map, currentResult.gridSpacing());
                     mapPane = new ScrollPane(forestSunlightView);
 
-                    // Independent zoom tracking for sunlight tab
+                    // Zoom track
                     final double[] zoomSLevel = {1.0};
                     zoomInBtn.setOnAction(e -> { 
                         //limit
@@ -402,12 +309,10 @@ public class Interface extends BorderPane {
                     mapContainer.getChildren().addAll(zoomControls, mapPane);
                     break;
                 case "Temperature":
-                    // Create temperature view - shows forest overlaid on thermal data
-                    // Temperature affects plant metabolism and species viability ranges
                     this.forestTemperatureView = new ForestOnMapView(currentResult.forest(), map, currentResult.gridSpacing());
                     mapPane = new ScrollPane(forestTemperatureView);
 
-                    // Independent zoom tracking for temperature tab
+                    // Zoom track
                     final double[] zoomTLevel = {1.0};
                     zoomInBtn.setOnAction(e -> { 
                         //limit
@@ -437,12 +342,10 @@ public class Interface extends BorderPane {
                     mapContainer.getChildren().addAll(zoomControls, mapPane);
                     break;
                 case "Age":
-                    // Create age view - shows forest overlaid on plant age distribution data
-                    // Useful for understanding forest succession and growth patterns over time
                     this.forestAgeView = new ForestOnMapView(currentResult.forest(), map, currentResult.gridSpacing());
                     mapPane = new ScrollPane(forestAgeView);
 
-                    // Independent zoom tracking for age tab
+                    // Zoom track
                     final double[] zoomALevel = {1.0};
                     zoomInBtn.setOnAction(e -> {
                         //limit
@@ -472,65 +375,46 @@ public class Interface extends BorderPane {
                     mapContainer.getChildren().addAll(zoomControls, mapPane);
                     break;
             }
-
-        // Configure scroll behavior for all environmental map tabs
-        // These settings ensure that large maps can be panned and scrolled properly
-        mapPane.setFitToHeight(false);  // Don't auto-scale height to fit container
-        mapPane.setFitToWidth(false);   // Don't auto-scale width to fit container
-        mapPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS); // Always show horizontal scrollbar
-        mapPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS); // Always show vertical scrollbar
-
-        // Allow the map pane to expand to fill available vertical space in the tab
+        mapPane.setFitToHeight(false);
+        mapPane.setFitToWidth(false);
+        mapPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
+        mapPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);     
         VBox.setVgrow(mapPane, Priority.ALWAYS);
-
-        // Create the actual tab and add it to the tab container
         tabs.getTabs().add(makeTab(mapType, mapContainer));
     }
 
-    /**
-     * Creates the Pink Noise visualization tab.
-     * This tab shows the random sampling pattern used to place plants in the simulation.
-     * Pink noise creates more natural-looking random distributions than pure white noise.
-     * This helps users understand how plants were initially distributed before growth simulation.
-     */
+    // Create Pink Noise tab with zoom controls
     private void createPinkNoiseTab(){
-        // Container setup - same pattern as environmental tabs
         VBox pinkNoiseContainer = new VBox(5);
         HBox zoomControls = new HBox(10);
         zoomControls.setAlignment(Pos.CENTER_LEFT);
         zoomControls.setPadding(new Insets(5));
-
-        // Create zoom controls (identical to environmental tabs for consistent UI)
+        
         Button zoomInBtn = new Button("+");
         Button zoomOutBtn = new Button("-");
         Button defaultBtn = new Button("Default");
         Label zoomLabel = new Label("100%");
-
-        // Standard button sizing
+        
         zoomInBtn.setPrefSize(30, 30);
         zoomOutBtn.setPrefSize(30, 30);
         defaultBtn.setPrefSize(100, 30);
-
+        
         zoomControls.getChildren().addAll(zoomOutBtn, zoomInBtn, defaultBtn, zoomLabel);
-
-        // Create pink noise visualization - shows the random sampling pattern used for plant placement
-        // Uses the sample points from the simulation to show where plants were initially placed
-        PinkNoiseView pinkNoiseView = new PinkNoiseView(currentResult.samples(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing());
+        
+        // Create the view
+        PinkNoiseView pinkNoiseView = new PinkNoiseView(currentResult.samples(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()); 
         ScrollPane pinkNoisePane = new ScrollPane(pinkNoiseView);
-
-        // Same scroll configuration as environmental tabs
         pinkNoisePane.setFitToHeight(false);
         pinkNoisePane.setFitToWidth(false);
         pinkNoisePane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         pinkNoisePane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-
-        // Track zoom level for this specific view
+        // Zoom track
         final double[] zoomLevel = {1.0};
         
-        // Zoom behavior - identical to environmental tabs since this follows same interaction pattern
-        zoomInBtn.setOnAction(e -> {
-            if(pinkNoiseView.getHeight() != 3000){   // Same 3000px limit as other visualizations
-                zoomLevel[0] = zoomLevel[0] * 1.2;    // 20% increase per click
+        zoomInBtn.setOnAction(e -> { 
+            //limit
+            if(pinkNoiseView.getHeight() != 3000){
+                zoomLevel[0] = zoomLevel[0] * 1.2;
                 pinkNoiseView.zoomIn();
                 zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100));
             }else{
@@ -539,8 +423,8 @@ public class Interface extends BorderPane {
         });
 
         zoomOutBtn.setOnAction(e -> {
-            if(pinkNoiseView.getHeight() != 256){    // Same 256px minimum as other visualizations
-                zoomLevel[0] = zoomLevel[0] / 1.2;    // 20% decrease per click
+            if(pinkNoiseView.getHeight() != 256){
+                zoomLevel[0] = zoomLevel[0] / 1.2;
                 pinkNoiseView.zoomOut();
                 zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100));
             }else{
@@ -549,61 +433,47 @@ public class Interface extends BorderPane {
         });
 
         defaultBtn.setOnAction(e -> {
-            zoomLevel[0] = 1.0;                      // Reset to 100% scale
+            zoomLevel[0] = 1.0;
             pinkNoiseView.resetToDefault();
             zoomLabel.setText("100%");
         });
-
-        // Assemble the tab components and add to tab container
         pinkNoiseContainer.getChildren().addAll(zoomControls, pinkNoisePane);
-        VBox.setVgrow(pinkNoisePane, Priority.ALWAYS);  // Allow pane to expand vertically
+        VBox.setVgrow(pinkNoisePane, Priority.ALWAYS);
         tabs.getTabs().add(makeTab("Pink Noise", pinkNoiseContainer));
     }
     
-    /**
-     * Creates the Forest-only visualization tab.
-     * This tab shows just the forest without any environmental background data.
-     * It's simpler and faster to render than the environmental overlay tabs,
-     * making it ideal for focusing purely on forest structure and species distribution.
-     */
+    // Create Forest tab with zoom controls
     private void createForestTab(){
-        // Same container setup pattern as other tabs
         VBox forestContainer = new VBox(5);
         HBox zoomControls = new HBox(10);
         zoomControls.setAlignment(Pos.CENTER_LEFT);
         zoomControls.setPadding(new Insets(5));
-
-        // Standard zoom control buttons
+        
         Button zoomInBtn = new Button("+");
         Button zoomOutBtn = new Button("-");
         Button defaultBtn = new Button("Default");
         Label zoomLabel = new Label("100%");
-
-        // Consistent button sizing across all tabs
+        
         zoomInBtn.setPrefSize(30, 30);
         zoomOutBtn.setPrefSize(30, 30);
         defaultBtn.setPrefSize(100, 30);
-
+        
         zoomControls.getChildren().addAll(zoomOutBtn, zoomInBtn, defaultBtn, zoomLabel);
-
-        // Create forest-only view - shows plants as colored circles on black background
-        // This is much simpler than ForestOnMapView since there's no environmental background to render
-        forestView = new ForestView(currentResult.forest(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing());
+        
+        // Create the view
+        forestView = new ForestView(currentResult.forest(), currentResult.dimX(), currentResult.dimY(), currentResult.gridSpacing()); 
         ScrollPane forestViewPane = new ScrollPane(forestView);
-
-        // Standard scroll pane configuration
         forestViewPane.setFitToHeight(false);
         forestViewPane.setFitToWidth(false);
         forestViewPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         forestViewPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
-
-        // Zoom level tracking for forest view
+        // Zoom track
         final double[] zoomLevel = {1.0};
-
-        // Forest tab zoom handlers - identical behavior to other tabs
-        zoomInBtn.setOnAction(e -> {
-            if(forestView.getHeight() != 3000){      // Standard zoom limit
-                zoomLevel[0] = zoomLevel[0] * 1.2;    // 20% increase
+        
+        zoomInBtn.setOnAction(e -> { 
+            //limit
+            if(forestView.getHeight() != 3000){
+                zoomLevel[0] = zoomLevel[0] * 1.2;
                 forestView.zoomIn();
                 zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100));
             }else{
@@ -612,8 +482,8 @@ public class Interface extends BorderPane {
         });
 
         zoomOutBtn.setOnAction(e -> {
-            if(forestView.getHeight() != 256){       // Standard minimum size
-                zoomLevel[0] = zoomLevel[0] / 1.2;    // 20% decrease
+            if(forestView.getHeight() != 256){
+                zoomLevel[0] = zoomLevel[0] / 1.2;
                 forestView.zoomOut();
                 zoomLabel.setText(String.format("%.0f%%", zoomLevel[0] * 100));
             }else{
@@ -622,115 +492,86 @@ public class Interface extends BorderPane {
         });
 
         defaultBtn.setOnAction(e -> {
-            zoomLevel[0] = 1.0;                      // Reset to 100%
+            zoomLevel[0] = 1.0;
             forestView.resetToDefault();
             zoomLabel.setText("100%");
         });
-
-        // Assemble and add the forest tab
         forestContainer.getChildren().addAll(zoomControls, forestViewPane);
-        VBox.setVgrow(forestViewPane, Priority.ALWAYS);  // Allow vertical expansion
+        VBox.setVgrow(forestViewPane, Priority.ALWAYS);
         tabs.getTabs().add(makeTab("Forest", forestContainer));
     }
 
-    /**
-     * Updates all visualization tabs when simulation results change.
-     * This is called after each simulation run or when switching between saved states.
-     * It recreates all the visualization tabs with new data while preserving user settings.
-     */
+    // this updates the three tabs on the top and makes the grids
     private void updateVisualization() {
-        // Clear all existing tabs to prevent duplicates when refreshing
-        tabs.getTabs().clear();
-
-        // Recreate all visualization tabs with updated simulation data
+        tabs.getTabs().clear();   
         createTabs();
-
-        // Update bottom status panel (only needed in Test Mode for environmental parameter display)
+    
+        // bottom info not used for run
         if(isTestGrid) updateStatusDisplay();
-
-        // Log the total plant count to console for debugging and user feedback
+        
         console.log("Plants: " + currentResult.forest().getAllPlants().size());
     }
 
 
-    /**
-     * Initializes the simulation with a specific mode selected from the startup screen.
-     * This method handles the transition from mode selection to actually running the simulation.
-     * Different modes provide different environmental configurations for testing or real data.
-     */
+    // This is just for the second screen with the options 
     public void initializeWithMode(String mode) {
-        // Clear console from previous sessions
         console.clear();
-
-        // Test Mode: Uses 2x2 grid with randomized or preset environmental conditions
+        // console.log("Initializing Test Mode: " + mode);
+        
         if (isTestGrid)
         {
             switch (mode) {
                 case "random":
-                    executeSimulation(0, false, null);  // 0 = random environmental parameters
+                    executeSimulation(0, false, null);
                     break;
                 case "preset1":
-                    executeSimulation(1, false, null);  // 1 = first predefined environment
+                    executeSimulation(1, false, null);
                     break;
                 case "preset2":
-                    executeSimulation(2, false, null);  // 2 = second predefined environment
+                    executeSimulation(2, false, null);
                     break;
             }
         }
-        // Run Mode: Uses real environmental data from preset datasets or custom folders
         else
         {
+
             switch (mode){
                 case "preset1":
-                    executeSimulation(1, false, null);  // D1-256: 256x256 grid dataset
+                    executeSimulation(1, false, null);
                     break;
                 case "preset2":
-                    executeSimulation(2, false, null);  // D2-512: 512x512 grid dataset
+                    executeSimulation(2, false, null);
                     break;
                 case "preset3":
-                    executeSimulation(3, false, null);  // D3-1024: 1024x1024 grid dataset
+                    executeSimulation(3, false, null);
                 case "preset4":
-                    executeSimulation(4, false, null);  // D4-1024: Alternative 1024x1024 dataset
+                    executeSimulation(4, false, null);
                 case "chooseFolder":
-                    // Initialize engine for custom folder loading
                     simulationEngine = new SimulationEngine(console::log, isTestGrid, sampleCount);
                     console.log("Custom folder mode - waiting for folder data...");
-                    executeSimulation(5, false, null);  // 5 = custom folder mode
+                    executeSimulation(5, false, null);
             }
         }
     }
 
-    /**
-     * Executes a simulation with the specified configuration.
-     * This is the core method that actually runs the ecological simulation and updates the UI.
-     *
-     * @param choice The simulation preset (0=random, 1-4=presets, 5=custom folder)
-     * @param isResimulation Whether this is a re-run of existing configuration
-     * @param fullPath Custom folder path (used when choice=5)
-     */
+    // here is execute simulation for the first time
     private void executeSimulation(int choice, boolean isResimulation, String fullPath) {
-        // Start performance monitoring for this simulation run
         PerformanceTimer.start("execute_simulation");
-
-        // Clear any existing visualization tabs before creating new ones
         tabs.getTabs().clear();
 
         try {
-            // Only save state for undo/redo if this isn't part of an undo operation
             if (!isUndo)
             {
-                // Clean up redo history when user makes a new change (creates a new "branch")
-                // If we're not at the latest state, remove all states after current position
+                // making a new 'branch' as the user has made an edit. can no longer redo
                 if(saveStatesArray.size() -1 > saveState)
                 {
-                    // Remove all future states since user has made a change
                     for (int i = saveState; i < saveStatesArray.size(); i++)
                     {
                         saveStatesArray.remove(i);
                     }
                 }
+                
 
-                // Handle different types of simulation execution
                 if(isResimulation)
                 {
                     // index of which save state it is
@@ -756,84 +597,66 @@ public class Interface extends BorderPane {
                 }
                 else
                 {
-                    // This is an initial simulation run with a specific preset configuration
                     currentResult = simulationEngine.run(choice, fullPath);
+                
                 }
                 
                 // adds to the current save state
                 saveStatesArray.add(currentResult);
-
-                // Limit memory usage by capping the number of saved states
                 if (saveStatesArray.size() > maxSaveStates) // maximum 30 save states
                 {
-                    saveStatesArray.remove(1); // Keep original forest but remove oldest iteration
-                    saveState--; // Adjust index to stay within bounds
+                    saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
+                    saveState--; // the index now caps out at 20
+
                 }
             }
 
             // Update grid editors with current values
             if (isTestGrid) 
             {
-                // Test Mode: Update parameter editors and status display
-                updateGridEditors();     // Sync UI controls with current environmental values
-                updateStatusDisplay();   // Update bottom status panel
+                updateGridEditors();
+                updateStatusDisplay();
+
             }
             
             // console.log("✓ Simulation complete. Plants placed: " + currentResult.forest().getAllPlants().size());
 
             int numSpecies = 0;
-            for (SpeciesMap sm : currentResult.forest().getOverallSpeciesMap())
+            for (SpeciesMap sm : currentResult.forest().getOverallSpeciesMap()) 
             {
-                // Show count and name for each species in the simulation
                 console.log(" - " + sm.getPlants().size() + "  " + sm.getSpecies().getName() );
-                if (sm.getPlants().size() > 0) numSpecies++;  // Count only species with living plants
+                if (sm.getPlants().size() > 0) numSpecies++;
             }
-
+            
             console.log("Number of species: " + numSpecies);
-
-            // Reset undo flag and refresh all visualization tabs
             isUndo = false;
             updateVisualization();
             wasChange = false;
 
         } catch (Exception ex)
         {
-            // Handle simulation errors gracefully
             ex.printStackTrace();
-            console.log("✗ Simulation failed: " + ex.getMessage());
+            console.log("✗ Test simulation failed: " + ex.getMessage());
         } finally {
-            // Always stop performance timer, even if simulation failed
             PerformanceTimer.end("execute_simulation");
         }
     }
 
-    /**
-     * Helper method to create a non-closable tab with specified name and content.
-     * All visualization tabs are non-closable to maintain a consistent UI structure.
-     */
     private Tab makeTab(String name, Node content) {
         Tab t = new Tab(name, content);
-        t.setClosable(false);  // Prevent users from accidentally closing visualization tabs
+        t.setClosable(false);
         return t;
     }
 
-    /**
-     * Undoes the last simulation change by reverting to the previous saved state.
-     * This allows users to step backwards through their simulation history.
-     */
     private void undo()
     {
-        // Can only undo if we have multiple states and aren't at the beginning
         if(saveStatesArray.size() > 1 && saveState > 0)
         {
-            // Mark this as an undo operation to prevent creating new save states
             isUndo = true;
 
-            // Move back one step in the history
+            // saveStatesArray.remove(saveState--); // removes last saveState then decrements by 1
             saveState--;
             System.out.println("Save State: " + saveState);
-
-            // Restore the previous simulation state
             currentResult = saveStatesArray.get(saveState);
             this.simulationEngine.loadSaveState(currentResult);
             executeSimulation(0, true, null); // choice doesnt matter because it
