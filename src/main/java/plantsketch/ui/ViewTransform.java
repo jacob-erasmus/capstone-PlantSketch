@@ -70,4 +70,7 @@ public final class ViewTransform {
     // --- pixels -> meters ---
     public double pxToMeterX(double xPx) { return (xPx / cellPx) * gridSpacing; }
     public double pxToMeterY(double yPx) { return (yPx / cellPx) * gridSpacing; }
+
+    // --- meters -> cells ---
+    public double meterXToCellX(double px) { return pxToMeterX(px)/cellPx;}
 }
