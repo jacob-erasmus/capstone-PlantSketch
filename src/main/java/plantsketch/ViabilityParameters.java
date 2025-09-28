@@ -69,20 +69,6 @@ public class ViabilityParameters {
         return slopeR;
     }
 
-    @Override
-    public String toString() {
-        return "ViabilityParameters{" +
-                "sunlightC=" + sunlightC +
-                ", sunlightR=" + sunlightR +
-                ", moistureC=" + moistureC +
-                ", moistureR=" + moistureR +
-                ", temperatureC=" + temperatureC +
-                ", temperatureR=" + temperatureR +
-                ", slopeC=" + slopeC +
-                ", slopeR=" + slopeR +
-                '}';
-    }
-
     // SETTERS
 
     public void setSunlightC(float sunlightC) {
@@ -115,5 +101,19 @@ public class ViabilityParameters {
 
     public void setSlopeR(float slopeR) {
         this.slopeR = slopeR;
+    }
+
+    @Override
+    public String toString() {
+        return "ViabilityParameters{" +
+                "sunlightC=" + sunlightC +
+                ", sunlightR=" + sunlightR +
+                ", moistureC=" + moistureC +
+                ", moistureR=" + moistureR +
+                ", temperatureC=" + temperatureC +
+                ", temperatureR=" + temperatureR +
+                ", slopeC=" + slopeC +
+                ", slopeR=" + slopeR +
+                '}';
     }
 }
