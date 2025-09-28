@@ -555,75 +555,52 @@ public class Interface extends BorderPane {
     }
 
     // here is execute simulation for the first time
+    // Replace your executeSimulation method with this updated version:
     private void executeSimulation(int choice, boolean isResimulation, String fullPath) {
         PerformanceTimer.start("execute_simulation");
         tabs.getTabs().clear();
 
         try {
-            if (!isUndo)
-            {
-                // making a new 'branch' as the user has made an edit. can no longer redo
-                if(saveStatesArray.size() -1 > saveState)
-                {
-                    for (int i = saveState; i < saveStatesArray.size(); i++)
-                    {
-                        saveStatesArray.remove(i);
+            if (!isUndo) {
+                if (isResimulation) {
+                    console.log("==================\nRe-simulating with new parameters...");
+
+                    boolean gridChanges = false;
+                    if (isTestGrid) {
+                        gridChanges = readGridEditors();
                     }
-                }
-                
 
-                if(isResimulation)
-                {
-                    // index of which save state it is
-                        saveState++;
-                        console.log("Re-simulating with new parameters...");
-
-                        boolean gridChanges = false;
-                        if (isTestGrid) gridChanges = readGridEditors();
-
-                        // Update TestGrid with new values
-                        if (regeneratePinkNoise.isSelected() && isTestGrid) {
-                            currentResult = simulationEngine.runChange(regeneratePinkNoise.isSelected(), false);
-                        } 
-                        else if (gridChanges || wasChange) 
-                        { // Use gridChanges OR wasChange
-                            currentResult = simulationEngine.runChange(regeneratePinkNoise.isSelected(), false);
-                        } 
-                        else 
-                        {
-                            console.log("No changes detected - skipping simulation");
-                            return; // Don't run simulation if no changes
-                        }
-                }
-                else
-                {
+                    // Update TestGrid with new values
+                    if (regeneratePinkNoise.isSelected() && isTestGrid) {
+                        currentResult = simulationEngine.runChange(regeneratePinkNoise.isSelected(), false);
+                        // Create save state using centralized method
+                    createSaveState(currentResult);
+                    } else if (gridChanges || wasChange) {
+                        currentResult = simulationEngine.runChange(regeneratePinkNoise.isSelected(), false);
+                        // Create save state using centralized method
+                    createSaveState(currentResult);
+                    } else {
+                        console.log("No changes detected - skipping simulation");
+                    }
+                    
+                    
+                } else {
+                    // Initial simulation
                     currentResult = simulationEngine.run(choice, fullPath);
-                
-                }
-                
-                // adds to the current save state
-                saveStatesArray.add(currentResult);
-                if (saveStatesArray.size() > maxSaveStates) // maximum 30 save states
-                {
-                    saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
-                    saveState--; // the index now caps out at 20
-
+                    createSaveState(currentResult);
                 }
             }
 
             // Update grid editors with current values
-            if (isTestGrid) 
-            {
+            if (isTestGrid) {
                 updateGridEditors();
                 updateStatusDisplay();
-
+            } else {
+                updateSpeciesParameterUI();
             }
             
-            // console.log("✓ Simulation complete. Plants placed: " + currentResult.forest().getAllPlants().size());
-
             int numSpecies = 0;
-            for (SpeciesMap sm : currentResult.forest().getOverallSpeciesMap()) 
-            {
+            for (SpeciesMap sm : currentResult.forest().getOverallSpeciesMap()) {
                 console.log(" - " + sm.getPlants().size() + "  " + sm.getSpecies().getName() );
                 if (sm.getPlants().size() > 0) numSpecies++;
             }
@@ -633,8 +610,7 @@ public class Interface extends BorderPane {
             updateVisualization();
             wasChange = false;
 
-        } catch (Exception ex)
-        {
+        } catch (Exception ex) {
             ex.printStackTrace();
             console.log("✗ Test simulation failed: " + ex.getMessage());
         } finally {
@@ -648,6 +624,30 @@ public class Interface extends BorderPane {
         return t;
     }
 
+
+    private void createSaveState(SimulationResult result) 
+    {
+        // Remove any future save states if user made changes after undoing
+        if (saveStatesArray.size() - 1 > saveState) {
+            // Remove from the end backwards to avoid index issues
+            for (int i = saveStatesArray.size() - 1; i > saveState; i--) {
+                saveStatesArray.remove(i);
+            }
+        }
+        
+        // Add the new save state
+        saveStatesArray.add(result);
+        saveState = saveStatesArray.size() - 1; // Point to the last (newest) element
+        
+        // Limit save states
+        if (saveStatesArray.size() > maxSaveStates) {
+            saveStatesArray.remove(1); // Keep index 0 as original, remove index 1
+            saveState--; // Adjust index since we removed an element
+        }
+        
+        console.log("Save state created. Current state: " + saveState + "/" + (saveStatesArray.size() - 1));
+    }
+
     private void undo()
     {
         if(saveStatesArray.size() > 1 && saveState > 0)
@@ -656,7 +656,7 @@ public class Interface extends BorderPane {
 
             // saveStatesArray.remove(saveState--); // removes last saveState then decrements by 1
             saveState--;
-            System.out.println("Save State: " + saveState);
+            System.out.println("==================\nSave State: " + saveState);
             currentResult = saveStatesArray.get(saveState);
             this.simulationEngine.loadSaveState(currentResult);
             executeSimulation(0, true, null); // choice doesnt matter because it
@@ -926,16 +926,15 @@ public class Interface extends BorderPane {
         speciesCheck.put("European Beech", europeanBeech);
 
         Button simulateBtn = new Button("Selected Species Only");
+        
         simulateBtn.setOnAction(e -> {
-            saveState++;
-            saveStatesArray.add(currentResult);
-                if (saveStatesArray.size() > 20) // maximum 20 save states
-                {
-                    saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
-                    saveState--; // the index now caps out at 20
+            removeSpecies(currentResult, speciesCheck);
 
-                }
-            removeSpecies(currentResult, speciesCheck);});
+// william check change
+            executeSimulation(0, true, null);
+
+            });
+
         simulateBtn.setPrefWidth(250);
 
         GridPane gridPane = new GridPane();
@@ -1064,15 +1063,7 @@ public class Interface extends BorderPane {
             if (newTab != null) {
                 brushRemovalMode = false;
                 brushAgeMode = false;
-                saveState++;
-                saveStatesArray.add(currentResult);
-                if (saveStatesArray.size() > 20) // maximum 20 save states
-                {
-                    saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
-                    saveState--; // the index now caps out at 20
-
-                }
-                console.log("\nNumber of Remaining Plants: " + currentResult.forest().getAllPlants().size());
+                // console.log("\nNumber of Remaining Plants: " + currentResult.forest().getAllPlants().size());
                 switch(newTab.getText()){
                     case("Environment (Elevation)"):
                             forestElevationView.disableBrushMode();
@@ -1113,85 +1104,79 @@ public class Interface extends BorderPane {
         Button enableBrushRemovalBtn = new Button("Toggle Brush Removal Mode");
         enableBrushRemovalBtn.setOnAction(e -> 
             {
-            if (!brushRemovalMode){
-                saveState++;
-                saveStatesArray.add(currentResult);
-                if (saveStatesArray.size() > 20) // maximum 20 save states
-                {
-                    saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
-                    saveState--; // the index now caps out at 20
-                }
+        
+            switch(tabs.getSelectionModel().getSelectedItem().getText()) 
+            {
+                case("Environment (Elevation)"):
+                    forestElevationView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                    brushRemoval(forestElevationView, brushSizeSlider);
+                    break;
+                case("Temperature"):
+                    forestTemperatureView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                    brushRemoval(forestTemperatureView, brushSizeSlider);
+                    break;
+                case("Sunlight"):
+                    forestSunlightView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                    brushRemoval(forestSunlightView, brushSizeSlider);
+                    break;
+                case("Moisture"):
+                    forestMoistureView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                    brushRemoval(forestMoistureView, brushSizeSlider);
+                    break;
+                case("Age"):
+                    forestAgeView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                    brushRemoval(forestAgeView, brushSizeSlider);
+                    break;
+                case("Pink Noise"):
+                    System.out.println("Brush functions are disabled for Pink Noise tab");
+                    break;
+                case("Forest"):
+                    System.out.println("Brush functions are disabled for Forest tab");
+                    break;
             }
-            switch(tabs.getSelectionModel().getSelectedItem().getText()){
-                    case("Environment (Elevation)"):
-                        forestElevationView.setSelectedSpeciesSupplier(getSelectedSpecies);
-                        brushRemoval(forestElevationView, brushSizeSlider);
-                        break;
-                    case("Temperature"):
-                        forestTemperatureView.setSelectedSpeciesSupplier(getSelectedSpecies);
-                        brushRemoval(forestTemperatureView, brushSizeSlider);
-                        break;
-                    case("Sunlight"):
-                        forestSunlightView.setSelectedSpeciesSupplier(getSelectedSpecies);
-                        brushRemoval(forestSunlightView, brushSizeSlider);
-                        break;
-                    case("Moisture"):
-                        forestMoistureView.setSelectedSpeciesSupplier(getSelectedSpecies);
-                        brushRemoval(forestMoistureView, brushSizeSlider);
-                        break;
-                    case("Age"):
-                        forestAgeView.setSelectedSpeciesSupplier(getSelectedSpecies);
-                        brushRemoval(forestAgeView, brushSizeSlider);
-                        break;
-                    case("Pink Noise"):
-                        System.out.println("Brush functions are disabled for Pink Noise tab <-> FOR VISUAL PURPOSES ONLY");
-                        break;
-                    case("Forest"):
-                        System.out.println("Brush functions are disabled for Forest tab <-> FOR VISUAL PURPOSES ONLY");
-                        break;
-            }    });
+        });
         enableBrushRemovalBtn.setPrefWidth(250);
 
         Button enableAgeChangeBtn = new Button("Toggle Brush Age Mode");
-        enableAgeChangeBtn.setOnAction(e -> 
+        enableAgeChangeBtn.setOnAction(e -> {
+            // Only create save state when entering brush mode, not when toggling off
+            if (!brushAgeMode) 
             {
-            if (!brushAgeMode){
-                saveState++;
-                saveStatesArray.add(currentResult);
-                if (saveStatesArray.size() > 20) // maximum 20 save states
-                {
-                    saveStatesArray.remove(1); // keeps the original forest but removes the first iteration on top of that
-                    saveState--; // the index now caps out at 20
-                }
+                wasChange = true; // Mark that changes will be made
+                executeSimulation(0, true, null); // This will create the save state
             }
-            switch(tabs.getSelectionModel().getSelectedItem().getText()){
-                    case("Environment (Elevation)"):
-                        forestElevationView.setSelectedSpeciesSupplier(getSelectedSpecies);
-                        brushAge(forestElevationView, brushSizeSlider, ageSlider);
-                        break;
-                    case("Temperature"):
-                        forestTemperatureView.setSelectedSpeciesSupplier(getSelectedSpecies);
-                        brushAge(forestTemperatureView, brushSizeSlider, ageSlider);
-                        break;
-                    case("Sunlight"):
-                        forestSunlightView.setSelectedSpeciesSupplier(getSelectedSpecies);
-                        brushAge(forestSunlightView, brushSizeSlider, ageSlider);
-                        break;
-                    case("Moisture"):
-                        forestMoistureView.setSelectedSpeciesSupplier(getSelectedSpecies);
-                        brushAge(forestMoistureView, brushSizeSlider, ageSlider);
-                        break;
-                    case("Age"):
-                        forestAgeView.setSelectedSpeciesSupplier(getSelectedSpecies);
-                        brushAge(forestAgeView, brushSizeSlider, ageSlider);
-                        break;
-                    case("Pink Noise"):
-                        System.out.println("Brush functions are disabled for Pink Noise tab <-> FOR VISUAL PURPOSES ONLY");
-                        break;
-                    case("Forest"):
-                        System.out.println("Brush functions are disabled for Forest tab <-> FOR VISUAL PURPOSES ONLY");
-                        break;
-            }    });
+            
+            switch(tabs.getSelectionModel().getSelectedItem().getText()) 
+            {
+                case("Environment (Elevation)"):
+                    forestElevationView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                    brushAge(forestElevationView, brushSizeSlider, ageSlider);
+                    break;
+                case("Temperature"):
+                    forestTemperatureView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                    brushAge(forestTemperatureView, brushSizeSlider, ageSlider);
+                    break;
+                case("Sunlight"):
+                    forestSunlightView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                    brushAge(forestSunlightView, brushSizeSlider, ageSlider);
+                    break;
+                case("Moisture"):
+                    forestMoistureView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                    brushAge(forestMoistureView, brushSizeSlider, ageSlider);
+                    break;
+                case("Age"):
+                    forestAgeView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                    brushAge(forestAgeView, brushSizeSlider, ageSlider);
+                    break;
+                case("Pink Noise"):
+                    System.out.println("Brush functions are disabled for Pink Noise tab");
+                    break;
+                case("Forest"):
+                    System.out.println("Brush functions are disabled for Forest tab");
+                    break;
+            }
+        });
+
         enableAgeChangeBtn.setPrefWidth(250);
         // menu for abiotics
         VBox abioticContent = new VBox(10);
@@ -1237,9 +1222,9 @@ public class Interface extends BorderPane {
         }else{
             mapView.disableBrushMode();
             mapView.setCursor(Cursor.DEFAULT);  
-            console.log("\nNumber of Remaining Plants: " + currentResult.forest().getAllPlants().size());
+            // console.log("\nNumber of Remaining Plants: " + currentResult.forest().getAllPlants().size());
         }
-        
+
     }
 
     private void brushAge(ForestOnMapView mapView, Slider brushSlider, Slider ageSlider){
@@ -1250,7 +1235,7 @@ public class Interface extends BorderPane {
         }else{
             mapView.disableBrushMode();
             mapView.setCursor(Cursor.DEFAULT);  
-            console.log("\nNumber of Remaining Plants: " + currentResult.forest().getAllPlants().size());
+            // console.log("\nNumber of Remaining Plants: " + currentResult.forest().getAllPlants().size());
         }
     }
     private void updateBrushCursor(ForestOnMapView mapView, double brushSize){
@@ -1278,6 +1263,7 @@ public class Interface extends BorderPane {
                     //moved saved state to the button call
                 }          
             }
+            currentResult = result;
         }
         refreshForestViews();
         console.log("Species Filter Remove and Visualise Elapsed Time: " + (System.nanoTime() - startTime) + " nanoseconds.");
