@@ -44,13 +44,10 @@ public class Interface extends BorderPane {
     // WHEN UNDO UPDATE SPECIES PARAMETERS TAB
 
 
-//*********** INSTANCE VARIABLES ****************\\
-    
-
     private ArrayList<SimulationResult> saveStatesArray = new ArrayList<>();
     private int saveState;
     private boolean isUndo;
-    private int maxSaveStates = 30;
+    private int maxSaveStates = 10;
 
     private final Runnable onBack;
     private SimulationEngine simulationEngine;

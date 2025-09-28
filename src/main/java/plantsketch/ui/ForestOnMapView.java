@@ -59,7 +59,7 @@ public class ForestOnMapView extends Region {
                 if (v > mapMax) mapMax = v;
             }
         }
-        mapRange = Math.max(1e-9f, mapMax - mapMin);
+        mapRange = Math.max(1e-9f, mapMax - mapMin); //just make sure its above the smallest float
 
         //renderzoom
         updateRegionSize();
