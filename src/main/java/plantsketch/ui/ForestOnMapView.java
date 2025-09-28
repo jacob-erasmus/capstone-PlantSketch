@@ -184,6 +184,11 @@ public class ForestOnMapView extends Region {
         forestCanvas.setOnMousePressed(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get()/3, ageSupplier.get(), simulationEngine));
         forestCanvas.setOnMouseDragged(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get()/3, ageSupplier.get(), simulationEngine));
     }
+    public void enableBrushAbioticMode(Supplier<Double> brushSizeSupplier, Supplier<Double> temperatureSupplier, Supplier<Double> sunlightSupplier, Supplier<Double> moistureSupplier, SimulationEngine simulationEngine){
+        forestCanvas.setOnMousePressed(e -> applyBrushAbiotic(e.getX(), e.getY(), brushSizeSupplier.get()/3, temperatureSupplier.get(), sunlightSupplier.get(), moistureSupplier.get(), simulationEngine));
+        forestCanvas.setOnMouseDragged(e -> applyBrushAbiotic(e.getX(), e.getY(), brushSizeSupplier.get()/3, temperatureSupplier.get(), sunlightSupplier.get(), moistureSupplier.get(), simulationEngine));
+    }
+
     public void disableBrushMode(){
         forestCanvas.setOnMousePressed(null);
         forestCanvas.setOnMouseDragged(null);
@@ -283,6 +288,62 @@ public class ForestOnMapView extends Region {
             drawForest();
             //System.out.println("Brush Elapsed Time: " + (System.nanoTime() - brushStartTime) + " (nanoseconds). Changed ages of " + toChange.size() + " plants");
         } 
+    }
+
+    private void applyBrushAbiotic(double brushX, double brushY, double brushSize, double temperatureFactor, double sunlightFactor, double moistureFactor, SimulationEngine simulationEngine){
+        long brushStartTime = System.nanoTime();
+        List<Integer> toChangeX = new ArrayList<>();
+        List<Integer> toChangeY = new ArrayList<>();
+        double brushRadiusPx = brushSizeToPixels(brushSize);
+        double brushXMeters = vt.pxToMeterX(brushX);
+        double brushYMeters = vt.pxToMeterY(brushY);
+        double brushRadiusMeters = vt.pxToMeterX(brushRadiusPx);
+        // bounding box in cell indices
+        int minCellX = Math.max(0, (int)((brushXMeters - brushRadiusMeters) / gridSpacing));
+        int maxCellX = Math.min(map.length - 1, (int)((brushXMeters + brushRadiusMeters) / gridSpacing));
+        int minCellY = Math.max(0, (int)((brushYMeters - brushRadiusMeters) / gridSpacing));
+        int maxCellY = Math.min(map[0].length - 1, (int)((brushYMeters + brushRadiusMeters) / gridSpacing));
+
+        // --- Step 4: Loop through cells & check circular distance ---
+        for (int cx = minCellX; cx <= maxCellX; cx++) {
+            for (int cy = minCellY; cy <= maxCellY; cy++) {
+                // Find center of this cell in meters
+                double cellXMeters = cx * gridSpacing + gridSpacing / 2.0;
+                double cellYMeters = cy * gridSpacing + gridSpacing / 2.0;
+
+                // Distance from brush center to this cell
+                double dx = brushXMeters - cellXMeters;
+                double dy = brushYMeters - cellYMeters;
+                double distMSquared = dx*dx + dy*dy;
+                double brushRadiusMetersSquared = brushRadiusMeters * brushRadiusMeters;
+
+                // Apply only if inside circular brush
+                if (distMSquared <= brushRadiusMetersSquared) {
+                    simulationEngine.adjustTemperature(cx, cy, (float)temperatureFactor);
+                    simulationEngine.adjustSunlight(cx, cy, (float)sunlightFactor);
+                    simulationEngine.adjustMoisture(cx, cy, (float)moistureFactor);
+                    toChangeX.add(cx);
+                    toChangeY.add(cy);
+                }
+            }
+        }
+        /* 
+        simulationEngine.placementLoop();
+        simulationEngine.assembleForest();
+        simulationEngine.makeSimResult();
+        drawForest();
+        */
+        if (!toChangeX.isEmpty()){
+            for(int i = 0; i < toChangeX.size(); i++){
+                int xCell = toChangeX.get(i);
+                int yCell = toChangeY.get(i);
+                simulationEngine.replaceArea(xCell, yCell);
+            }
+            simulationEngine.assembleForest();
+            drawForest();
+            //System.out.println("Brush Elapsed Time: " + (System.nanoTime() - brushStartTime) + " (nanoseconds). Changed ages of " + toChange.size() + " plants");
+        } 
+            
     }
     private double brushSizeToPixels(double size){
         return size * vt.cellPx;
