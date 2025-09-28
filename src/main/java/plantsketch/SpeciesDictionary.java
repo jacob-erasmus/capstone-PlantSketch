@@ -4,7 +4,6 @@ package plantsketch;
 public class SpeciesDictionary {
 
     public SpeciesDictionary() {
-        // Constructor
     }
 
     public Species loadBoxwood() {
