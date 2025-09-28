@@ -19,7 +19,7 @@ public class ViabilityCalculator {
     public ViabilityCalculator(Terrain terrain, AbioticFactors abioticFactors) {
         // now we have the calculator loaded with all the info about everything
         // so for each random pink noise point we simply call one of the methods and
-        // return the viabilities of each species
+        // return the viability of each species
         this.terrain = terrain;
         this.abioticFactors = abioticFactors;
         this.temperatureMap = abioticFactors.getTemperatureMap();

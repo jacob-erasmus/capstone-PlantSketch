@@ -282,8 +282,6 @@ public class SimulationEngine
     }
 
     public void adjustAge(int x, int y, float ageFactor){
-        System.out.println("Cell curAge:" + age.getValue(x, y));
-        System.out.println("ageFactor: " + ageFactor);
         if (age.getValue(x, y) + ageFactor > 650){
             age.setBase(x, y, 650);
         }else if (age.getValue(x, y) + ageFactor < 0){
@@ -291,11 +289,10 @@ public class SimulationEngine
         }else{
             age.setAdjustment(x, y, ageFactor);
         }
-        System.out.println("Cell after adjustment:" + age.getValue(x, y));
     }
     public void changePlantAge(int x, int y, float ageFactor, Plant p){
         float cohortAge = age.getAge(x, y);
-        System.out.println("cohort Age: " + cohortAge);
+
         //plant dies
         float plantAge = rAge * cohortAge * p.getSpecies().getViabilityAtPoint();
         if (plantAge > p.getLifeSpan()){
