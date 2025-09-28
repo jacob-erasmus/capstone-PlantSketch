@@ -452,13 +452,13 @@ public class SimulationEngine
         else
         {
             if (choice == 1) {
-                loadD("src/target/classes/D1-256");
+                loadD("./src/main/resources/D1-256");
             } else if (choice == 2) {
-                loadD("src/target/classes/D2-512");
+                loadD("./src/main/resources/D2-512");
             } else if (choice == 3) {
-                loadD("src/target/classes/D3-1024");
+                loadD("./src/main/resources/D3-1024");
             } else if (choice == 4) {
-                loadD("src/target/classes/D4-1024");
+                loadD("./src/main/resources/D4-1024");
             } else if (choice == 5){
                 if (fullPath != null) {
                     loadD(fullPath);

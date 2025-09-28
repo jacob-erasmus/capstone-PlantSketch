@@ -615,7 +615,6 @@ public class Interface extends BorderPane {
             
             updateSpeciesPanelEditor();
 
-            createTabs();
             
             // console.log("✓ Simulation complete. Plants placed: " + currentResult.forest().getAllPlants().size());
 
