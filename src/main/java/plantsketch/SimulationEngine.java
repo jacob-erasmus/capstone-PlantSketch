@@ -13,7 +13,7 @@ public class SimulationEngine
     boolean isTestGrid = true;
     private final Consumer<String> logger;
     private final Random r = new Random();
-    private final float rAge = r.nextFloat();
+    private final float randomFloat = r.nextFloat();
     // set values
     int sampleCount = 30;
     float gridSpacing = 25f; // in metres
@@ -35,7 +35,7 @@ public class SimulationEngine
     int numPlants;
 
     // Preset Boundary values (based on ranges from literature)
-    float minTemp = -2.0f; // 1.5 lower than coldest tree
+    float minTemp = -1.5f; // 1 lower than coldest tree
     float maxTemp = 13.0f; // 1 higher
     float minAge = 0.0f; // no trees
     float maxAge = 650.0f; // 50 higher than oldest species
@@ -44,7 +44,7 @@ public class SimulationEngine
     float minSun = 0.0f; // no sun
     float maxSun = 13.0f; // 1 higher
 // arbitrary values for elev
-    float minElev = 60.0f;
+    float minElev = 0.0f;
     float maxElev = 100.0f; // the problem with this is that the slop is often far too high
     // temp change with elevation? air?
     float minSlope = 0.0f; // flat
@@ -258,7 +258,8 @@ public class SimulationEngine
 
             float cohortAge = age.getAge(xCell, yCell);
             //float cap = Math.min(cohortAge, chosen.getLifeSpan());
-            float plantAge = rAge * cohortAge * chosen.getViabilityAtPoint();
+            cohortAge = Math.min(cohortAge, 650);
+            float plantAge = randomFloat * cohortAge * chosen.getViabilityAtPoint();
             if(plantAge > chosen.getLifeSpan()){
                 plantAge = chosen.getLifeSpan();
             }
@@ -291,12 +292,23 @@ public class SimulationEngine
         }
     }
     public void changePlantAge(int x, int y, float ageFactor, Plant p){
+        float oldAge = p.getAge(); // Get the plant's current stored age
+        
+        // Calculate new values
         float cohortAge = age.getAge(x, y);
-
-        //plant dies
-        float plantAge = rAge * cohortAge * p.getSpecies().getViabilityAtPoint();
+        float plantAge = randomFloat * cohortAge * p.getVigour();
+    
+        // Debug shrinking
+        if (plantAge < oldAge) {
+            System.out.println("=== AGE DECREASED ===");
+            System.out.println("Plant stored age: " + oldAge + " -> calculated age: " + plantAge);
+            System.out.println("Current cohort age: " + cohortAge);
+            System.out.println("What cohort age would give old plant age " + oldAge + "? " + 
+                            (oldAge / (randomFloat * p.getVigour()))); //p.getSpecies().getViabilityAtPoint())));
+        }
+    
         if (plantAge > p.getLifeSpan()){
-            plantAge = p.getLifeSpan();
+            plantAge = p.getLifeSpan();  
         }
             float height = new GrowthFunction().calculateSize(p.getSpecies(), plantAge, p.isAllometryOpen());
             float canopy = height * (p.isAllometryOpen() ? p.getSpecies().getRadiusMultiplierOpen() : p.getSpecies().getRadiusMultiplierClosed());
@@ -317,13 +329,17 @@ public class SimulationEngine
     // make simulation result object
     public SimulationResult makeSimResult()
     {
+        List<Species> deepCopy = new ArrayList<>();
+        for (Species s : speciesList) {
+            deepCopy.add(new Species(s)); // assuming Species has a copy constructor
+        }
         simResult = new SimulationResult(forest, pinkNoise, dimX, dimY, gridSpacing, 
             new AgeMap(dimX, dimY, gridSpacing, age.getGrid()), 
             new Terrain(dimX, dimY, gridSpacing, abiotics, terrain.elevationMap), 
             new AbioticFactors(new MoistureMap (dimX, dimY, gridSpacing, abiotics.getMoistureMap().getGrid()), 
                 new TemperatureMap(dimX, dimY, gridSpacing, abiotics.getTemperatureMap().getGrid()) , 
                 new SunlightMap(dimX, dimY, gridSpacing, abiotics.getSunlightMap().getGrid())), 
-                new ArrayList<Species>(speciesList));
+                deepCopy);
 
         //commenting this out to assist with merging
 //        new EcoVizOutput(simResult).createFile("testingGrid.pdb"); // and then make the file

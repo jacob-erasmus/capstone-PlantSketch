@@ -25,6 +25,17 @@ public class ViabilityParameters {
         this.slopeR = slopeR;
     }
 
+    public ViabilityParameters(ViabilityParameters other) {
+        this.sunlightC = other.sunlightC;
+        this.sunlightR = other.sunlightR;
+        this.moistureC = other.moistureC;
+        this.moistureR = other.moistureR;
+        this.temperatureC = other.temperatureC;
+        this.temperatureR = other.temperatureR;
+        this.slopeC = other.slopeC;
+        this.slopeR = other.slopeR;
+    }
+
     // Getters
     public float getSunlightC() {
         return sunlightC;

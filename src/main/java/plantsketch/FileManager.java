@@ -210,7 +210,7 @@ public class FileManager {
                 for (int y = 0; y < height; y++) {
                     int rgb = img.getRGB(x, y);
                     int red = (rgb >> 16) & 0xFF;
-                    float age = (red / 255.0f) * 600.0f;
+                    float age = (red / 255.0f) * 650.0f;
                     grid[x][y] = age;
                 }
             }

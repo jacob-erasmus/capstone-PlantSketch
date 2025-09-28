@@ -342,10 +342,10 @@ public class ForestOnMapView extends Region {
             // Calculate distance between brush center and plant center
             double dx = brushX - xPx;
             double dy = brushY - yPx;
-            double dist = Math.hypot(dx,dy); // Euclidean distance
-
-            // Check if brush overlaps with plant canopy (circle-circle collision)
-            if(dist <= (brushRadiusPx + rPx)){
+            double distSquared = dx*dx + dy*dy;
+            double thresholdSquared = (brushRadiusPx + rPx) * (brushRadiusPx + rPx);
+            //if plant canopy contacts brush radius
+            if(distSquared <= thresholdSquared){
                 toRemove.add(p);
             }
         }
@@ -368,11 +368,9 @@ public class ForestOnMapView extends Region {
      * 2. Update individual plant ages for plants touching the brush
      */
     private void applyBrushAge(double brushX, double brushY, double brushSize, double ageFactor, SimulationEngine simulationEngine){
-        long brushStartTime = System.nanoTime(); // Performance timing
-        double brushRadiusPx = brushSizeToPixels(brushSize);
+        long brushStartTime = System.nanoTime();
         List<Plant> toChange = new ArrayList<>();
-
-        // Convert brush coordinates from pixels to meters
+        double brushRadiusPx = brushSizeToPixels(brushSize);
         double brushXMeters = vt.pxToMeterX(brushX);
         double brushYMeters = vt.pxToMeterY(brushY);
         double brushRadiusMeters = vt.pxToMeterX(brushRadiusPx);
@@ -394,11 +392,11 @@ public class ForestOnMapView extends Region {
                 // Calculate distance from brush center to cell center
                 double dx = brushXMeters - cellXMeters;
                 double dy = brushYMeters - cellYMeters;
-                double dist = Math.hypot(dx, dy);
+                double distMSquared = dx*dx + dy*dy;
+                double brushRadiusMetersSquared = brushRadiusMeters * brushRadiusMeters;
 
-                // Apply age modification only if cell is inside circular brush
-                PerformanceTimer.start("map_adjust");
-                if (dist <= brushRadiusMeters) {
+                // Apply only if inside circular brush
+                if (distMSquared <= brushRadiusMetersSquared) {
                     simulationEngine.adjustAge(cx, cy, (float)ageFactor);
                 }
                 PerformanceTimer.end("map_adjust");
@@ -415,10 +413,10 @@ public class ForestOnMapView extends Region {
             // Calculate distance between brush center and plant center
             double dx = brushX - xPx;
             double dy = brushY - yPx;
-            double dist = Math.hypot(dx,dy);
-
-            // Check if brush overlaps with plant canopy
-            if(dist <= (brushRadiusPx + rPx)){
+            double distSquared = dx*dx + dy*dy;
+            double thresholdSquared = (brushRadiusPx + rPx) * (brushRadiusPx + rPx);
+            //if plant canopy contacts brush radius
+            if(distSquared <= thresholdSquared){
                 toChange.add(p);
             }
         }
@@ -426,15 +424,15 @@ public class ForestOnMapView extends Region {
         // Apply age changes to all affected plants
         if (!toChange.isEmpty()){
             for(Plant p : toChange){
-                // Determine which grid cell this plant is in
+                //int xCell = (int) vt.meterXToCellX(p.getX());
                 int xCell = (int) (p.getX() / gridSpacing);
                 int yCell = (int) (p.getY() / gridSpacing);
+                //int yCell = (int) vt.meterXToCellX(p.getY());
                 simulationEngine.changePlantAge(xCell, yCell, (float)ageFactor, p);
             }
-            drawForest(); // Redraw to show changes
-            System.out.println("Brush Elapsed Time: " + (System.nanoTime() - brushStartTime) +
-                " (nanoseconds). Changed ages of " + toChange.size() + " plants");
-        }
+            drawForest();
+            //System.out.println("Brush Elapsed Time: " + (System.nanoTime() - brushStartTime) + " (nanoseconds). Changed ages of " + toChange.size() + " plants");
+        } 
     }
     /**
      * Converts brush size from grid cell units to pixel units.

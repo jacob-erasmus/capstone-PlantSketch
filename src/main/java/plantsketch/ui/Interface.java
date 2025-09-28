@@ -48,6 +48,7 @@ public class Interface extends BorderPane {
     private int saveState;
     private boolean isUndo;
     private int maxSaveStates = 10;
+    HBox mainContent = new HBox(10);
 
     private final Runnable onBack;
     private SimulationEngine simulationEngine;
@@ -62,10 +63,12 @@ public class Interface extends BorderPane {
     private ForestOnMapView forestMoistureView;
     private ForestOnMapView forestAgeView;
     private ForestView forestView;
+    boolean wasChange = false;
     
     Supplier<Set<String>> getSelectedSpecies;
-    GridPane speciesPanelEditor;
+
     String[] speciesParameters = {"sunlightC", "sunlightR", "moistureC", "moistureR", "temperatureC", "temperatureR", "slopeC", "slopeR", "maxHeightOpen", "maxHeightClosed", "q", "lifeSpan"};
+    private final Map<String, GridPane> speciesPanelEditors = new HashMap<>();
     TextField[] textFields;
     // UI Components
     private final TabPane tabs = new TabPane();
@@ -116,7 +119,6 @@ public class Interface extends BorderPane {
         split.setDividerPositions(0.666);
         
         // Main content - tabs on left, parameter panel on right
-        HBox mainContent = new HBox(10);
 
 
     // buildParameterPanel is different between both
@@ -575,19 +577,30 @@ public class Interface extends BorderPane {
                     // index of which save state it is
                         saveState++;
                         console.log("Re-simulating with new parameters...");
-                    if(isTestGrid)
-                    {
-                        boolean wasChange = readGridEditors();
+
+                        boolean gridChanges = false;
+                        if (isTestGrid) gridChanges = readGridEditors();
+
                         // Update TestGrid with new values
-                        if (regeneratePinkNoise.isSelected()) currentResult = simulationEngine.runChange(regeneratePinkNoise.isSelected(), false); // if need to regenerate pink noise
-                        else if (wasChange) currentResult = simulationEngine.runChange(regeneratePinkNoise.isSelected(), false); // if there was actually a change to anything
-                    }
+                        if (regeneratePinkNoise.isSelected() && isTestGrid) {
+                            currentResult = simulationEngine.runChange(regeneratePinkNoise.isSelected(), false);
+                        } 
+                        else if (gridChanges || wasChange) 
+                        { // Use gridChanges OR wasChange
+                            currentResult = simulationEngine.runChange(regeneratePinkNoise.isSelected(), false);
+                        } 
+                        else 
+                        {
+                            console.log("No changes detected - skipping simulation");
+                            return; // Don't run simulation if no changes
+                        }
                 }
                 else
                 {
                     currentResult = simulationEngine.run(choice, fullPath);
                 
                 }
+                
                 // adds to the current save state
                 saveStatesArray.add(currentResult);
                 if (saveStatesArray.size() > maxSaveStates) // maximum 30 save states
@@ -598,12 +611,6 @@ public class Interface extends BorderPane {
                 }
             }
 
-            
-            // for undo/redo of main run
-            if (isUndo && !isTestGrid && isResimulation){
-                currentResult = simulationEngine.runChange(false, true);
-            }
-
             // Update grid editors with current values
             if (isTestGrid) 
             {
@@ -611,10 +618,6 @@ public class Interface extends BorderPane {
                 updateStatusDisplay();
 
             }
-            // else updateSliderEditors();
-            
-            updateSpeciesPanelEditor();
-
             
             // console.log("✓ Simulation complete. Plants placed: " + currentResult.forest().getAllPlants().size());
 
@@ -628,6 +631,7 @@ public class Interface extends BorderPane {
             console.log("Number of species: " + numSpecies);
             isUndo = false;
             updateVisualization();
+            wasChange = false;
 
         } catch (Exception ex)
         {
@@ -656,6 +660,8 @@ public class Interface extends BorderPane {
             currentResult = saveStatesArray.get(saveState);
             this.simulationEngine.loadSaveState(currentResult);
             executeSimulation(0, true, null); // choice doesnt matter because it
+
+            updateSpeciesParameterUI();
         }
 
     }
@@ -680,56 +686,95 @@ public class Interface extends BorderPane {
             currentResult = saveStatesArray.get(saveState);
             this.simulationEngine.loadSaveState(currentResult);
             executeSimulation(0, true, null); // choice doesnt matter because it
+
+            updateSpeciesParameterUI();
         }
     }
 
+    private void updateSpeciesParameterUI() {
+    // Loop through each species and update its parameter panel
+    for (Species species : currentResult.speciesList()) {
+        // Get the existing panel for this species
+        GridPane existingPanel = speciesPanelEditors.get(species.getName());
+        
+        if (existingPanel != null) {
+            // Get current parameter values from the restored species
+            float[] parameterValues = {
+                species.getSunlightC(), species.getSunlightR(), 
+                species.getMoistureC(), species.getMoistureR(), 
+                species.getTemperatureC(), species.getTemperatureR(), 
+                species.getSlopeC(), species.getSlopeR(), 
+                species.getMaxHeightOpen(), species.getMaxHeightClosed(), 
+                species.getQ(), species.getLifeSpan()
+            };
+            
+            // Update each text field in the existing panel
+            // The text fields are at column 1 of each row
+            int paramIndex = 0;
+            for (Node node : existingPanel.getChildren()) {
+                if (node instanceof TextField && paramIndex < parameterValues.length) {
+                    TextField textField = (TextField) node;
+                    // Only update TextFields in column 1 (the value fields)
+                    if (GridPane.getColumnIndex(node) != null && GridPane.getColumnIndex(node) == 1) {
+                        textField.setText(String.valueOf(parameterValues[paramIndex]));
+                        paramIndex++;
+                    }
+                }
+            }
+        }
+    }
+}
+
     // makes the species panel editors
+    // MODIFIED: Fixed the issue with listener using incorrect variable scope
     private GridPane createSpeciesPanelEditor(Species species)
     {
-
-        speciesPanelEditor = new GridPane();
+        GridPane speciesPanelEditor = new GridPane();
         speciesPanelEditor.setHgap(10);
         speciesPanelEditor.setVgap(8);
 
-        float[] parameterValues = {species.getSunlightC(), species.getSunlightR(), species.getMoistureC(), species.getMoistureR(), 
-            species.getTemperatureC(), species.getTemperatureR(), species.getSlopeC(), species.getSlopeR(), species.getMaxHeightOpen(),
-            species.getMaxHeightClosed(), species.getQ(), species.getLifeSpan()};
+        float[] parameterValues = {
+            species.getSunlightC(), species.getSunlightR(), 
+            species.getMoistureC(), species.getMoistureR(), 
+            species.getTemperatureC(), species.getTemperatureR(), 
+            species.getSlopeC(), species.getSlopeR(), 
+            species.getMaxHeightOpen(), species.getMaxHeightClosed(), 
+            species.getQ(), species.getLifeSpan()
+        };
 
         textFields = new TextField[speciesParameters.length];
 
-        // how tf are we supposed to directly change viability? Maybe add that to the brush or something?
-
-        int row = 1;
         for (int i = 0; i < speciesParameters.length; i++) {
-            int index = i;  // final copy for lambda
+            final int index = i;  // final copy for lambda - MOVED inside loop
 
             Label titleLabel = new Label(speciesParameters[i]);
             titleLabel.setPrefWidth(200);
             speciesPanelEditor.add(titleLabel, 0, index);
 
             TextField parameterValue = new TextField();
-            parameterValue.setPromptText(String.valueOf(parameterValues[index]));
+            parameterValue.setText(String.valueOf(parameterValues[index]));
             parameterValue.setPrefWidth(200);
 
-// POTENTIALLY NOT WORKING
             parameterValue.textProperty().addListener((obs, oldText, newText) -> {
                 if (!newText.trim().isEmpty()) {
                     try {
                         float value = Float.parseFloat(newText.trim());
 
-                        // use index instead of i
-                        if (index == 0) species.setSunlightC(value);
-                        else if (index == 1) species.setSunlightR(value);
-                        else if (index == 2) species.setMoistureC(value);
-                        else if (index == 3) species.setMoistureR(value);
-                        else if (index == 4) species.setTemperatureC(value);
-                        else if (index == 5) species.setTemperatureR(value);
-                        else if (index == 6) species.setSlopeC(value);
-                        else if (index == 7) species.setSlopeR(value);
-                        else if (index == 8) species.setMaxHeightOpen(value);
-                        else if (index == 9) species.setMaxHeightClosed(value);
-                        else if (index == 10) species.setQ(value);
-                        else if (index == 11) species.setLifeSpan(value);
+                        // Update the species object based on the parameter index
+                        switch (index) {
+                            case 0: species.setSunlightC(value); break;
+                            case 1: species.setSunlightR(value); break;
+                            case 2: species.setMoistureC(value); break;
+                            case 3: species.setMoistureR(value); break;
+                            case 4: species.setTemperatureC(value); break;
+                            case 5: species.setTemperatureR(value); break;
+                            case 6: species.setSlopeC(value); break;
+                            case 7: species.setSlopeR(value); break;
+                            case 8: species.setMaxHeightOpen(value); break;
+                            case 9: species.setMaxHeightClosed(value); break;
+                            case 10: species.setQ(value); break;
+                            case 11: species.setLifeSpan(value); break;
+                        }
 
                     } catch (NumberFormatException ex) {
                         System.out.println("Invalid float: " + newText);
@@ -741,49 +786,40 @@ public class Interface extends BorderPane {
             textFields[i] = parameterValue;
         }
 
-
+        speciesPanelEditors.put(species.getName(), speciesPanelEditor);
         return speciesPanelEditor;
-
     }
 
-// NOT WORKING
-    public GridPane updateSpeciesPanelEditor()
-    {
-        for (int i = 0; i < simulationEngine.getSpeciesList().size(); i++)
-        {
-            float[] parameterValues = {simulationEngine.getSpeciesList().get(i).getSunlightC(), simulationEngine.getSpeciesList().get(i).getSunlightR(), simulationEngine.getSpeciesList().get(i).getMoistureC(), simulationEngine.getSpeciesList().get(i).getMoistureR(),
-            simulationEngine.getSpeciesList().get(i).getTemperatureC(), simulationEngine.getSpeciesList().get(i).getTemperatureR(), simulationEngine.getSpeciesList().get(i).getSlopeC(), simulationEngine.getSpeciesList().get(i).getSlopeR(), simulationEngine.getSpeciesList().get(i).getMaxHeightOpen(),
-            simulationEngine.getSpeciesList().get(i).getMaxHeightClosed(), simulationEngine.getSpeciesList().get(i).getQ(), simulationEngine.getSpeciesList().get(i).getLifeSpan()};
 
-            for (int j = 0; j < speciesParameters.length; j++) {
-            textFields[j].setPromptText(String.valueOf(parameterValues[j]));
-        }
-        }
-
-
-        
-
-        return null;
-    }
 
     public Button updateSpeciesParametersButton()
     {
-        Button updateSpeciesParametersButton = new Button ("Update species parameters");
+        Button updateSpeciesParametersButton = new Button("Update species parameters");
 
         updateSpeciesParametersButton.setOnAction(e -> {
+            wasChange = true;
+            executeSimulation(0, true, null);
             
-            for (Species species : simulationEngine.getSpeciesList())
+            // Update the UI to reflect any changes
+            updateSpeciesParameterUI();
+            
+            if (isTestGrid) {
+                // Rebuild the parameter panel to refresh the UI
+                mainContent.getChildren().remove(mainContent.getChildren().size() - 1);
+                mainContent.getChildren().add(buildParameterPanelTest());
+                updateGridEditors();
+            }
+            else
             {
-                createSpeciesPanelEditor(species);
+                mainContent.getChildren().remove(mainContent.getChildren().size() - 1);
+                mainContent.getChildren().add(buildParameterPanelRun());
             }
             
-            executeSimulation(0, true, null);
-        }
-            );
-            
+            wasChange = false;
+        });
+        
         return updateSpeciesParametersButton;
     }
-
 
 //*********** RUN VIEW METHODS ****************\\
     
@@ -816,8 +852,12 @@ public class Interface extends BorderPane {
 
             GridPane speciesParametersPanel = createSpeciesPanelEditor(species);
 
-            TitledPane speciesHeader = new TitledPane(species.getName(), speciesParametersPanel);
+            speciesPanelEditors.put(species.getName(), speciesParametersPanel);
+
+            TitledPane speciesHeader = new TitledPane(species.getName(), speciesPanelEditors.get(species.getName()));
             speciesHeader.setExpanded(false);
+            speciesHeader.setStyle("-fx-background-color: " +species.getColour() + "; -fx-text-fill: "+ species.getColour()+ ";");
+
 
             innerAccordion.getPanes().add(speciesHeader);
         };
@@ -1377,26 +1417,20 @@ public class Interface extends BorderPane {
 
         accordion.getPanes().add(abioticsHeader);
 
-
-        SpeciesDictionary dict = new SpeciesDictionary();
-        List<Species> speciesList = List.of(
-                dict.loadBoxwood(),
-                dict.loadSnowyMespilus(),
-                dict.loadMountainPine(),
-                dict.loadSilverFir(),
-                dict.loadSilverBirch(),
-                dict.loadSissileOak(),
-                dict.loadEuropeanBeech());
-
-        for (Species species : speciesList)
+        for (Species species : simulationEngine.getSpeciesList())
         {
 
             GridPane speciesParametersPanel = createSpeciesPanelEditor(species);
 
-            TitledPane speciesHeader = new TitledPane(species.getName(), speciesParametersPanel);
+            speciesPanelEditors.put(species.getName(), speciesParametersPanel);
+
+            TitledPane speciesHeader = new TitledPane(species.getName(), speciesPanelEditors.get(species.getName()));
             speciesHeader.setExpanded(false);
+            speciesHeader.setStyle("-fx-background-color: " +species.getColour() + "; -fx-text-fill: "+ species.getColour()+ ";");
 
             accordion.getPanes().add(speciesHeader);
+
+
         };
 
         VBox container = new VBox(accordion);
