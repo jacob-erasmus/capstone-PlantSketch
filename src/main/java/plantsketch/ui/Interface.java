@@ -63,6 +63,7 @@ public class Interface extends BorderPane {
     private ForestOnMapView forestTemperatureView;
     private ForestOnMapView forestSunlightView;
     private ForestOnMapView forestMoistureView;
+    private ForestOnMapView forestAgeView;
     private ForestView forestView;
     
     Supplier<Set<String>> getSelectedSpecies;
@@ -180,6 +181,7 @@ public class Interface extends BorderPane {
         createForestOnMapTab(currentResult.abiotics().getMoistureMap().getGrid(), "Moisture");
         createForestOnMapTab(currentResult.abiotics().getSunlightMap().getGrid(), "Sunlight");
         createForestOnMapTab(currentResult.abiotics().getTemperatureMap().getGrid(), "Temperature");
+        createForestOnMapTab(simulationEngine.getAgeGrid(), "Age");
         createPinkNoiseTab();
         createForestTab();
 
@@ -337,7 +339,40 @@ public class Interface extends BorderPane {
                         forestTemperatureView.resetToDefault();
                         zoomLabel.setText("100%");
                     });
-                    
+
+                    mapContainer.getChildren().addAll(zoomControls, mapPane);
+                    break;
+                case "Age":
+                    this.forestAgeView = new ForestOnMapView(currentResult.forest(), map, currentResult.gridSpacing());
+                    mapPane = new ScrollPane(forestAgeView);
+
+                    // Zoom track
+                    final double[] zoomALevel = {1.0};
+                    zoomInBtn.setOnAction(e -> {
+                        //limit
+                        if(forestAgeView.getHeight() != 3000){
+                            zoomALevel[0] = zoomALevel[0] * 1.2;
+                            forestAgeView.zoomIn();
+                            zoomLabel.setText(String.format("%.0f%%", zoomALevel[0] * 100));
+                        }else{
+                            zoomLabel.setText("Max Zoom");
+                        }
+                    });
+                    zoomOutBtn.setOnAction(e -> {
+                        if(forestAgeView.getHeight() != 256){
+                            zoomALevel[0] = zoomALevel[0] / 1.2;
+                            forestAgeView.zoomOut();
+                            zoomLabel.setText(String.format("%.0f%%", zoomALevel[0] * 100));
+                        }else{
+                            zoomLabel.setText("Min Zoom");
+                        }
+                    });
+                    defaultBtn.setOnAction(e -> {
+                        zoomALevel[0] = 1.0;
+                        forestAgeView.resetToDefault();
+                        zoomLabel.setText("100%");
+                    });
+
                     mapContainer.getChildren().addAll(zoomControls, mapPane);
                     break;
             }
@@ -980,6 +1015,9 @@ public class Interface extends BorderPane {
                     case("Moisture"):
                         updateBrushCursor(forestMoistureView, newVal.doubleValue());
                         break;
+                    case("Age"):
+                        updateBrushCursor(forestAgeView, newVal.doubleValue());
+                        break;
                 }
                 
             }
@@ -1017,8 +1055,13 @@ public class Interface extends BorderPane {
                             break;
                         case("Moisture"):
                             forestMoistureView.disableBrushMode();
-                            forestMoistureView.setCursor(Cursor.DEFAULT);  
+                            forestMoistureView.setCursor(Cursor.DEFAULT);
                             forestMoistureView.draw();
+                            break;
+                        case("Age"):
+                            forestAgeView.disableBrushMode();
+                            forestAgeView.setCursor(Cursor.DEFAULT);
+                            forestAgeView.draw();
                             break;
                         case("Pink Noise"):
                             System.out.println("Brush functions aren't applicabe for Pink Noise tab <-> FOR VISUAL PURPOSES ONLY");
@@ -1060,6 +1103,10 @@ public class Interface extends BorderPane {
                         forestMoistureView.setSelectedSpeciesSupplier(getSelectedSpecies);
                         brushRemoval(forestMoistureView, brushSizeSlider);
                         break;
+                    case("Age"):
+                        forestAgeView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                        brushRemoval(forestAgeView, brushSizeSlider);
+                        break;
                     case("Pink Noise"):
                         System.out.println("Brush functions are disabled for Pink Noise tab <-> FOR VISUAL PURPOSES ONLY");
                         break;
@@ -1097,6 +1144,10 @@ public class Interface extends BorderPane {
                     case("Moisture"):
                         forestMoistureView.setSelectedSpeciesSupplier(getSelectedSpecies);
                         brushAge(forestMoistureView, brushSizeSlider, ageSlider);
+                        break;
+                    case("Age"):
+                        forestAgeView.setSelectedSpeciesSupplier(getSelectedSpecies);
+                        brushAge(forestAgeView, brushSizeSlider, ageSlider);
                         break;
                     case("Pink Noise"):
                         System.out.println("Brush functions are disabled for Pink Noise tab <-> FOR VISUAL PURPOSES ONLY");
@@ -1204,6 +1255,7 @@ public class Interface extends BorderPane {
         if (forestTemperatureView != null) forestTemperatureView.draw();
         if (forestSunlightView != null) forestSunlightView.draw();
         if (forestMoistureView != null) forestMoistureView.draw();
+        if (forestAgeView != null) forestAgeView.draw();
         if (forestView != null) forestView.draw();
 
         PerformanceTimer.end("refresh_forest_views");
