@@ -907,7 +907,7 @@ public class Interface extends BorderPane {
     private TitledPane createAbioticsPanel()
     {
          // abiotic stuff:
-        Label temp = new Label("Temperature Slider: Min = "+ simulationEngine.getMinTemp() +"  ; Max = "+ simulationEngine.getMaxTemp());
+        Label temp = new Label("Temperature: Set Amount to Add or Subtract (Min = "+ simulationEngine.getMinTemp() +"  ; Max = "+ simulationEngine.getMaxTemp() +")");
         Slider tempSlider = new Slider(-15, 15, 0);
         tempSlider.setShowTickLabels(true);
         tempSlider.setShowTickMarks(true);
@@ -916,7 +916,7 @@ public class Interface extends BorderPane {
         tempSlider.setSnapToTicks(true);
         tempSlider.setPrefWidth(400);
         
-        Label age = new Label("Age Slider: Min = "+ simulationEngine.getMinAge() +"  ; Max = "+ simulationEngine.getMaxAge());
+        Label age = new Label("Age: Set Amount to Add or Subtract (Min = "+ simulationEngine.getMinAge() +"  ; Max = "+ simulationEngine.getMaxAge() +")");
         Slider ageSlider = new Slider(-650, 650, 0);
         ageSlider.setShowTickLabels(true);
         ageSlider.setShowTickMarks(true);
@@ -925,7 +925,7 @@ public class Interface extends BorderPane {
         ageSlider.setSnapToTicks(true);
         ageSlider.setPrefWidth(250);
 
-        Label sun = new Label("Sunlight Slider: Min = "+ simulationEngine.getMinSun() +"  ; Max = "+ simulationEngine.getMaxSun());
+        Label sun = new Label("Sunlight: Set Amount to Add or Subtract (Min = "+ simulationEngine.getMinSun() +"  ; Max = "+ simulationEngine.getMaxSun() +")");
         Slider sunSlider = new Slider(-13, 13, 0);
         sunSlider.setShowTickLabels(true);
         sunSlider.setShowTickMarks(true);
@@ -934,7 +934,7 @@ public class Interface extends BorderPane {
         sunSlider.setSnapToTicks(true);
         sunSlider.setPrefWidth(250);
 
-        Label moist = new Label("Moisture Slider: Min = "+ simulationEngine.getMinMoist() +"  ; Max = "+ simulationEngine.getMaxMoist());
+        Label moist = new Label("Moisture: Set Amount to Add or Subtract (Min = "+ simulationEngine.getMinMoist() +"  ; Max = "+ simulationEngine.getMaxMoist() +")");
         Slider moistSlider = new Slider(-54, 54, 0);
         moistSlider.setShowTickLabels(true);
         moistSlider.setShowTickMarks(true);
@@ -943,7 +943,7 @@ public class Interface extends BorderPane {
         moistSlider.setSnapToTicks(true);
         moistSlider.setPrefWidth(250);
 
-        Label elevation = new Label("Elevation Slider: Min = "+ simulationEngine.getMinElev() +"  ; Max = "+ simulationEngine.getMaxElev());
+        Label elevation = new Label("Elevation: Set Amount to Add or Subtract (Min = "+ simulationEngine.getMinElev() +"  ; Max = "+ simulationEngine.getMaxElev() +")");
         Slider elevationSlider = new Slider(-200, 200, 0);
         elevationSlider.setShowTickLabels(true);
         elevationSlider.setShowTickMarks(true);
