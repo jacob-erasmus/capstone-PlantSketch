@@ -908,47 +908,47 @@ public class Interface extends BorderPane {
     {
          // abiotic stuff:
         Label temp = new Label("Temperature Slider: Min = "+ testGrid.getMinTemp() +"  ; Max = "+ testGrid.getMaxTemp());
-        Slider tempSlider = new Slider(testGrid.getMinTemp(), testGrid.getMaxTemp(), (testGrid.getMinTemp() + testGrid.getMaxTemp()) / 2);
+        Slider tempSlider = new Slider(-15, 15, 0);
         tempSlider.setShowTickLabels(true);
         tempSlider.setShowTickMarks(true);
-        tempSlider.setBlockIncrement((testGrid.getMaxTemp() - testGrid.getMinTemp()) / 20);
-        tempSlider.setMajorTickUnit((testGrid.getMaxTemp() - testGrid.getMinTemp()) / 10);
+        tempSlider.setBlockIncrement(0.5);
+        tempSlider.setMajorTickUnit(0.5);
         tempSlider.setSnapToTicks(true);
         tempSlider.setPrefWidth(400);
-
+        
         Label age = new Label("Age Slider: Min = "+ testGrid.getMinAge() +"  ; Max = "+ testGrid.getMaxAge());
-        Slider ageSlider = new Slider(testGrid.getMinAge(), testGrid.getMaxAge(), (testGrid.getMinAge() + testGrid.getMaxAge()) / 2);
+        Slider ageSlider = new Slider(-650, 650, 0);
         ageSlider.setShowTickLabels(true);
         ageSlider.setShowTickMarks(true);
-        ageSlider.setBlockIncrement((testGrid.getMaxAge() - testGrid.getMinAge()) / 20);
-        ageSlider.setMajorTickUnit((testGrid.getMaxAge() - testGrid.getMinAge()) / 10);
+        ageSlider.setBlockIncrement(25);
+        ageSlider.setMajorTickUnit(25);
         ageSlider.setSnapToTicks(true);
         ageSlider.setPrefWidth(250);
 
         Label sun = new Label("Sunlight Slider: Min = "+ testGrid.getMinSun() +"  ; Max = "+ testGrid.getMaxSun());
-        Slider sunSlider = new Slider(testGrid.getMinSun(), testGrid.getMaxSun(), (testGrid.getMinSun() + testGrid.getMaxSun()) / 2);
+        Slider sunSlider = new Slider(-13, 13, 0);
         sunSlider.setShowTickLabels(true);
         sunSlider.setShowTickMarks(true);
-        sunSlider.setBlockIncrement((testGrid.getMaxSun() - testGrid.getMinSun()) / 20);
-        sunSlider.setMajorTickUnit((testGrid.getMaxSun() - testGrid.getMinSun()) / 10);
+        sunSlider.setBlockIncrement(1);
+        sunSlider.setMajorTickUnit(0.5);
         sunSlider.setSnapToTicks(true);
         sunSlider.setPrefWidth(250);
 
         Label moist = new Label("Moisture Slider: Min = "+ testGrid.getMinMoist() +"  ; Max = "+ testGrid.getMaxMoist());
-        Slider moistSlider = new Slider(testGrid.getMinMoist(), testGrid.getMaxMoist(), (testGrid.getMinMoist() + testGrid.getMaxMoist()) / 2);
+        Slider moistSlider = new Slider(-54, 54, 0);
         moistSlider.setShowTickLabels(true);
         moistSlider.setShowTickMarks(true);
-        moistSlider.setBlockIncrement((testGrid.getMaxMoist() - testGrid.getMinMoist()) / 20);
-        moistSlider.setMajorTickUnit((testGrid.getMaxMoist() - testGrid.getMinMoist()) / 10);
+        moistSlider.setBlockIncrement(1);
+        moistSlider.setMajorTickUnit(1);
         moistSlider.setSnapToTicks(true);
         moistSlider.setPrefWidth(250);
 
         Label elevation = new Label("Elevation Slider: Min = "+ testGrid.getMinElev() +"  ; Max = "+ testGrid.getMaxElev());
-        Slider elevationSlider = new Slider(testGrid.getMinElev(), testGrid.getMaxElev(), (testGrid.getMinElev() + testGrid.getMaxElev()) / 2);
+        Slider elevationSlider = new Slider(-200, 200, 0);
         elevationSlider.setShowTickLabels(true);
         elevationSlider.setShowTickMarks(true);
-        elevationSlider.setBlockIncrement((testGrid.getMaxElev() - testGrid.getMinElev()) / 20);
-        elevationSlider.setMajorTickUnit((testGrid.getMaxElev() - testGrid.getMinElev()) / 10);
+        elevationSlider.setBlockIncrement(10);
+        elevationSlider.setMajorTickUnit(10);
         elevationSlider.setSnapToTicks(true);
         elevationSlider.setPrefWidth(250);
 
