@@ -2,7 +2,8 @@ package plantsketch;
 
 import java.util.List;
 
-/** Immutable Data Transfer Object returned by SimulationRunner for the UI to render. */
+/** Immutable Data Transfer Object returned by SimulationRunner for the UI to render. Used specifically for undo and redo functionality */
+
 public record SimulationResult(
         Forest forest,
         List<PointSample> samples,
