@@ -53,7 +53,7 @@ public class Interface extends BorderPane {
     private int maxSaveStates = 30;
 
     private final Runnable onBack;
-    private TestGrid testGrid;
+    private SimulationEngine simulationEngine;
     private SimulationResult currentResult;
     private boolean isTestGrid;
     private int sampleCount;
@@ -86,7 +86,7 @@ public class Interface extends BorderPane {
     public Interface(Runnable onBack, String mode, boolean isTestGrid, int sampleCount) {
         this.onBack = onBack;
         this.sampleCount = sampleCount;
-        this.testGrid = new TestGrid(console::log, isTestGrid, sampleCount);
+        this.simulationEngine = new SimulationEngine(console::log, isTestGrid, sampleCount);
         this.isTestGrid = isTestGrid;
         isUndo = false;
         saveState = 0;
@@ -513,7 +513,7 @@ public class Interface extends BorderPane {
                 case "preset4":
                     executeSimulation(4, false, null);
                 case "chooseFolder":
-                    testGrid = new TestGrid(console::log, isTestGrid, sampleCount);
+                    simulationEngine = new SimulationEngine(console::log, isTestGrid, sampleCount);
                     console.log("Custom folder mode - waiting for folder data...");
                     executeSimulation(5, false, null);
             }
@@ -547,13 +547,13 @@ public class Interface extends BorderPane {
                     {
                         boolean wasChange = readGridEditors();
                         // Update TestGrid with new values
-                        if (regeneratePinkNoise.isSelected()) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected(), false); // if need to regenerate pink noise
-                        else if (wasChange) currentResult = testGrid.runChange(regeneratePinkNoise.isSelected(), false); // if there was actually a change to anything
+                        if (regeneratePinkNoise.isSelected()) currentResult = simulationEngine.runChange(regeneratePinkNoise.isSelected(), false); // if need to regenerate pink noise
+                        else if (wasChange) currentResult = simulationEngine.runChange(regeneratePinkNoise.isSelected(), false); // if there was actually a change to anything
                     }
                 }
                 else
                 {
-                    currentResult = testGrid.run(choice, fullPath);
+                    currentResult = simulationEngine.run(choice, fullPath);
                 
                 }
                 // adds to the current save state
@@ -569,7 +569,7 @@ public class Interface extends BorderPane {
             
             // for undo/redo of main run
             if (isUndo && !isTestGrid && isResimulation){
-                currentResult = testGrid.runChange(false, true);
+                currentResult = simulationEngine.runChange(false, true);
             }
 
             // Update grid editors with current values
@@ -623,7 +623,7 @@ public class Interface extends BorderPane {
             saveState--;
             System.out.println("Save State: " + saveState);
             currentResult = saveStatesArray.get(saveState);
-            this.testGrid.loadSaveState(currentResult);
+            this.simulationEngine.loadSaveState(currentResult);
             executeSimulation(0, true, null); // choice doesnt matter because it
         }
 
@@ -647,7 +647,7 @@ public class Interface extends BorderPane {
             saveState++;
             System.out.println("Save State: " + saveState);
             currentResult = saveStatesArray.get(saveState);
-            this.testGrid.loadSaveState(currentResult);
+            this.simulationEngine.loadSaveState(currentResult);
             executeSimulation(0, true, null); // choice doesnt matter because it
         }
     }
@@ -718,11 +718,11 @@ public class Interface extends BorderPane {
 // NOT WORKING
     public GridPane updateSpeciesPanelEditor()
     {
-        for (int i = 0; i < testGrid.getSpeciesList().size(); i++)
+        for (int i = 0; i < simulationEngine.getSpeciesList().size(); i++)
         {
-            float[] parameterValues = {testGrid.getSpeciesList().get(i).getSunlightC(), testGrid.getSpeciesList().get(i).getSunlightR(), testGrid.getSpeciesList().get(i).getMoistureC(), testGrid.getSpeciesList().get(i).getMoistureR(), 
-            testGrid.getSpeciesList().get(i).getTemperatureC(), testGrid.getSpeciesList().get(i).getTemperatureR(), testGrid.getSpeciesList().get(i).getSlopeC(), testGrid.getSpeciesList().get(i).getSlopeR(), testGrid.getSpeciesList().get(i).getMaxHeightOpen(),
-            testGrid.getSpeciesList().get(i).getMaxHeightClosed(), testGrid.getSpeciesList().get(i).getQ(), testGrid.getSpeciesList().get(i).getLifeSpan()};
+            float[] parameterValues = {simulationEngine.getSpeciesList().get(i).getSunlightC(), simulationEngine.getSpeciesList().get(i).getSunlightR(), simulationEngine.getSpeciesList().get(i).getMoistureC(), simulationEngine.getSpeciesList().get(i).getMoistureR(),
+            simulationEngine.getSpeciesList().get(i).getTemperatureC(), simulationEngine.getSpeciesList().get(i).getTemperatureR(), simulationEngine.getSpeciesList().get(i).getSlopeC(), simulationEngine.getSpeciesList().get(i).getSlopeR(), simulationEngine.getSpeciesList().get(i).getMaxHeightOpen(),
+            simulationEngine.getSpeciesList().get(i).getMaxHeightClosed(), simulationEngine.getSpeciesList().get(i).getQ(), simulationEngine.getSpeciesList().get(i).getLifeSpan()};
 
             for (int j = 0; j < speciesParameters.length; j++) {
             textFields[j].setPromptText(String.valueOf(parameterValues[j]));
@@ -741,7 +741,7 @@ public class Interface extends BorderPane {
 
         updateSpeciesParametersButton.setOnAction(e -> {
             
-            for (Species species : testGrid.getSpeciesList())
+            for (Species species : simulationEngine.getSpeciesList())
             {
                 createSpeciesPanelEditor(species);
             }
@@ -780,7 +780,7 @@ public class Interface extends BorderPane {
 
         accordion.getPanes().add(createAbioticsPanel());
 
-        for (Species species : testGrid.getSpeciesList())
+        for (Species species : simulationEngine.getSpeciesList())
         {
 
             GridPane speciesParametersPanel = createSpeciesPanelEditor(species);
@@ -907,7 +907,7 @@ public class Interface extends BorderPane {
     private TitledPane createAbioticsPanel()
     {
          // abiotic stuff:
-        Label temp = new Label("Temperature Slider: Min = "+ testGrid.getMinTemp() +"  ; Max = "+ testGrid.getMaxTemp());
+        Label temp = new Label("Temperature Slider: Min = "+ simulationEngine.getMinTemp() +"  ; Max = "+ simulationEngine.getMaxTemp());
         Slider tempSlider = new Slider(-15, 15, 0);
         tempSlider.setShowTickLabels(true);
         tempSlider.setShowTickMarks(true);
@@ -916,7 +916,7 @@ public class Interface extends BorderPane {
         tempSlider.setSnapToTicks(true);
         tempSlider.setPrefWidth(400);
         
-        Label age = new Label("Age Slider: Min = "+ testGrid.getMinAge() +"  ; Max = "+ testGrid.getMaxAge());
+        Label age = new Label("Age Slider: Min = "+ simulationEngine.getMinAge() +"  ; Max = "+ simulationEngine.getMaxAge());
         Slider ageSlider = new Slider(-650, 650, 0);
         ageSlider.setShowTickLabels(true);
         ageSlider.setShowTickMarks(true);
@@ -925,7 +925,7 @@ public class Interface extends BorderPane {
         ageSlider.setSnapToTicks(true);
         ageSlider.setPrefWidth(250);
 
-        Label sun = new Label("Sunlight Slider: Min = "+ testGrid.getMinSun() +"  ; Max = "+ testGrid.getMaxSun());
+        Label sun = new Label("Sunlight Slider: Min = "+ simulationEngine.getMinSun() +"  ; Max = "+ simulationEngine.getMaxSun());
         Slider sunSlider = new Slider(-13, 13, 0);
         sunSlider.setShowTickLabels(true);
         sunSlider.setShowTickMarks(true);
@@ -934,7 +934,7 @@ public class Interface extends BorderPane {
         sunSlider.setSnapToTicks(true);
         sunSlider.setPrefWidth(250);
 
-        Label moist = new Label("Moisture Slider: Min = "+ testGrid.getMinMoist() +"  ; Max = "+ testGrid.getMaxMoist());
+        Label moist = new Label("Moisture Slider: Min = "+ simulationEngine.getMinMoist() +"  ; Max = "+ simulationEngine.getMaxMoist());
         Slider moistSlider = new Slider(-54, 54, 0);
         moistSlider.setShowTickLabels(true);
         moistSlider.setShowTickMarks(true);
@@ -943,7 +943,7 @@ public class Interface extends BorderPane {
         moistSlider.setSnapToTicks(true);
         moistSlider.setPrefWidth(250);
 
-        Label elevation = new Label("Elevation Slider: Min = "+ testGrid.getMinElev() +"  ; Max = "+ testGrid.getMaxElev());
+        Label elevation = new Label("Elevation Slider: Min = "+ simulationEngine.getMinElev() +"  ; Max = "+ simulationEngine.getMaxElev());
         Slider elevationSlider = new Slider(-200, 200, 0);
         elevationSlider.setShowTickLabels(true);
         elevationSlider.setShowTickMarks(true);
@@ -1158,7 +1158,7 @@ public class Interface extends BorderPane {
     private void brushAge(ForestOnMapView mapView, Slider brushSlider, Slider ageSlider){
         brushAgeMode = !brushAgeMode;
         if(brushAgeMode){
-            mapView.enableBrushAgeMode((() -> brushSlider.getValue()), (() -> ageSlider.getValue()), testGrid);
+            mapView.enableBrushAgeMode((() -> brushSlider.getValue()), (() -> ageSlider.getValue()), simulationEngine);
             updateBrushCursor(mapView, brushSlider.getValue());
         }else{
             mapView.disableBrushMode();
@@ -1266,17 +1266,17 @@ public class Interface extends BorderPane {
         
         // This creates the empty grids without the values inside
         gridEditors.put("Temperature", new GridEditor("Temperature (°C)", 
-            testGrid.getMinTemp(), testGrid.getMaxTemp()));
+            simulationEngine.getMinTemp(), simulationEngine.getMaxTemp()));
         gridEditors.put("Age", new GridEditor("Age (years)", 
-            testGrid.getMinAge(), testGrid.getMaxAge()));
+            simulationEngine.getMinAge(), simulationEngine.getMaxAge()));
         gridEditors.put("Moisture", new GridEditor("Moisture (%)", 
-            testGrid.getMinMoist(), testGrid.getMaxMoist()));
+            simulationEngine.getMinMoist(), simulationEngine.getMaxMoist()));
         gridEditors.put("Sunlight", new GridEditor("Sunlight (hours)", 
-            testGrid.getMinSun(), testGrid.getMaxSun()));
+            simulationEngine.getMinSun(), simulationEngine.getMaxSun()));
         gridEditors.put("Elevation", new GridEditor("Elevation (m)", 
-            testGrid.getMinElev(), testGrid.getMaxElev()));
+            simulationEngine.getMinElev(), simulationEngine.getMaxElev()));
         gridEditors.put("Slope", new GridEditor("Slope (degrees)", 
-            testGrid.getMinSlope(), testGrid.getMaxSlope()));
+            simulationEngine.getMinSlope(), simulationEngine.getMaxSlope()));
         
         GridPane gridPane = new GridPane();
         gridPane.setHgap(15);  // space between columns
@@ -1361,12 +1361,12 @@ public class Interface extends BorderPane {
     // puts in the values for the right tab
     private void updateGridEditors() 
     {
-        gridEditors.get("Temperature").setValues(testGrid.getTemperatureGrid());
-        gridEditors.get("Age").setValues(testGrid.getAgeGrid());
-        gridEditors.get("Moisture").setValues(testGrid.getMoistureGrid());
-        gridEditors.get("Sunlight").setValues(testGrid.getSunlightGrid());
-        gridEditors.get("Elevation").setValues(testGrid.getElevationGrid());
-        gridEditors.get("Slope").setValues(testGrid.getSlopeGrid());
+        gridEditors.get("Temperature").setValues(simulationEngine.getTemperatureGrid());
+        gridEditors.get("Age").setValues(simulationEngine.getAgeGrid());
+        gridEditors.get("Moisture").setValues(simulationEngine.getMoistureGrid());
+        gridEditors.get("Sunlight").setValues(simulationEngine.getSunlightGrid());
+        gridEditors.get("Elevation").setValues(simulationEngine.getElevationGrid());
+        gridEditors.get("Slope").setValues(simulationEngine.getSlopeGrid());
     }
 
     // reads in values from the screen grids
@@ -1382,22 +1382,22 @@ public class Interface extends BorderPane {
 
         if(gridEditors.get("Temperature").isEdited()) 
         {
-            testGrid.setTemperatureGrid(newTemp);
+            simulationEngine.setTemperatureGrid(newTemp);
             wasChange = true;
         }
         if(gridEditors.get("Age").isEdited()) 
         {
-            testGrid.setAgeGrid(newAge);
+            simulationEngine.setAgeGrid(newAge);
             wasChange = true;
         }        
         if(gridEditors.get("Moisture").isEdited()) 
         {
-            testGrid.setMoistureGrid(newMoist);
+            simulationEngine.setMoistureGrid(newMoist);
             wasChange = true;
         }        
         if(gridEditors.get("Sunlight").isEdited()) 
         {
-            testGrid.setSunlightGrid(newSun);
+            simulationEngine.setSunlightGrid(newSun);
             wasChange = true;
         }        
         // Elevation editing disabled for performance - slope recalculation is expensive
@@ -1405,7 +1405,7 @@ public class Interface extends BorderPane {
         {
             console.log("Warning: Elevation editing disabled for performance reasons");
             // Reset elevation values to original state
-            gridEditors.get("Elevation").setValues(testGrid.getElevationGrid());
+            gridEditors.get("Elevation").setValues(simulationEngine.getElevationGrid());
         }
 
         return wasChange;
@@ -1416,16 +1416,16 @@ public class Interface extends BorderPane {
     {
         StringBuilder status = new StringBuilder();
         status.append("Grid Status | ");
-        status.append("Samples: ").append(testGrid.getSampleCount()).append(" | ");
-        status.append("Pink Noise: ").append(testGrid.getNumPinkNoise()).append(" | ");
-        status.append("Plants: ").append(testGrid.getNumPlants()).append("\n");
+        status.append("Samples: ").append(simulationEngine.getSampleCount()).append(" | ");
+        status.append("Pink Noise: ").append(simulationEngine.getNumPinkNoise()).append(" | ");
+        status.append("Plants: ").append(simulationEngine.getNumPlants()).append("\n");
         
-        status.append("Temp: ").append(formatGrid(testGrid.getTemperatureGrid())).append(" | ");
-        status.append("Age: ").append(formatGrid(testGrid.getAgeGrid())).append(" | ");
-        status.append("Moist: ").append(formatGrid(testGrid.getMoistureGrid())).append("\n");
-        status.append("Sun: ").append(formatGrid(testGrid.getSunlightGrid())).append(" | ");
-        status.append("Elev: ").append(formatGrid(testGrid.getElevationGrid())).append(" | ");
-        status.append("Slope: ").append(formatGrid(testGrid.getSlopeGrid()));
+        status.append("Temp: ").append(formatGrid(simulationEngine.getTemperatureGrid())).append(" | ");
+        status.append("Age: ").append(formatGrid(simulationEngine.getAgeGrid())).append(" | ");
+        status.append("Moist: ").append(formatGrid(simulationEngine.getMoistureGrid())).append("\n");
+        status.append("Sun: ").append(formatGrid(simulationEngine.getSunlightGrid())).append(" | ");
+        status.append("Elev: ").append(formatGrid(simulationEngine.getElevationGrid())).append(" | ");
+        status.append("Slope: ").append(formatGrid(simulationEngine.getSlopeGrid()));
         
         statusLabel.setText(status.toString());
     }

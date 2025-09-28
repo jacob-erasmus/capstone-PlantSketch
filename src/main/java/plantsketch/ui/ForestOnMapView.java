@@ -3,11 +3,8 @@ package plantsketch.ui;
 import plantsketch.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,9 +12,6 @@ import java.util.function.Supplier;
 
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.image.WritableImage;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 
@@ -186,9 +180,9 @@ public class ForestOnMapView extends Region {
         forestCanvas.setOnMousePressed(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()/3));
         forestCanvas.setOnMouseDragged(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()/3));
     }
-    public void enableBrushAgeMode(Supplier<Double> brushSizeSupplier, Supplier<Double> ageSupplier, TestGrid testGrid){
-        forestCanvas.setOnMousePressed(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get()/3, ageSupplier.get(), testGrid));
-        forestCanvas.setOnMouseDragged(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get()/3, ageSupplier.get(), testGrid));
+    public void enableBrushAgeMode(Supplier<Double> brushSizeSupplier, Supplier<Double> ageSupplier, SimulationEngine simulationEngine){
+        forestCanvas.setOnMousePressed(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get()/3, ageSupplier.get(), simulationEngine));
+        forestCanvas.setOnMouseDragged(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get()/3, ageSupplier.get(), simulationEngine));
     }
     public void disableBrushMode(){
         forestCanvas.setOnMousePressed(null);
@@ -229,7 +223,7 @@ public class ForestOnMapView extends Region {
         } 
     }
 
-    private void applyBrushAge(double brushX, double brushY, double brushSize, double ageFactor, TestGrid testGrid){
+    private void applyBrushAge(double brushX, double brushY, double brushSize, double ageFactor, SimulationEngine simulationEngine){
         long brushStartTime = System.nanoTime();
         double brushRadiusPx = brushSizeToPixels(brushSize);
         List<Plant> toChange = new ArrayList<>();
@@ -256,7 +250,7 @@ public class ForestOnMapView extends Region {
 
                 // Apply only if inside circular brush
                 if (dist <= brushRadiusMeters) {
-                    testGrid.adjustAge(cx, cy, (float)ageFactor);
+                    simulationEngine.adjustAge(cx, cy, (float)ageFactor);
                 }
             }
         }
@@ -279,7 +273,7 @@ public class ForestOnMapView extends Region {
             for(Plant p : toChange){
                 int xCell = (int) (p.getX() / gridSpacing);
                 int yCell = (int) (p.getY() / gridSpacing);
-                testGrid.changePlantAge(xCell, yCell, (float)ageFactor, p);
+                simulationEngine.changePlantAge(xCell, yCell, (float)ageFactor, p);
             }
             drawForest();
             System.out.println("Brush Elapsed Time: " + (System.nanoTime() - brushStartTime) + " (nanoseconds). Changed ages of " + toChange.size() + " plants");

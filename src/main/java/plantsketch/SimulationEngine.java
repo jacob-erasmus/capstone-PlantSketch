@@ -7,7 +7,7 @@ import plantsketch.util.PerformanceTimer;
 import java.util.*;
 import java.util.function.Consumer;
 
-public class TestGrid 
+public class SimulationEngine
 {
 
     boolean isTestGrid = true;
@@ -61,7 +61,7 @@ public class TestGrid
 
 
     // constructor for the 2x2 test grid
-    public TestGrid(Consumer<String> logger, boolean isTestGrid, int sampleCount)
+    public SimulationEngine(Consumer<String> logger, boolean isTestGrid, int sampleCount)
     {
         this.logger = (logger == null) ? (s -> {}) : logger;
         this.isTestGrid = isTestGrid;
