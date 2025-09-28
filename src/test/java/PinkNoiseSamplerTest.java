@@ -7,12 +7,13 @@ public class PinkNoiseSamplerTest {
 
     @Test
     void deterministicWithSeed() {
+        //test if pink noise sampler seeding behaves as expected
         PinkNoiseSampler s1 = new PinkNoiseSampler(100f, 100f, 2.0f, 42L);
         PinkNoiseSampler s2 = new PinkNoiseSampler(100f, 100f, 2.0f, 42L);
 
         List<PointSample> a = s1.generateSamples(200);
         List<PointSample> b = s2.generateSamples(200);
-
+        // check that the size of the point sample lists is equal
         assertEquals(a.size(), b.size(), "Same seed = same count");
         for (int i = 0; i < a.size(); i++) {
             assertEquals(a.get(i).getX(), b.get(i).getX(), 1e-6);
@@ -22,10 +23,11 @@ public class PinkNoiseSamplerTest {
 
     @Test
     void enforcesMinSeparation() {
+        //check that none of the points are too close to each other
         PinkNoiseSampler s = new PinkNoiseSampler(50f, 50f, 2.0f, 7L);
         List<PointSample> pts = s.generateSamples(150);
 
-        float minD2 = (2.0f * 2.0f); // squared distance to avoid sqrt
+        float minD2 = (2.0f * 2.0f); // squared distance to avoid sqrt expensive calc
         for (int i = 0; i < pts.size(); i++) {
             for (int j = i + 1; j < pts.size(); j++) {
                 float dx = pts.get(i).getX() - pts.get(j).getX();
