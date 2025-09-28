@@ -86,8 +86,8 @@ public class PinkNoiseView extends Region {
             // clamp for safety
             xPx = Math.max(0, Math.min(vt.widthPx - 1, xPx));
             yPx = Math.max(0, Math.min(vt.heightPx - 1, yPx));
-            g.fillOval(yPx - r / 2, xPx - r / 2, r, r);
-            // swapping:    g.fillOval(xPx - r / 2, yPx - r / 2, r, r);
+            //g.fillOval(yPx - r / 2, xPx - r / 2, r, r);
+             g.fillOval(xPx - r / 2, yPx - r / 2, r, r);
         }
     }
 

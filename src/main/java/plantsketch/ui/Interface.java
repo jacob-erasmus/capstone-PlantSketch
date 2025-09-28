@@ -1485,7 +1485,7 @@ public class Interface extends BorderPane {
     // formats the grid values for display in the bottom status bar
     private String formatGrid(float[][] grid) {
         if (grid == null || grid.length < 2) return "N/A";
-        return String.format("[%.1f,%.1f;%.1f,%.1f]", grid[0][0], grid[0][1], grid[1][0], grid[1][1]);
+        return String.format("[%.1f,%.1f;%.1f,%.1f]", grid[0][0], grid[1][0], grid[0][1], grid[1][1]);
     }
 
 }
