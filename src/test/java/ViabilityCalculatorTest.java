@@ -15,7 +15,6 @@ public class ViabilityCalculatorTest {
     void setUp() {
         // Create test elevation data (2x2 grid)
         float[][] elevation = {{100.0f, 105.0f}, {102.0f, 108.0f}};
-
         // Create test abiotic factor grids
         float[][] moisture = {{27.5f, 30.0f}, {25.0f, 32.0f}};
         float[][] sunlight = {{3.75f, 4.0f}, {3.5f, 4.5f}};
@@ -30,36 +29,17 @@ public class ViabilityCalculatorTest {
 
         viabilityCalculator = new ViabilityCalculator(terrain, abioticFactors);
 
+        SpeciesDictionary speciesDictionary = new SpeciesDictionary();
+
         // Create test species based on the provided parameters
-        boxwood = createBoxwoodSpecies();
-        silverFir = createSilverFirSpecies();
-    }
-
-    private Species createBoxwoodSpecies() {
-        // Boxwood parameters from specification
-        ViabilityParameters viabilityParams = new ViabilityParameters(
-            3.75f, 4.25f, 27.5f, 12.5f, 11.75f, 23.35f, 0f, 80f);
-        GrowthParameters growthParams = new GrowthParameters(9f, 9f, -5f, 300f);
-
-        return new Species("Boxwood", "buse", viabilityParams, growthParams,
-                          "red", 0.42f, 0.42f, 0.7f, 15f, "L", 1.0f);
-    }
-
-    private Species createSilverFirSpecies() {
-        // Silver Fir parameters from specification
-        ViabilityParameters viabilityParams = new ViabilityParameters(
-            5f, 3f, 31f, 9f, 11.75f, 23.25f, 0f, 80f);
-        GrowthParameters growthParams = new GrowthParameters(40f, 50f, -6f, 550f);
-
-        return new Species("Silver Fir", "abal", viabilityParams, growthParams,
-                          "green", 0.12f, 0.07f, 0.47f, 22f, "L", 1.0f);
+        boxwood = speciesDictionary.loadBoxwood();
+        silverFir = speciesDictionary.loadSilverFir();
     }
 
     @Test
     void testCalculateViabilityFunction() {
         // Test the basic viability calculation function g(d)
         // Formula: g(d) = (1 + a) * e^((d/r)^4.5 * ln(0.2)) - a where a = 0.2
-
         // Test perfect match (d = 0) - should return 1.0
         double perfectMatch = viabilityCalculator.calculateViability(10.0, 5.0, 5.0);
         assertEquals(1.0, perfectMatch, 0.001, "Perfect environmental match should return viability of 1.0");
@@ -104,15 +84,12 @@ public class ViabilityCalculatorTest {
     void testViabilityMinimumPrinciple() {
         // Test that viability follows the minimum principle across all factors
         Species testSpecies = boxwood;
-
         float viability = viabilityCalculator.viabililty(testSpecies, 1, 1);
-
         // Get actual environmental values at position (1,1) from the maps
         float actualMoisture = abioticFactors.getMoistureMap().getMoisture(1, 1); // 32.0f
         float actualSunlight = abioticFactors.getSunlightMap().getSunlight(1, 1); // 4.5f
         float actualTemperature = abioticFactors.getTemperatureMap().getTemperature(1, 1); // 12.5f
         float actualSlope = terrain.getSlope(1, 1);
-
         // Calculate individual factor viabilities using actual environmental values
         float moistureViability = (float) viabilityCalculator.calculateViability(
             testSpecies.getMoistureR(), testSpecies.getMoistureC(), actualMoisture);
@@ -122,7 +99,6 @@ public class ViabilityCalculatorTest {
             testSpecies.getTemperatureR(), testSpecies.getTemperatureC(), actualTemperature);
         float slopeViability = (float) viabilityCalculator.calculateViability(
             testSpecies.getSlopeR(), testSpecies.getSlopeC(), actualSlope);
-
         float expectedMinimum = Math.min(Math.min(moistureViability, sunViability),
                                        Math.min(tempViability, slopeViability));
 
