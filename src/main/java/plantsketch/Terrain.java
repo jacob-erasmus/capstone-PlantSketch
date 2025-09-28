@@ -2,8 +2,13 @@ package plantsketch;
 
 import plantsketch.util.PerformanceTimer;
 
-// The terrain class stores all the of abiotic factors plus the elevation profile and is used extensively for referencing our 2d arrays
-
+/**
+ * Terrain - Geographic and Environmental Data Container
+ *
+ * Stores elevation data and pre-calculated slope values for the simulation area.
+ * Provides efficient access to terrain information and references to environmental
+ * factor maps (temperature, moisture, sunlight) through abiotic factors.
+ */
 public class Terrain {
     int width;
     int height;

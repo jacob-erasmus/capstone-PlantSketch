@@ -1,5 +1,12 @@
 package plantsketch;
 
+/**
+ * Species - Plant Species Definition and Characteristics
+ *
+ * Comprehensive model of a plant species containing all ecological and growth parameters
+ * needed for simulation. Encapsulates viability parameters (environmental tolerances)
+ * and growth parameters (size, lifespan) along with visual and behavioral traits.
+ */
 public class Species {
 
     // Basic info
