@@ -1,5 +1,7 @@
 package plantsketch;
 
+
+
 public class TemperatureMap extends GridMap {
 
     public TemperatureMap() {

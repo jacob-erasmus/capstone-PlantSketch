@@ -2,6 +2,8 @@ package plantsketch;
 
 import plantsketch.util.PerformanceTimer;
 
+// The terrain class stores all the of abiotic factors plus the elevation profile and is used extensively for referencing our 2d arrays
+
 public class Terrain {
     int width;
     int height;
@@ -22,7 +24,7 @@ public class Terrain {
         this.slopeMap = new float[width][height];
         this.abioticFactors = abioticFactors;
 
-        // Pre-calculate all slope values once
+        // Pre-calculate all slope values once in order to save computation later in the program
         calculateSlopeGrid();
     }
 
@@ -32,9 +34,7 @@ public class Terrain {
     }
 
     // Get Slope Method - now returns cached value
-    public float
-
-    getSlope(int x, int y) {
+    public float getSlope(int x, int y) {
         if (x < 0 || x >= width || y < 0 || y >= height) {
             throw new IllegalArgumentException("Coordinates out of bounds");
         }
