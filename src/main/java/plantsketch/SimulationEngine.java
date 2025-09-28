@@ -316,13 +316,17 @@ public class SimulationEngine
     // make simulation result object
     public SimulationResult makeSimResult()
     {
+        List<Species> deepCopy = new ArrayList<>();
+        for (Species s : speciesList) {
+            deepCopy.add(new Species(s)); // assuming Species has a copy constructor
+        }
         simResult = new SimulationResult(forest, pinkNoise, dimX, dimY, gridSpacing, 
             new AgeMap(dimX, dimY, gridSpacing, age.getGrid()), 
             new Terrain(dimX, dimY, gridSpacing, abiotics, terrain.elevationMap), 
             new AbioticFactors(new MoistureMap (dimX, dimY, gridSpacing, abiotics.getMoistureMap().getGrid()), 
                 new TemperatureMap(dimX, dimY, gridSpacing, abiotics.getTemperatureMap().getGrid()) , 
                 new SunlightMap(dimX, dimY, gridSpacing, abiotics.getSunlightMap().getGrid())), 
-                new ArrayList<Species>(speciesList));
+                deepCopy);
 
         //commenting this out to assist with merging
 //        new EcoVizOutput(simResult).createFile("testingGrid.pdb"); // and then make the file

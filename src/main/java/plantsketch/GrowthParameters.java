@@ -15,6 +15,13 @@ public class GrowthParameters {
         this.lifeSpan = lifeSpan;
     }
 
+    public GrowthParameters(GrowthParameters other) {
+        this.maxHeightOpen = other.maxHeightOpen;
+        this.maxHeightClosed = other.maxHeightClosed;
+        this.q = other.q;
+        this.lifeSpan = other.lifeSpan;
+    }
+
     // Getters
     public float getMaxHeightOpen() {
         return maxHeightOpen;
