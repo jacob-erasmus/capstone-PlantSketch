@@ -3,6 +3,7 @@ package plantsketch.util;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 
+//performance timer. generated using an LLM
 public class PerformanceTimer {
     private static final boolean PROFILING_ENABLED = Boolean.parseBoolean(
         System.getProperty("plantsketch.profiling", "true"));

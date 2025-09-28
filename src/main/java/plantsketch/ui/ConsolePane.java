@@ -8,7 +8,8 @@ import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.control.TextArea;
 
-/** Simple, reusable console pane that can capture System.out and System.err. */
+//tracks console for dubugging purposes. Used LLM generated code
+
 public final class ConsolePane {
 
     private final TextArea area = new TextArea();

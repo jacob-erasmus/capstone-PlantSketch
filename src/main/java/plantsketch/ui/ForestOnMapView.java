@@ -139,7 +139,7 @@ public class ForestOnMapView extends Region {
 
                 double px = vt.cellXtoPx(x);
                 double py = vt.cellYtoPx(y);
-                g.fillRect(py, px, cs, cs);
+                g.fillRect(px, py, cs, cs);
             }
         }
         g.setStroke(Color.BLACK);
@@ -160,8 +160,8 @@ public class ForestOnMapView extends Region {
                     double xPx = vt.meterXtoPx(p.getX());
                     double yPx = vt.meterYtoPx(p.getY());
                     double rPx = Math.max(2.0, vt.metersToPx(p.getCanopyRadius()));
-                    g.fillOval(yPx - rPx, xPx - rPx, rPx * 2, rPx * 2);
-                    // swappiing them to plaster fix mirror image thing:    g.fillOval(xPx - rPx, yPx - rPx, rPx * 2, rPx * 2);
+                    //g.fillOval(yPx - rPx, xPx - rPx, rPx * 2, rPx * 2);
+                    g.fillOval(xPx - rPx, yPx - rPx, rPx * 2, rPx * 2);
                 }
         }
 
@@ -205,8 +205,8 @@ public class ForestOnMapView extends Region {
             double yPx = vt.meterYtoPx(p.getY());
             double rPx = Math.max(2.0, vt.metersToPx(p.getCanopyRadius()));
             //swapped so same as draw method
-            double dx = brushX - yPx;
-            double dy = brushY - xPx;
+            double dx = brushX - xPx;
+            double dy = brushY - yPx;
             double dist = Math.hypot(dx,dy);
             //if plant canopy contacts brush radius
             if(dist <= (brushRadiusPx + rPx)){
@@ -260,8 +260,8 @@ public class ForestOnMapView extends Region {
             double yPx = vt.meterYtoPx(p.getY());
             double rPx = Math.max(2.0, vt.metersToPx(p.getCanopyRadius()));
             //swapped so same as draw method
-            double dx = brushX - yPx;
-            double dy = brushY - xPx;
+            double dx = brushX - xPx;
+            double dy = brushY - yPx;
             double dist = Math.hypot(dx,dy);
             //if plant canopy contacts brush radius
             if(dist <= (brushRadiusPx + rPx)){

@@ -47,7 +47,7 @@ public class GridEditor extends VBox {
                 originalValues = new float[2][2];
                 for (int i = 0; i < 2; i++) {
                     for (int j = 0; j < 2; j++) {
-                        fields[i][j].setText(String.format("%.2f", values[i][j]));
+                        fields[i][j].setText(String.format("%.2f", values[j][i]));
                         originalValues[i][j] = values[i][j];
                     }
                 }
