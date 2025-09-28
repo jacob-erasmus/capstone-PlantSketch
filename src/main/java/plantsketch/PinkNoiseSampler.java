@@ -18,11 +18,7 @@ public class PinkNoiseSampler {
         this.width = width;
         this.height = height;
         this.minDistance = minDistance;
-        if(seed == 0){
-            this.rng = new Random();
-        } else{
-            this.rng = new Random(seed);
-        };
+        this.rng = new Random(seed);
     }
 
     public List<PointSample> generateSamples(int n) {
