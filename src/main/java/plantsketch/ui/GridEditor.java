@@ -72,7 +72,7 @@ public class GridEditor extends VBox {
             for (int i = 0; i < 2; i++) {
                 for (int j = 0; j < 2; j++) {
                     try {
-                        float val = Float.parseFloat(fields[i][j].getText());
+                        float val = Float.parseFloat(fields[j][i].getText());
                         values[i][j] = Math.max(min, Math.min(max, val));
                     } catch (NumberFormatException e) {
                         values[i][j] = (min + max) / 2;
