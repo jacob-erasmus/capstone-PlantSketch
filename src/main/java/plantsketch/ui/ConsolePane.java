@@ -33,7 +33,7 @@ public final class ConsolePane {
         }
     }
 
-    /** Redirect System.out and System.err to this console. Call once. */
+    //get the system streams
     public void hookSystemStreams() {
         PrintStream outPs = new PrintStream(new TextAreaOutputStream(area), true, StandardCharsets.UTF_8);
         System.setOut(outPs);
