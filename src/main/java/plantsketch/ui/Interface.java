@@ -611,9 +611,6 @@ public class Interface extends BorderPane {
                 updateStatusDisplay();
 
             }
-            // else updateSliderEditors();
-            
-            updateSpeciesPanelEditor();
 
             
             // console.log("✓ Simulation complete. Plants placed: " + currentResult.forest().getAllPlants().size());
@@ -686,7 +683,6 @@ public class Interface extends BorderPane {
     // makes the species panel editors
     private GridPane createSpeciesPanelEditor(Species species)
     {
-
         speciesPanelEditor = new GridPane();
         speciesPanelEditor.setHgap(10);
         speciesPanelEditor.setVgap(8);
@@ -708,7 +704,7 @@ public class Interface extends BorderPane {
             speciesPanelEditor.add(titleLabel, 0, index);
 
             TextField parameterValue = new TextField();
-            parameterValue.setPromptText(String.valueOf(parameterValues[index]));
+            parameterValue.setText(String.valueOf(parameterValues[index]));
             parameterValue.setPrefWidth(200);
 
 // POTENTIALLY NOT WORKING
@@ -746,25 +742,6 @@ public class Interface extends BorderPane {
 
     }
 
-// NOT WORKING
-    public GridPane updateSpeciesPanelEditor()
-    {
-        for (int i = 0; i < simulationEngine.getSpeciesList().size(); i++)
-        {
-            float[] parameterValues = {simulationEngine.getSpeciesList().get(i).getSunlightC(), simulationEngine.getSpeciesList().get(i).getSunlightR(), simulationEngine.getSpeciesList().get(i).getMoistureC(), simulationEngine.getSpeciesList().get(i).getMoistureR(),
-            simulationEngine.getSpeciesList().get(i).getTemperatureC(), simulationEngine.getSpeciesList().get(i).getTemperatureR(), simulationEngine.getSpeciesList().get(i).getSlopeC(), simulationEngine.getSpeciesList().get(i).getSlopeR(), simulationEngine.getSpeciesList().get(i).getMaxHeightOpen(),
-            simulationEngine.getSpeciesList().get(i).getMaxHeightClosed(), simulationEngine.getSpeciesList().get(i).getQ(), simulationEngine.getSpeciesList().get(i).getLifeSpan()};
-
-            for (int j = 0; j < speciesParameters.length; j++) {
-            textFields[j].setPromptText(String.valueOf(parameterValues[j]));
-        }
-        }
-
-
-        
-
-        return null;
-    }
 
     public Button updateSpeciesParametersButton()
     {
@@ -1377,18 +1354,9 @@ public class Interface extends BorderPane {
 
         accordion.getPanes().add(abioticsHeader);
 
-
-        SpeciesDictionary dict = new SpeciesDictionary();
-        List<Species> speciesList = List.of(
-                dict.loadBoxwood(),
-                dict.loadSnowyMespilus(),
-                dict.loadMountainPine(),
-                dict.loadSilverFir(),
-                dict.loadSilverBirch(),
-                dict.loadSissileOak(),
-                dict.loadEuropeanBeech());
-
-        for (Species species : speciesList)
+// WILLIAM for 
+        //for (Species species : currentResult.speciesList())
+        for (Species species : simulationEngine.getSpeciesList())
         {
 
             GridPane speciesParametersPanel = createSpeciesPanelEditor(species);
