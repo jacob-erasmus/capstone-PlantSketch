@@ -276,6 +276,7 @@ public class FileManager {
     // ADD THIS in FileManager (same package: plantsketch)
     public void fileFinder(String directoryPath) {
         File directory = new File(directoryPath);
+        pwd = directoryPath;
         if (!directory.isDirectory()) {
             System.out.println("Not a valid directory :(");
             return;
