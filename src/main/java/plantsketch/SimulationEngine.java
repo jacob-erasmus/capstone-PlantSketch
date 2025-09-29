@@ -532,6 +532,7 @@ public class SimulationEngine
     {
         FileManager fm = new FileManager();
         fm.fileFinder(file);
+        pwd = fm.getPwd();
 
         dimX = fm.getDimX();
         dimY = fm.getDimY();
