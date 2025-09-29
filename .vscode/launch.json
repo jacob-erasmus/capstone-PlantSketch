@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "ThreeDee",
+            "request": "launch",
+            "mainClass": "plantsketch.threeDee.ThreeDee",
+            "projectName": "plantsketch"
+        },
+        {
+            "type": "java",
             "name": "Launcher",
             "request": "launch",
             "mainClass": "plantsketch.opengl.Launcher",

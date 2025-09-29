@@ -1,5 +1,7 @@
 package plantsketch.ui;
 
+import java.io.File;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -9,13 +11,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
+import plantsketch.threeDee.ThreeDee;
 
 public class MainApp extends Application {
 
     // this makes sure that each window is always centered. yay! No more missing half of the screen
     private void centerStage(Stage stage) {
         // Get the screen dimensions
+
         javafx.geometry.Rectangle2D screenBounds = javafx.stage.Screen.getPrimary().getVisualBounds();
         
         // Calculate the center position
@@ -23,6 +28,10 @@ public class MainApp extends Application {
         stage.setY((screenBounds.getHeight() - stage.getHeight()) / 2);
     }
 
+    
+    boolean is3D = false;
+
+    
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("PlantSketch");
@@ -52,8 +61,26 @@ public class MainApp extends Application {
         runButton.setPrefHeight(50);
         runButton.setStyle("-fx-font-size: 16px;");
         runButton.setOnAction(e -> showTestMode(stage, false));
+
+       Button threeDeeButton = new Button("3D Mode");
+        threeDeeButton.setPrefWidth(200);
+        threeDeeButton.setPrefHeight(50);
+        threeDeeButton.setStyle("-fx-font-size: 16px;");
+        threeDeeButton.setOnAction(e -> {
+        DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Select ecosystem folder for 3D mode");
+        File folder = chooser.showDialog(stage);
+        if (folder != null && folder.isDirectory()) {
+            ThreeDee.setDataFolder(folder.getAbsolutePath());
+            try {
+                new ThreeDee().start(stage);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    });
         
-        root.getChildren().addAll(title, subtitle, testButton, runButton);
+        root.getChildren().addAll(title, subtitle, testButton, runButton, threeDeeButton);
         
         Scene scene = new Scene(root, 400, 300);
         stage.setScene(scene);
@@ -183,6 +210,8 @@ public class MainApp extends Application {
 
     // this is the method to enter for the file choosing option
     private void showWizard(Stage stage, boolean isTestGrid, TextField sampleField) {
+        if(!is3D)
+        {
         StartupWizard wizard = new StartupWizard(stage, (dataRoot, envFolder, sampleCount) -> {
             // Create TestView with custom folder configuration
             Interface theInterface = new Interface(() -> showModeSelection(stage), "customFolder", isTestGrid, sampleCount);
@@ -193,13 +222,34 @@ public class MainApp extends Application {
 
             // Initialize with the custom folder data
             Platform.runLater(() -> theInterface.initializeWithCustomFolder(dataRoot, envFolder));
-        });
+
+        }
+        );
         
         // Display the wizard
         Scene wizardScene = new Scene(wizard, 600, 400);
         stage.setScene(wizardScene);
         stage.show();
         centerStage(stage);
+        }
+        else
+        {
+            DirectoryChooser chooser = new DirectoryChooser();
+        chooser.setTitle("Select ecosystem folder for 3D mode");
+        File selected = chooser.showDialog(stage);
+
+        if (selected != null && selected.isDirectory()) {
+            String chosenPath = selected.getAbsolutePath();
+
+            // Pass the chosen folder to ThreeDee
+            ThreeDee.setDataFolder(chosenPath); // static method to set folder path
+            try {
+                new ThreeDee().start(stage); // launch 3D scene
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        }
     }
 
     public static void main(String[] args) {

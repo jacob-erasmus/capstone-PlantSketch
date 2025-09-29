@@ -1384,7 +1384,7 @@ public class Interface extends BorderPane {
             String name = fileNameField.getText().trim();
             if (!name.isEmpty()) 
             {
-                new EcoVizOutput(currentResult).createFile( "src/outputPdbSaves/"+ name+".pdb");
+                new EcoVizOutput(currentResult).createFile( simulationEngine.getPwd()+ "/" + name +".pdb");
             }});
 
         saveButton.setPrefWidth(100);
