@@ -14,6 +14,7 @@ public class SimulationEngine
     private final Consumer<String> logger;
     private final Random r = new Random();
     private final float randomFloat = r.nextFloat();
+    private String pwd;
     // set values
     int sampleCount = 30;
     float gridSpacing = 25f; // in metres
@@ -477,6 +478,7 @@ public class SimulationEngine
     // run method only for the initial run
     public SimulationResult run(int choice, String fullPath)
     {
+        pwd = fullPath;
         PerformanceTimer.start("initial_run");
         if (isTestGrid)
         {
@@ -777,6 +779,11 @@ public class SimulationEngine
     public void setSpeciesList(List<Species> newSpeciesList)
     {
         this.speciesList = newSpeciesList;
+    }
+
+    public String getPwd()
+    {
+        return pwd;
     }
 
 }

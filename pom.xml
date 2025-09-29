@@ -19,7 +19,7 @@
 
     <!-- Your JavaFX entry point -->
     <main.class>plantsketch.ui.MainApp</main.class>
-<!-- ui.MainApp or opengl.Launcher -->
+<!-- ui.MainApp or threeDee.ThreeDee -->
 
     <!-- LWJGL for OpenGL for 3d rendering-->
     <lwjgl.version>3.3.3</lwjgl.version>
@@ -125,7 +125,7 @@
         <version>0.0.8</version>
         <configuration>
           <mainClass>plantsketch.ui.MainApp</mainClass>
-<!-- ui.MainApp or opengl.Launcher-->
+<!-- ui.MainApp or threeDee.ThreeDee-->
           <!-- list the modules you actually use -->
           <launcher>app</launcher>
           <jlinkZip>false</jlinkZip>
