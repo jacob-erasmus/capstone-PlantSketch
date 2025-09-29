@@ -318,31 +318,19 @@ public class SimulationEngine
             moist.setAdjustment(x, y, moistureFactor);
         }
     }
-    public void changePlantAge(int x, int y, float ageFactor, Plant p){
-        float oldAge = p.getAge(); // Get the plant's current stored age
-        
+    public void changePlantAge(int x, int y, float ageFactor, Plant p){ 
         // Calculate new values
         float cohortAge = age.getAge(x, y);
         float plantAge = randomFloat * cohortAge * p.getVigour();
     
-        // Debug shrinking
-        if (plantAge < oldAge) {
-            System.out.println("=== AGE DECREASED ===");
-            System.out.println("Plant stored age: " + oldAge + " -> calculated age: " + plantAge);
-            System.out.println("Current cohort age: " + cohortAge);
-            System.out.println("What cohort age would give old plant age " + oldAge + "? " + 
-                            (oldAge / (randomFloat * p.getVigour()))); //p.getSpecies().getViabilityAtPoint())));
-        }
-    
         if (plantAge > p.getLifeSpan()){
             plantAge = p.getLifeSpan();  
         }
-            float height = new GrowthFunction().calculateSize(p.getSpecies(), plantAge, p.isAllometryOpen());
-            float canopy = height * (p.isAllometryOpen() ? p.getSpecies().getRadiusMultiplierOpen() : p.getSpecies().getRadiusMultiplierClosed());
-            p.setAge(plantAge);
-            p.setHeight(height);
-            p.setCanopyRadius(canopy);
-
+        float height = new GrowthFunction().calculateSize(p.getSpecies(), plantAge, p.isAllometryOpen());
+        float canopy = height * (p.isAllometryOpen() ? p.getSpecies().getRadiusMultiplierOpen() : p.getSpecies().getRadiusMultiplierClosed());
+        p.setAge(plantAge);
+        p.setHeight(height);
+        p.setCanopyRadius(canopy);
     }
 
     public void replaceArea(int x, int y){
@@ -360,7 +348,6 @@ public class SimulationEngine
             for (Species species : speciesList) {
                 if (mapBySpecies.get(species) != null) mapBySpecies.get(species).removePlantAt(s.getX(), s.getY());
             }
-            System.out.println("match");
             int xCell = clamp((int) (s.getX() / gridSpacing), 0, dimX - 1);
             int yCell = clamp((int) (s.getY() / gridSpacing), 0, dimY - 1);
 
@@ -408,13 +395,11 @@ public class SimulationEngine
 
             if (!mapBySpecies.containsKey(chosen)){
                 mapBySpecies.put(chosen, new SpeciesMap(chosen));
-                System.out.println("map");
             } 
 
             SpeciesMap bucket = mapBySpecies.get(chosen);
             if (bucket != null) {
                 bucket.setPlantAt(p);
-                System.out.println("place");
             }
 // why if != null?
         
