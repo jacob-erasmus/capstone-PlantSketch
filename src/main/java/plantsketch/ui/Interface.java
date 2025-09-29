@@ -24,25 +24,27 @@ import java.util.stream.Collectors;
 
 public class Interface extends BorderPane {
     
-
-//*********** NOTES AND TO DO ****************\\
-
-// must be able to change plant variables (ie max sunlight etc)
-// must read in slider values and apply them to the maps
-// edit species variables.
-// i have added getters and setters so i simply need to just edit speciesList values in TestGrid (global species changes)
-// make checking/ unchecking species automatic on button click
-
-
-// species editing:
-    // pull down menu for each species
-    // be able to edit each value for the species
-    // when done, it'll run
-    // on button click (explain it is on button click because it is global)
-    // brush is still automatic though and on the brush stroke
-
-    // WHEN UNDO UPDATE SPECIES PARAMETERS TAB
-
+/**
+ * The main user interface controller for the PlantSketch ecological simulation application.
+ * This is the heart of the UI system - it manages everything the user sees and interacts with.
+ *
+ * Key responsibilities:
+ * - Creates and manages all visualization tabs (forest views, environmental maps, etc.)
+ * - Handles user interactions (brush tools, species selection, parameter editing)
+ * - Coordinates between the simulation engine and the visual components
+ * - Manages undo/redo functionality with save states
+ * - Supports both Test Mode (2x2 grid) and Run Mode (full datasets)
+ *
+ * Architecture:
+ * - Uses JavaFX BorderPane layout: toolbar at top, tabs in center, parameter panel on right
+ * - Maintains multiple view objects for different data visualizations
+ * - Implements a state management system for undo/redo operations
+ * - Provides interactive editing tools (brush removal, age modification, species filtering)
+ *
+ * The interface adapts based on the simulation mode:
+ * - Test Mode: Shows editable 2x2 parameter grids for experimentation
+ * - Run Mode: Shows real environmental data with brush tools and species management
+ */
 
     private ArrayList<SimulationResult> saveStatesArray = new ArrayList<>();
     private int saveState;
