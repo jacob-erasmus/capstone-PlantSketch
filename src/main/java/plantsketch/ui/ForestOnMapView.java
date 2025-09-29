@@ -177,16 +177,16 @@ public class ForestOnMapView extends Region {
         this.selectedSpeciesSupplier = supplier;
     }
     public void enableBrushRemovalMode(Supplier<Double> brushSizeSupplier){
-        forestCanvas.setOnMousePressed(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()/3));
-        forestCanvas.setOnMouseDragged(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()/3));
+        forestCanvas.setOnMousePressed(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()*4));
+        forestCanvas.setOnMouseDragged(e -> applyBrushRemoval(e.getX(), e.getY(), brushSizeSupplier.get()*4));
     }
     public void enableBrushAgeMode(Supplier<Double> brushSizeSupplier, Supplier<Double> ageSupplier, SimulationEngine simulationEngine){
-        forestCanvas.setOnMousePressed(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get()/3, ageSupplier.get(), simulationEngine));
-        forestCanvas.setOnMouseDragged(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get()/3, ageSupplier.get(), simulationEngine));
+        forestCanvas.setOnMousePressed(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get()*4, ageSupplier.get(), simulationEngine));
+        forestCanvas.setOnMouseDragged(e -> applyBrushAge(e.getX(), e.getY(), brushSizeSupplier.get()*4, ageSupplier.get(), simulationEngine));
     }
     public void enableBrushAbioticMode(Supplier<Double> brushSizeSupplier, Supplier<Double> temperatureSupplier, Supplier<Double> sunlightSupplier, Supplier<Double> moistureSupplier, SimulationEngine simulationEngine){
-        forestCanvas.setOnMousePressed(e -> applyBrushAbiotic(e.getX(), e.getY(), brushSizeSupplier.get()/3, temperatureSupplier.get(), sunlightSupplier.get(), moistureSupplier.get(), simulationEngine));
-        forestCanvas.setOnMouseDragged(e -> applyBrushAbiotic(e.getX(), e.getY(), brushSizeSupplier.get()/3, temperatureSupplier.get(), sunlightSupplier.get(), moistureSupplier.get(), simulationEngine));
+        forestCanvas.setOnMousePressed(e -> applyBrushAbiotic(e.getX(), e.getY(), brushSizeSupplier.get()*4, temperatureSupplier.get(), sunlightSupplier.get(), moistureSupplier.get(), simulationEngine));
+        forestCanvas.setOnMouseDragged(e -> applyBrushAbiotic(e.getX(), e.getY(), brushSizeSupplier.get()*4, temperatureSupplier.get(), sunlightSupplier.get(), moistureSupplier.get(), simulationEngine));
     }
 
     public void disableBrushMode(){

@@ -984,16 +984,16 @@ public class Interface extends BorderPane {
     {
          // abiotic stuff:
         Label temp = new Label("Temperature: Set Amount to Add or Subtract (Min = "+ simulationEngine.getMinTemp() +"  ; Max = "+ simulationEngine.getMaxTemp() +")");
-        Slider tempSlider = new Slider(-15, 15, 0);
+        Slider tempSlider = new Slider(-0.1, 0.1, 0);
         tempSlider.setShowTickLabels(true);
         tempSlider.setShowTickMarks(true);
-        tempSlider.setBlockIncrement(0.5);
-        tempSlider.setMajorTickUnit(0.5);
+        tempSlider.setBlockIncrement(0.01);
+        tempSlider.setMajorTickUnit(0.01);
         tempSlider.setSnapToTicks(true);
         tempSlider.setPrefWidth(400);
         
         Label age = new Label("Age: Set Amount to Add or Subtract (Min = "+ simulationEngine.getMinAge() +"  ; Max = "+ simulationEngine.getMaxAge() +")");
-        Slider ageSlider = new Slider(-650, 650, 0);
+        Slider ageSlider = new Slider(-100, 100, 0);
         ageSlider.setShowTickLabels(true);
         ageSlider.setShowTickMarks(true);
         ageSlider.setBlockIncrement(25);
@@ -1002,16 +1002,16 @@ public class Interface extends BorderPane {
         ageSlider.setPrefWidth(250);
 
         Label sun = new Label("Sunlight: Set Amount to Add or Subtract (Min = "+ simulationEngine.getMinSun() +"  ; Max = "+ simulationEngine.getMaxSun() +")");
-        Slider sunSlider = new Slider(-13, 13, 0);
+        Slider sunSlider = new Slider(-0.1, 0.1, 0);
         sunSlider.setShowTickLabels(true);
         sunSlider.setShowTickMarks(true);
         sunSlider.setBlockIncrement(1);
-        sunSlider.setMajorTickUnit(0.5);
+        sunSlider.setMajorTickUnit(0.01);
         sunSlider.setSnapToTicks(true);
         sunSlider.setPrefWidth(250);
 
         Label moist = new Label("Moisture: Set Amount to Add or Subtract (Min = "+ simulationEngine.getMinMoist() +"  ; Max = "+ simulationEngine.getMaxMoist() +")");
-        Slider moistSlider = new Slider(-54, 54, 0);
+        Slider moistSlider = new Slider(-6, 6, 0);
         moistSlider.setShowTickLabels(true);
         moistSlider.setShowTickMarks(true);
         moistSlider.setBlockIncrement(1);
@@ -1021,14 +1021,14 @@ public class Interface extends BorderPane {
 
         // brush stuff
         Label brushSize = new Label("Brush Size");
-        Slider brushSizeSlider = new Slider(10, 90, 50);
+        Slider brushSizeSlider = new Slider(1, 9, 5);
         brushSizeSlider.setShowTickLabels(true);
         brushSizeSlider.setShowTickMarks(true);
-        brushSizeSlider.setMajorTickUnit(20);
-        brushSizeSlider.setBlockIncrement(20);
+        brushSizeSlider.setMajorTickUnit(2);
+        brushSizeSlider.setBlockIncrement(2);
         brushSizeSlider.setPrefWidth(250);
         brushSizeSlider.setSnapToTicks(true);
-        brushSizeSlider.setMinorTickCount(0);
+        brushSizeSlider.setMinorTickCount(1);
         brushSizeSlider.showTickLabelsProperty();
         
         //listen for changes
