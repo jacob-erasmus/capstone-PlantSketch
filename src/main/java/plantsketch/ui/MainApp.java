@@ -105,7 +105,7 @@ public class MainApp extends Application {
         title.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
         subtitle.setStyle("-fx-font-size: 16px;");
 
-        sampleLabel = new Label("Sample Count (1-10000):");
+        sampleLabel = new Label("Sample Count (1-20000):");
         sampleField.setPrefWidth(150);
         sampleField.setPrefHeight(40);
         
@@ -166,9 +166,9 @@ public class MainApp extends Application {
         if (sampleCount <= 0) {
             sampleCount = 1;
         }
-        if (sampleCount >= 10000)
+        if (sampleCount >= 20000)
         {
-            sampleCount = 10000;
+            sampleCount = 20000;
         }
 
         Interface theInterface = new Interface(() -> showModeSelection(stage), mode, isTestGrid, sampleCount);

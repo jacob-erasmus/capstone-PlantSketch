@@ -291,31 +291,119 @@ public class SimulationEngine
             age.setAdjustment(x, y, ageFactor);
         }
     }
-    public void changePlantAge(int x, int y, float ageFactor, Plant p){
-        float oldAge = p.getAge(); // Get the plant's current stored age
-        
+    public void adjustTemperature(int x, int y, float temperatureFactor){
+        if (temp.getValue(x, y) + temperatureFactor > maxTemp){
+            temp.setBase(x, y, maxTemp);
+        }else if (temp.getValue(x, y) + temperatureFactor < minTemp){
+            temp.setBase(x, y, minTemp);
+        }else{
+            temp.setAdjustment(x, y, temperatureFactor);
+        }
+    }
+    public void adjustSunlight(int x, int y, float sunlightFactor){
+        if (sun.getValue(x, y) + sunlightFactor > maxSun){
+            sun.setBase(x, y, maxSun);
+        }else if (sun.getValue(x, y) + sunlightFactor < minSun){
+            sun.setBase(x, y, minSun);
+        }else{
+            sun.setAdjustment(x, y, sunlightFactor);
+        }
+    }
+    public void adjustMoisture(int x, int y, float moistureFactor){
+        if (moist.getValue(x, y) + moistureFactor > maxMoist){
+            moist.setBase(x, y, maxMoist);
+        }else if (moist.getValue(x, y) + moistureFactor < minMoist){
+            moist.setBase(x, y, minMoist);
+        }else{
+            moist.setAdjustment(x, y, moistureFactor);
+        }
+    }
+    public void changePlantAge(int x, int y, float ageFactor, Plant p){ 
         // Calculate new values
         float cohortAge = age.getAge(x, y);
         float plantAge = randomFloat * cohortAge * p.getVigour();
     
-        // Debug shrinking
-        if (plantAge < oldAge) {
-            System.out.println("=== AGE DECREASED ===");
-            System.out.println("Plant stored age: " + oldAge + " -> calculated age: " + plantAge);
-            System.out.println("Current cohort age: " + cohortAge);
-            System.out.println("What cohort age would give old plant age " + oldAge + "? " + 
-                            (oldAge / (randomFloat * p.getVigour()))); //p.getSpecies().getViabilityAtPoint())));
-        }
-    
         if (plantAge > p.getLifeSpan()){
             plantAge = p.getLifeSpan();  
         }
-            float height = new GrowthFunction().calculateSize(p.getSpecies(), plantAge, p.isAllometryOpen());
-            float canopy = height * (p.isAllometryOpen() ? p.getSpecies().getRadiusMultiplierOpen() : p.getSpecies().getRadiusMultiplierClosed());
-            p.setAge(plantAge);
-            p.setHeight(height);
-            p.setCanopyRadius(canopy);
+        float height = new GrowthFunction().calculateSize(p.getSpecies(), plantAge, p.isAllometryOpen());
+        float canopy = height * (p.isAllometryOpen() ? p.getSpecies().getRadiusMultiplierOpen() : p.getSpecies().getRadiusMultiplierClosed());
+        p.setAge(plantAge);
+        p.setHeight(height);
+        p.setCanopyRadius(canopy);
+    }
 
+    public void replaceArea(int x, int y){
+        abiotics = new AbioticFactors(moist, temp, sun);
+        ViabilityCalculator calc = new ViabilityCalculator(terrain, abiotics);
+        int placed = 0;
+        ArrayList<Species> candidates = new ArrayList<>();
+        ArrayList<Table> wheel = new ArrayList<>();
+// logic here potentially wrong
+        currentPlants.clear();
+// changed the wheel to an arraylist so that it is easier to size and also sumv was not being used
+
+        for (PointSample s : pinkNoise) {
+            if (x != (int) (s.getX() / gridSpacing) || y != (int) (s.getY() / gridSpacing)) continue;
+            for (Species species : speciesList) {
+                if (mapBySpecies.get(species) != null) mapBySpecies.get(species).removePlantAt(s.getX(), s.getY());
+            }
+            int xCell = clamp((int) (s.getX() / gridSpacing), 0, dimX - 1);
+            int yCell = clamp((int) (s.getY() / gridSpacing), 0, dimY - 1);
+
+            float density = 0f;
+            float sumV = 0f;
+            candidates.clear();
+            wheel.clear();
+
+            for (Species sp : speciesList) {
+                float v = calc.viabililty(sp, xCell, yCell);
+                sp.setViabilityAtPoint(v);
+                if (v > 0f) {
+                    candidates.add(sp);
+                    density = Math.max(density, v);
+                    sumV += v;
+                    wheel.add(new Table(sp, sumV));
+                }
+            }
+            if (candidates.isEmpty()) continue;
+
+            // thinning by density
+            if (density < r.nextFloat()) continue;
+// changed > to < because if the float is greater than the density the plant can't exist
+
+            // roulette wheel on cumulative viability
+            
+            Species chosen = new RouletteWheelSelector(sumV).selectSpecies(wheel, wheel.size());
+            if (chosen == null) continue;
+
+            float cohortAge = age.getAge(xCell, yCell);
+            //float cap = Math.min(cohortAge, chosen.getLifeSpan());
+            cohortAge = Math.min(cohortAge, 650);
+            float plantAge = randomFloat * cohortAge * chosen.getViabilityAtPoint();
+            if(plantAge > chosen.getLifeSpan()){
+                plantAge = chosen.getLifeSpan();
+            }
+            boolean isOpen = density > openOrClosedDensity;
+            float height = new GrowthFunction().calculateSize(chosen, plantAge, isOpen);
+            float canopy = height * (isOpen ? chosen.getRadiusMultiplierOpen() : chosen.getRadiusMultiplierClosed());
+// trusting the above equations
+
+            Plant p = new Plant(++placed, chosen.getMnemonic(), s.getX(), s.getY(), plantAge, chosen, canopy, height, true,
+                    chosen.getViabilityAtPoint(), isOpen);
+            currentPlants.add(p);
+
+            if (!mapBySpecies.containsKey(chosen)){
+                mapBySpecies.put(chosen, new SpeciesMap(chosen));
+            } 
+
+            SpeciesMap bucket = mapBySpecies.get(chosen);
+            if (bucket != null) {
+                bucket.setPlantAt(p);
+            }
+// why if != null?
+        
+        }
     }
     // assemble forest
     public Forest assembleForest()
@@ -325,7 +413,6 @@ public class SimulationEngine
         numPlants = forest.getAllPlants().size();
         return forest;
     }
-
     // make simulation result object
     public SimulationResult makeSimResult()
     {
@@ -345,57 +432,6 @@ public class SimulationEngine
 //        new EcoVizOutput(simResult).createFile("testingGrid.pdb"); // and then make the file
         return simResult;
 // could potentially use my list of plants for this instead of the species maps
-    }
-
-// TO DO: FINISH THIS METHOD
-// this method is for when the values are changed for the grid!!
-    // Recalculate with same species positions
-    // ignoring all of this hard work i reckon
-    public void recalculateWithSameSpecies() {
-        
-        ViabilityCalculator calc = new ViabilityCalculator(terrain, abiotics);
-        Random r = new Random();
-        int placed = 0;
-        
-        // Store the old plants temporarily
-        List<Plant> oldPlants = new ArrayList<>();
-        if (forest != null) {
-            oldPlants.addAll(currentPlants);
-        }
-        currentPlants.clear();
-                // logic here potentially wrong
-        mapBySpecies.values().forEach(SpeciesMap::clearMap);
-        
-        // Re-process each pink noise point with same species
-        for (Plant s : oldPlants) {
-            int xCell = clamp((int) (s.getX() / gridSpacing), 0, dimX - 1);
-            int yCell = clamp((int) (s.getY() / gridSpacing), 0, dimY - 1);  
-
-            Species species = s.getSpecies();
-            // Recalculate viability with new conditions
-            float v = calc.viabililty(species, xCell, yCell);
-            //if (v < r.nextFloat()) continue;
-
-            // Recalculate age and growth parameters
-            float cohortAge = age.getAge(xCell, yCell);
-            float cap = Math.min(cohortAge, species.getLifeSpan());
-            float plantAge = Math.min(s.getAge(), cap * v); // Adjust age based on new viability
-            
-            boolean isOpen = v > openOrClosedDensity;
-            float height = new GrowthFunction().calculateSize(species, plantAge, isOpen);
-            float canopy = height * (isOpen ? species.getRadiusMultiplierOpen() : species.getRadiusMultiplierClosed());
-            
-            // Create updated plant
-            Plant p = new Plant(++placed, species.getMnemonic(), s.getX(), s.getY(), 
-                    plantAge, species, canopy, height, true, v, isOpen);
-            
-            SpeciesMap bucket = mapBySpecies.get(species);
-            if (bucket != null) bucket.setPlantAt(p);
-        }
-        
-        // Rebuild forest
-        assembleForest();
-        logger.accept("Recalculated " + placed + " plants with same species positions");
     }
 
 
