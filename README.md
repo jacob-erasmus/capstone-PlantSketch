@@ -9,6 +9,8 @@ To run the application:
 ```bash
 mvn clean compile javafx:run
 ```
+## Repository
+https://gitlab.cs.uct.ac.za/capstone-project-PlantSketch/plantsketch/-/tree/main
 
 ## Table of Contents
 
