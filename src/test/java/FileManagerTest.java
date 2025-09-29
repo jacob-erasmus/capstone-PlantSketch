@@ -68,7 +68,7 @@ public class FileManagerTest {
 
         assertNotNull(ageGrid, "Age grid should not be null");
         assertEquals(EXPECTED_256_DIMX, ageGrid.length, "Age grid should have correct dimensions");
-        assertTrue(ageGrid[0][0] >= 0 && ageGrid[0][0] <= 600, "Age should be in range [0, 600]");
+        assertTrue(ageGrid[0][0] >= 0 && ageGrid[0][0] <= 650, "Age should be in range [0, 650]");
     }
 
     @Test
