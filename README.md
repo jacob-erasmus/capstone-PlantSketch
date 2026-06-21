@@ -2,6 +2,8 @@
 
 An ecological simulation application that models plant species growth and viability under various environmental conditions. PlantSketch provides comprehensive tools for setting up, running, and analyzing ecological simulations with an intuitive JavaFX GUI.
 
+> **📄 Capstone Documentation:** [Read the full ecological simulation and architecture report here](./formalReport/PlantSketch-Report.pdf)
+
 ## Quick Start
 
 To run the application:
